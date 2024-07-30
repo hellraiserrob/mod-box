@@ -37,9 +37,13 @@ h1 {
 }
 
 h2 {
-  font-size: 20px;
-  font-weight: 500;
+  font-size: 12px;
+  font-weight: 400;
   margin-bottom: 10px;
+  // padding-bottom: 10px;
+  text-transform: uppercase;
+  color: #999;
+  // border-bottom: 1px solid #ddd;
 }
 
 h3 {
@@ -111,7 +115,7 @@ a {
     &__item {
       position: relative;
       display: flex;
-      padding: 8px 12px;
+      padding: 6px 8px;
       border-radius: 4px;
       cursor: pointer;
 
@@ -123,13 +127,12 @@ a {
         background-color: #efefef;
       }
 
-      &__active {
-        display: inline-block;
-        width: 10px;
-        height: 10px;
-        background: green;
-        margin: 5px 0 0 auto;
-        border-radius: 10px;
+      &__label {
+        font-size: 14px;
+      }
+
+      .toggle {
+        margin-left: auto;
       }
     }
   }
@@ -176,8 +179,8 @@ a {
 }
 
 .panel {
-  padding: 20px;
-  background: #efefef;
+  // padding: 20px;
+  // background: #efefef;
 }
 
 .panel + .panel {
@@ -186,7 +189,6 @@ a {
 
 .row {
   display: flex;
-  background: #efefef;
   gap: 20px;
   border-radius: 5px;
   align-items: center;
@@ -209,15 +211,47 @@ a {
 .field {
   &__input {
     background-color: transparent;
-    border: 0;
-    border-bottom: 1px solid #ccc;
-    // border-radius: 5px;
-    padding: 5px 5px;
+    border: 1px solid #ddd;
+    // border-bottom: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 8px 10px;
     width: 100%;
 
     &:focus {
       border-color: #333;
       outline: none;
     }
+  }
+}
+
+.toggle {
+  border: 1px solid #ddd;
+  width: 30px;
+  height: 15px;
+  border-radius: 15px;
+  background-color: #fff;
+  position: relative;
+  cursor: pointer;
+
+  &:hover {
+    border-color: #ccc;
+  }
+
+  &__text {
+    width: 10px;
+    height: 10px;
+    background-color: #999;
+    text-indent: -6000px;
+    border-radius: 10px;
+    position: absolute;
+    top: 50%;
+    left: 3px;
+    transform: translateY(-50%);
+    transition: all ease 0.2s;
+  }
+
+  &--active &__text {
+    background-color: blue;
+    left: 15px;
   }
 }

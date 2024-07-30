@@ -3,19 +3,27 @@
     <h1>ModBox</h1>
     <div v-if="data.folders" class="folders">
       <div class="folders__list">
-        <!-- <h2>Folders</h2> -->
+        <h2>Folders</h2>
         <div v-if="!data.folders.length">No folders</div>
         <div
           v-for="(folder, index) in data.folders"
           class="folders__list__item"
-          @click="activeFolder = index"
           :class="{ 'folders__list__item--active': index === activeFolder }"
         >
-          {{ folder.name }}
-          <span v-if="folder.active" class="folders__list__item__active"></span>
+          <div @click="activeFolder = index" class="folders__list__item__label">{{ folder.name }}</div>
+          <!-- <span v-if="folder.active" class="folders__list__item__active"></span> -->
+
+          <div class="toggle" @click="folder.active = !folder.active" :class="{'toggle--active' : folder.active }">
+            <div class="toggle__text">
+              {{ folder.active ? "On" : "Off" }}
+            </div>
+          </div>
         </div>
-        <button class="mt20" @click="addFolder">Add folder</button>
-        <button class="mt20" @click="data.active = !data.active">{{ data.active ? "Disable all": "Enable all"}}</button>
+        <button class="mt20 mb20" @click="addFolder">Add folder</button>
+        
+        <h2>Global setting</h2>
+        
+        <button class="" @click="data.active = !data.active">{{ data.active ? "Disable all": "Enable all"}}</button>
       </div>
       <div class="folders__detail">
         <div v-for="(folder, index) in data.folders">
@@ -113,6 +121,8 @@ function addFolder() {
       },
     ],
   });
+
+  activeFolder.value = data.value.folders.length - 1;
 }
 
 function deleteFolder(targetFolder: Folder) {

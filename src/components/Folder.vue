@@ -45,9 +45,14 @@
           <div>
             <div class="row" v-for="(request) in tab.blockedRequests">
               <div class="row__col row__col--checkbox">
-                <div class="field">
-                  <input class="" type="checkbox" v-model="request.active"  />
+                <div class="toggle" @click="request.active = !request.active" :class="{'toggle--active' : request.active }">
+                  <div class="toggle__text">
+                    {{ request.active ? "On" : "Off" }}
+                  </div>
                 </div>
+                <!-- <div class="field">
+                  <input class="" type="checkbox" v-model="request.active"  />
+                </div> -->
               </div>
               <div class="row__col">
                 <div class="field">
