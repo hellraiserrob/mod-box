@@ -1,9 +1,13 @@
 
 <template>
   <div class="folder">
-    <h2>{{ folder.name }}</h2>
+    <!-- <h2>{{ folder.name }}</h2> -->
     <div class="mb20">
-      isActive: {{ folder.active}} <button @click="folder.active = !folder.active">toggle</button>
+      <input type="text" v-model="folder.name" placeholder="Folder name">
+    </div>
+    <div class="mb20">
+      <button @click="folder.active = !folder.active">{{ folder.active ? "Disable" : "Activate"}}</button>
+      <button @click="deleteFolder()">Delete</button>
     </div>
     <div class="tabs mb20">
       <button class="tabs__tab" v-for="(tab, index) in folder.tabs"
@@ -47,15 +51,21 @@
 <script setup lang="ts">
 import { ref } from "vue"
 const props = defineProps(['folder'])
+const emit = defineEmits(["deleteFolder"])
+
 
 const folder = props.folder;
 const activeTab = ref(0);
 
-function addRequestHeader(tab) {
+function addRequestHeader(tab:any) {
   tab.requestHeaders.push({
     name: "",
     value: ""
   })
+} 
+
+function deleteFolder() {
+  emit("deleteFolder", props.folder)
 } 
 
 </script>

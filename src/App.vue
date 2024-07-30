@@ -12,11 +12,11 @@
         >
           {{ folder.name }} <span v-if="folder.active" class="folders__list__item__active"></span>
         </div>
-        <button class="mt20">Add folder</button>
+        <button class="mt20" @click="addFolder">Add folder</button>
       </div>
       <div class="folders__detail">
         <div v-for="(folder, index) in data.folders">
-          <Folder v-if="index === activeFolder" :folder="folder" />
+          <Folder v-if="index === activeFolder" :folder="folder" @deleteFolder="deleteFolder" />
         </div>
       </div>
     </div>
@@ -60,6 +60,22 @@
   })
 
   const activeFolder = ref(0);
+
+  function addFolder() {
+    data.value.folders.push({
+      name: "New folder",
+      active: true,
+      tabs: [{
+        name: "default tab",
+        active: true,
+        requestHeaders: []
+      }]
+    })
+  }
+
+  function deleteFolder(targetFolder:any) {
+    data.value.folders = data.value.folders.filter(folder => folder !== targetFolder);
+  }
 
 </script>
 
