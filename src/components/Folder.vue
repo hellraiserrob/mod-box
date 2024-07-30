@@ -19,13 +19,23 @@
     </div>
 
     <div class="tabs mb20">
-      <button class="tabs__tab" v-for="(tab, index) in folder.tabs"
-        :class="{'tabs__tab--active': index === activeTab}"
-        @click="activeTab = index"
-      >
-        {{ tab.name }} <span v-if="tab.active" class="tabs__tab__active"></span>
-      </button>
-      <button>Add tab</button>
+      <div 
+        class="tabs__tab" 
+        v-for="(tab, index) in folder.tabs"
+        :class="{'tabs__tab--active': index === activeTab}">
+        <button class="" 
+          @click="activeTab = index"
+        >
+          {{ tab.name }} 
+        </button>
+          
+        <div class="toggle" @click="tab.active = !tab.active" :class="{'toggle--active' : tab.active }">
+          <div class="toggle__text">
+            {{ tab.active ? "On" : "Off" }}
+          </div>
+        </div>
+      </div>
+      <!-- <button>Add tab</button> -->
     </div>
     
     <div class="tab" v-for="(tab, index) in folder.tabs">

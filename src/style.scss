@@ -149,11 +149,12 @@ a {
     border: 0;
     // border-bottom: 1px solid #ddd;
     // margin-bottom: -1px;
-    padding: 5px 10px;
+    padding: 0 10px 0 0;
     cursor: pointer;
     border-radius: 4px;
     background-color: transparent;
     display: flex;
+    align-items: center;
     // & + & {
       //   margin-left: 10px;
       // }
@@ -163,13 +164,10 @@ a {
       background-color: #efefef;
     }
 
-    &__active {
-      display: inline-block;
-      width: 10px;
-      height: 10px;
-      background: green;
-      margin: 5px 0 0 8px;
-      border-radius: 10px;
+    button {
+      border: 0;
+      padding: 5px 10px;
+      background-color: transparent;
     }
   }
 }
