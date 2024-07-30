@@ -8,7 +8,9 @@
     
     <div v-if="showSettings" class="panel mb20">
       <div class="mb20">
-        <input type="text" v-model="folder.name" placeholder="Folder name">
+        <div class="field">
+          <input class="field__input" type="text" v-model="folder.name" placeholder="Folder name">
+        </div>
       </div>
       <div>
         <button @click="folder.active = !folder.active">{{ folder.active ? "Disable" : "Activate"}}</button>
@@ -23,17 +25,16 @@
       >
         {{ tab.name }} <span v-if="tab.active" class="tabs__tab__active"></span>
       </button>
-      <button>Add</button>
+      <button>Add tab</button>
     </div>
     
     <div class="tab" v-for="(tab, index) in folder.tabs">
       <div v-if="index === activeTab">
-        <h3>{{tab.name}}</h3>
-        <div class="mb20">
-          <input type="text" v-model="tab.name" placeholder="Tab name">
+        <div class="field mb20">
+          <input class="field__input" type="text" v-model="tab.name" placeholder="Tab name">
         </div>
         <div class="mb20">
-          isActive: {{ tab.active}} <button @click="tab.active = !tab.active">toggle</button>
+          <button @click="tab.active = !tab.active">{{ !tab.active ? "Activate tab" : "Disable tab"}}</button>
         </div>
 
         <div class="panel">
@@ -95,6 +96,11 @@
                   <input class="field__input" type="text" v-model="header.value"  placeholder="Header value" />
                 </div>
               </div>
+              <div class="row__col">
+                <div class="field">
+                  <input class="field__input" type="text" v-model="header.condition.urlFilter"  placeholder="urlFilter" />
+                </div>
+              </div>
               <div class="row__col row__col--checkbox">
                 <button @click="deleteRequestHeader(header)">Delete</button>
               </div>
@@ -124,15 +130,18 @@ const showSettings = ref(false);
 
 function addRequestHeader(tab:any) {
   tab.requestHeaders.push({
-    active: false,
+    active: true,
     name: "",
     value: "",
+    condition: {
+      urlFilter: ""
+    }
   })
 } 
 
 function addBlockedRequest(tab:any) {
   tab.blockedRequests.push({
-    active: false,
+    active: true,
     condition: {
       urlFilter: ""
     }

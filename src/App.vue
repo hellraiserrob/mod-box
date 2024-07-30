@@ -146,6 +146,24 @@ function generateRules() {
               id += 1;
             }
           });
+
+          tab.requestHeaders?.forEach((request) => {
+            if (request.active) {
+              rules.push({
+                id,
+                priority: 1,
+                action: { 
+                  type: "modifyHeaders",
+                  requestHeaders: [{ header: request.name, operation: "set", value: request.value }]
+                },
+                condition: {
+                  ...(request.condition.urlFilter !== "" && { urlFilter : request.condition.urlFilter }),
+                }
+              });
+
+              id += 1;
+            }
+          });
         }
       });
     }
@@ -157,8 +175,8 @@ function generateRules() {
 async function save() {
   const newRules = generateRules();
 
-  // console.log(newRules);
-  console.log(data.value);
+  console.log(newRules);
+  // console.log(data.value);
 
   if (isChrome) {
     const oldRules = await chrome.declarativeNetRequest.getDynamicRules();
