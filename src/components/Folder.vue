@@ -2,7 +2,7 @@
 <template>
   <div class="folder">
     <div class="folder__header mb20">
-      <h2>{{ folder.name }}</h2>
+      <!-- <h2>{{ folder.name }}</h2> -->
       <button @click="showSettings = !showSettings">Settings</button>
     </div>
     

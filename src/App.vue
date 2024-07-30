@@ -3,7 +3,7 @@
     <h1>ModBox</h1>
     <div v-if="data.folders" class="folders">
       <div class="folders__list">
-        <h2>Folders</h2>
+        <!-- <h2>Folders</h2> -->
         <div v-if="!data.folders.length">No folders</div>
         <div
           v-for="(folder, index) in data.folders"
@@ -15,6 +15,7 @@
           <span v-if="folder.active" class="folders__list__item__active"></span>
         </div>
         <button class="mt20" @click="addFolder">Add folder</button>
+        <button class="mt20" @click="data.active = !data.active">{{ data.active ? "Disable all": "Enable all"}}</button>
       </div>
       <div class="folders__detail">
         <div v-for="(folder, index) in data.folders">
