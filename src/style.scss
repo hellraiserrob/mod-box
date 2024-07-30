@@ -5,6 +5,7 @@
 body {
   color: #333;
   background: #fff;
+  min-width: 700px;
 }
 
 html, body {
@@ -96,7 +97,7 @@ a {
 
 #app {
   max-width: 1200px;
-  margin: 50px auto;
+  margin: 20px auto;
   padding: 0 20px;
 }
 
@@ -105,13 +106,14 @@ a {
   gap: 32px;
 
   &__list {
-    flex-basis: 250px;
+    flex-basis: 150px;
 
     &__item {
       position: relative;
       display: flex;
       padding: 8px 12px;
       border-radius: 4px;
+      cursor: pointer;
 
       &:last-child {
         margin-bottom: 20px;
@@ -170,17 +172,46 @@ a {
 }
 
 .request-header {
-  display: flex;
-  padding: 10px;
-  background: #efefef;
-  gap: 10px;
-  // border-radius: 5px;
-  // margin-bottom: 10px;
+  
+}
 
-  &__input {
+.panel {
+  padding: 20px;
+  background: #efefef;
+}
+
+.panel + .panel {
+  margin-top: 20px;
+}
+
+.row {
+  display: flex;
+  background: #efefef;
+  gap: 20px;
+  border-radius: 5px;
+  align-items: center;
+  align-content: center;
+
+  &__col {
     flex: 1;
+
+    &--checkbox {
+      flex-basis: 50px;
+      flex-grow: 0;
+    }
+  } 
+}
+
+.row + .row {
+  margin-top: 20px;
+}
+
+.field {
+  &__input {
+    background-color: #fff;
     border: 0;
     border-radius: 5px;
     padding: 5px 10px;
-  } 
+    width: 100%;
+  }
 }

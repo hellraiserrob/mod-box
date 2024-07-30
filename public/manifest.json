@@ -5,5 +5,16 @@
   "version": "1.0",
   "action": {
     "default_popup": "index.html"
-  }
+  },
+  "permissions": [
+    "activeTab",
+    "tabs",
+    "storage",
+    "declarativeNetRequest",
+    "declarativeNetRequestWithHostAccess",
+    "declarativeNetRequestFeedback"
+  ],
+  "host_permissions": [
+    "*://*/*"
+  ]
 }
