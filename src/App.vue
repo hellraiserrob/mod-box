@@ -1,40 +1,52 @@
 <template>
   <div>
-    <h1>ModBox</h1>
     <div v-if="data.folders" class="folders">
       <div class="folders__list">
-        <h2>Folders</h2>
+        <h1 class="mb10">ModBox</h1>
+        <h2 class="mb10">Folders</h2>
         <div v-if="!data.folders.length">No folders</div>
-        <div
-          v-for="(folder, index) in data.folders"
-          class="folders__list__item"
-          :class="{ 'folders__list__item--active': index === activeFolder }"
-        >
-          <div @click="activeFolder = index" class="folders__list__item__label">{{ folder.name }}</div>
+        <div v-for="(folder, index) in data.folders" class="folders__list__item"
+          :class="{ 'folders__list__item--active': index === activeFolder }">
+          <button :title="'selectet ' + folder.name" @click="activeFolder = index" class="folders__list__item__label">{{ folder.name }}</button>
           <!-- <span v-if="folder.active" class="folders__list__item__active"></span> -->
 
-          <div class="toggle" @click="folder.active = !folder.active" :class="{'toggle--active' : folder.active }">
+          <button class="toggle" @click="folder.active = !folder.active" :class="{ 'toggle--active': folder.active }" :title="folder.active ? 'Disable folder rules' : 'Enable folder rules'">
             <div class="toggle__text">
               {{ folder.active ? "On" : "Off" }}
             </div>
+          </button>
+        </div>
+        <button class="mt20 mb20 btn" @click="addFolder">
+          <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd">
+            <path d="M11 11v-11h1v11h11v1h-11v11h-1v-11h-11v-1h11z" />
+          </svg>
+          Add folder
+        </button>
+
+        <h2 class="mb10">Global setting</h2>
+        <div class="folders__list__item">
+          <button class="folders__list__item__label" @click="data.active = !data.active">{{ data.active ? "Disable all" :
+            "Enable all"}}</button>
+          <div class="toggle toggle--warning" @click="data.active = !data.active" :class="{ 'toggle--active': data.active }">
+            <div class="toggle__text">
+              {{ data.active ? "On" : "Off" }}
+            </div>
           </div>
         </div>
-        <button class="mt20 mb20" @click="addFolder">Add folder</button>
-        
-        <h2>Global setting</h2>
-        
-        <button class="" @click="data.active = !data.active">{{ data.active ? "Disable all": "Enable all"}}</button>
+        <div class="folders__list__item">
+          <button class="folders__list__item__label" @click="reset">Reset all</button>
+        </div>
+
+
+        <button class="mt20 btn" @click="save">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 1c6.065 0 11 4.935 11 11s-4.935 11-11 11-11-4.935-11-11 4.935-11 11-11zm0-1c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12z"/></svg>
+          Save all
+        </button>
       </div>
       <div class="folders__detail">
         <div v-for="(folder, index) in data.folders">
-          <Folder
-            v-if="index === activeFolder"
-            :folder="folder"
-            @deleteFolder="deleteFolder"
-          />
+          <Folder v-if="index === activeFolder" :folder="folder" @deleteFolder="deleteFolder" />
         </div>
-
-        <button class="mt20" @click="save">Save</button>
 
         <!-- <textarea name="" id="" cols="30" rows="10" :value="JSON.stringify(data)"></textarea> -->
       </div>
@@ -46,26 +58,8 @@
 import { ref, onMounted } from "vue";
 import type { Ref } from "vue";
 
+import { DataType, FolderType } from "./interaces"
 import Folder from "./components/Folder.vue";
-
-interface Tab {
-  name: string;
-  active: boolean;
-  requestHeaders?: any[];
-  responseHeaders?: any[];
-  blockedRequests?: any[];
-}
-
-interface Folder {
-  name: string;
-  active: boolean;
-  tabs: Tab[];
-}
-
-interface Data {
-  active: boolean;
-  folders: Folder[];
-}
 
 /**
  * static variables
@@ -96,7 +90,7 @@ const fallbackData = {
  * reactive variables
  */
 
-const data: Ref<Data> = ref({
+const data: Ref<DataType> = ref({
   active: true,
   folders: [],
 });
@@ -106,6 +100,12 @@ const activeFolder: Ref<number> = ref(0);
 /**
  * methods
  */
+
+function reset() {
+  data.value = fallbackData;
+  activeFolder.value = 0;
+  save();
+}
 
 function addFolder() {
   data.value.folders?.push({
@@ -125,7 +125,7 @@ function addFolder() {
   activeFolder.value = data.value.folders.length - 1;
 }
 
-function deleteFolder(targetFolder: Folder) {
+function deleteFolder(targetFolder: FolderType) {
   data.value.folders = data.value.folders.filter(
     (folder) => folder !== targetFolder
   );
@@ -151,7 +151,10 @@ function generateRules() {
                 id,
                 priority: 1,
                 action: { type: "block" },
-                condition: request.condition,
+                condition: {
+                  ...(request.condition.urlFilter !== "" && { urlFilter: request.condition.urlFilter }),
+                  ...(request.condition.requestDomains && { requestDomains: request.condition.requestDomains.split(",") }),
+                },
               });
 
               id += 1;
@@ -163,12 +166,12 @@ function generateRules() {
               rules.push({
                 id,
                 priority: 1,
-                action: { 
+                action: {
                   type: "modifyHeaders",
                   requestHeaders: [{ header: request.name, operation: "set", value: request.value }]
                 },
                 condition: {
-                  ...(request.condition.urlFilter !== "" && { urlFilter : request.condition.urlFilter }),
+                  ...(request.condition.urlFilter !== "" && { urlFilter: request.condition.urlFilter }),
                 }
               });
 
@@ -209,7 +212,7 @@ async function save() {
 async function getData() {
   const chromeData = await chrome.storage.local.get(["data"]);
 
-  //   chrome.storage.local.get(["key"]).then((result) => {
+  // chrome.storage.local.get(["key"]).then((result) => {
   //   console.log("Value is " + result.key);
   // });
 
