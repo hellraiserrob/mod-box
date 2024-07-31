@@ -7,10 +7,12 @@
         <div v-if="!data.folders.length">No folders</div>
         <div v-for="(folder, index) in data.folders" class="folders__list__item"
           :class="{ 'folders__list__item--active': index === activeFolder }">
-          <button :title="'selectet ' + folder.name" @click="activeFolder = index" class="folders__list__item__label">{{ folder.name }}</button>
+          <button :title="'selectet ' + folder.name" @click="activeFolder = index" class="folders__list__item__label">{{
+            folder.name }}</button>
           <!-- <span v-if="folder.active" class="folders__list__item__active"></span> -->
 
-          <button class="toggle" @click="folder.active = !folder.active" :class="{ 'toggle--active': folder.active }" :title="folder.active ? 'Disable folder rules' : 'Enable folder rules'">
+          <button class="toggle" @click="folder.active = !folder.active" :class="{ 'toggle--active': folder.active }"
+            :title="folder.active ? 'Disable folder rules' : 'Enable folder rules'">
             <div class="toggle__text">
               {{ folder.active ? "On" : "Off" }}
             </div>
@@ -25,9 +27,11 @@
 
         <h2 class="mb10">Global setting</h2>
         <div class="folders__list__item">
-          <button class="folders__list__item__label" @click="data.active = !data.active">{{ data.active ? "Disable all" :
-            "Enable all"}}</button>
-          <div class="toggle toggle--warning" @click="data.active = !data.active" :class="{ 'toggle--active': data.active }">
+          <button class="folders__list__item__label" @click="data.active = !data.active">{{ data.active ? "Disable all"
+            :
+            "Enable all"}} <div class="badge">0</div></button>
+          <div class="toggle toggle--warning" @click="data.active = !data.active"
+            :class="{ 'toggle--active': data.active }">
             <div class="toggle__text">
               {{ data.active ? "On" : "Off" }}
             </div>
@@ -39,7 +43,10 @@
 
 
         <button class="mt20 btn" @click="save">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 1c6.065 0 11 4.935 11 11s-4.935 11-11 11-11-4.935-11-11 4.935-11 11-11zm0-1c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12z"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+            <path
+              d="M12 1c6.065 0 11 4.935 11 11s-4.935 11-11 11-11-4.935-11-11 4.935-11 11-11zm0-1c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12z" />
+          </svg>
           Save all
         </button>
       </div>
@@ -235,6 +242,9 @@ async function getData() {
 onMounted(() => {
   if (isChrome) {
     getData();
+
+    chrome.action.setBadgeText({ text: "0" });
+    chrome.action.setBadgeBackgroundColor({ color: "blue" })
   } else {
     const lsData = window.localStorage.getItem("[ModBox]Data");
 
