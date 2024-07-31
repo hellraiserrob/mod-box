@@ -54,7 +54,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue"
+import { ref, toRefs } from "vue"
 
 import Tab from "./Tab.vue";
 
@@ -62,13 +62,15 @@ const props = defineProps(['folder'])
 const emit = defineEmits(["deleteFolder"])
 
 
-const folder = props.folder;
+const { folder } = toRefs(props);
 
 const activeTab = ref(0);
 const showSettings = ref(false);
 
 function deleteTab(targetTab: any) {
   folder.tabs = folder.tabs.filter((tab: any) => tab !== targetTab)
+
+  activeTab.value = 0;
 }
 
 function addTab() {

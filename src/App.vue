@@ -29,7 +29,7 @@
         <div class="folders__list__item">
           <button class="folders__list__item__label" @click="data.active = !data.active">{{ data.active ? "Disable all"
             :
-            "Enable all"}} <div class="badge">0</div></button>
+            "Enable all"}} <div class="badge">{{ totalRules }}</div></button>
           <div class="toggle toggle--warning" @click="data.active = !data.active"
             :class="{ 'toggle--active': data.active }">
             <div class="toggle__text">
@@ -103,6 +103,7 @@ const data: Ref<DataType> = ref({
 });
 
 const activeFolder: Ref<number> = ref(0);
+const totalRules: Ref<number> = ref(0);
 
 /**
  * methods
@@ -195,9 +196,8 @@ function generateRules() {
 
 async function save() {
   const newRules = generateRules();
-
+  totalRules.value = newRules.length;
   console.log(newRules);
-  // console.log(data.value);
 
   if (isChrome) {
     const oldRules = await chrome.declarativeNetRequest.getDynamicRules();
@@ -211,6 +211,10 @@ async function save() {
     chrome.storage.local.set({ data: JSON.stringify(data.value) }).then(() => {
       console.log("Chrome data is set");
     });
+
+    // set badge
+    chrome.action.setBadgeBackgroundColor({ color: "blue" })
+    chrome.action.setBadgeText({ text: totalRules.value });
   } else {
     window.localStorage.setItem("[ModBox]Data", JSON.stringify(data.value));
   }
@@ -242,9 +246,6 @@ async function getData() {
 onMounted(() => {
   if (isChrome) {
     getData();
-
-    chrome.action.setBadgeText({ text: "0" });
-    chrome.action.setBadgeBackgroundColor({ color: "blue" })
   } else {
     const lsData = window.localStorage.getItem("[ModBox]Data");
 
@@ -256,5 +257,7 @@ onMounted(() => {
       data.value = fallbackData;
     }
   }
+
+  save()
 });
 </script>
