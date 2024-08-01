@@ -19,8 +19,8 @@
           </button>
         </div>
         <button class="mt20 mb20 btn" @click="addFolder">
-          <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd">
-            <path d="M11 11v-11h1v11h11v1h-11v11h-1v-11h-11v-1h11z" />
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"/>
           </svg>
           Add folder
         </button>
@@ -42,13 +42,13 @@
         </div>
 
 
-        <button class="mt20 btn" @click="save">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-            <path
-              d="M12 1c6.065 0 11 4.935 11 11s-4.935 11-11 11-11-4.935-11-11 4.935-11 11-11zm0-1c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12z" />
+        <!-- <button class="mt20 btn" @click="save">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-floppy" viewBox="0 0 16 16">
+            <path d="M11 2H9v3h2z"/>
+            <path d="M1.5 0h11.586a1.5 1.5 0 0 1 1.06.44l1.415 1.414A1.5 1.5 0 0 1 16 2.914V14.5a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 14.5v-13A1.5 1.5 0 0 1 1.5 0M1 1.5v13a.5.5 0 0 0 .5.5H2v-4.5A1.5 1.5 0 0 1 3.5 9h9a1.5 1.5 0 0 1 1.5 1.5V15h.5a.5.5 0 0 0 .5-.5V2.914a.5.5 0 0 0-.146-.353l-1.415-1.415A.5.5 0 0 0 13.086 1H13v4.5A1.5 1.5 0 0 1 11.5 7h-7A1.5 1.5 0 0 1 3 5.5V1H1.5a.5.5 0 0 0-.5.5m3 4a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 .5-.5V1H4zM3 15h10v-4.5a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0-.5.5z"/>
           </svg>
           Save all
-        </button>
+        </button> -->
       </div>
       <div class="folders__detail">
         <div v-for="(folder, index) in data.folders">
@@ -62,7 +62,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import type { Ref } from "vue";
 
 import { DataType, FolderType } from "./interaces"
@@ -162,6 +162,7 @@ function generateRules() {
                 condition: {
                   ...(request.condition.urlFilter !== "" && { urlFilter: request.condition.urlFilter }),
                   ...(request.condition.requestDomains && { requestDomains: request.condition.requestDomains.split(",") }),
+                  ...(request.condition.document && { resourceTypes: ["main_frame"] }),
                 },
               });
 
@@ -180,6 +181,8 @@ function generateRules() {
                 },
                 condition: {
                   ...(request.condition.urlFilter !== "" && { urlFilter: request.condition.urlFilter }),
+                  ...(request.condition.requestDomains && { requestDomains: request.condition.requestDomains.split(",") }),
+                  resourceTypes: ["main_frame", "sub_frame", "stylesheet", "script", "image", "font", "object", "xmlhttprequest", "ping", "csp_report", "media", "websocket", "webtransport", "webbundle", "other"]
                 }
               });
 
@@ -213,8 +216,10 @@ async function save() {
     });
 
     // set badge
-    chrome.action.setBadgeBackgroundColor({ color: "blue" })
-    chrome.action.setBadgeText({ text: totalRules.value });
+    const color = totalRules.value > 0 ? "blue" : "black";
+    chrome.action.setBadgeBackgroundColor({ color })
+    chrome.action.setBadgeText({ text: `${totalRules.value}` });
+
   } else {
     window.localStorage.setItem("[ModBox]Data", JSON.stringify(data.value));
   }
@@ -223,21 +228,28 @@ async function save() {
 async function getData() {
   const chromeData = await chrome.storage.local.get(["data"]);
 
-  // chrome.storage.local.get(["key"]).then((result) => {
-  //   console.log("Value is " + result.key);
-  // });
-
-  console.log(chromeData.data);
-  console.log(activeFolder.value);
-
   if (chromeData.data) {
     console.log("restore data from chrome storage");
     data.value = JSON.parse(chromeData.data);
+    save();
   } else {
     console.log("nothing to restore from chrome");
     data.value = fallbackData;
   }
 }
+
+
+/**
+ * watch
+ */
+
+ watch(
+  () => data,
+  () => {
+    save()
+  },
+  { deep: true }
+)
 
 /**
  * lifecycle hooks
@@ -252,12 +264,13 @@ onMounted(() => {
     if (lsData) {
       console.log("restore data from ls");
       data.value = JSON.parse(lsData);
+      save()
     } else {
       console.log("nothing to restore from ls");
       data.value = fallbackData;
     }
   }
 
-  save()
+  // save()
 });
 </script>

@@ -173,6 +173,7 @@ a {
 
   &__header {
     display: flex;
+    align-items: center;
 
     button {
       // margin-left: auto;
@@ -207,11 +208,11 @@ a {
     &__label {
       cursor: pointer;
       border: 0;
-      padding: 10px 15px;
+      padding: 10px 10px;
       background-color: transparent;
       font-size: 14px;
-      font-weight: 500;
-      color: #666;
+      // font-weight: 500;
+      color: #999;
 
       &:hover {
         color: #333;
@@ -234,7 +235,7 @@ a {
 }
 
 .panel {
-  padding: 16px;
+  padding: 8px;
   background: #efefef;
   border-radius: 6px;
 }
@@ -364,11 +365,11 @@ a {
 .btn {
   border: 1px solid #ddd;
   border-radius: 15px;
-  padding: 1px 10px 1px 10px;
+  padding: 5px 12px 5px 12px;
   background-color: #fff;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 10px;
   font-size: 14px;
   cursor: pointer;
   transition: all ease 0.2s;
@@ -378,12 +379,20 @@ a {
     color: blue
   }
 
+  &--borderless {
+    border-width: 0;
+  }
+
   &:hover {
     border-color: #999;
   }
 
+  &:active {
+    border-color: blue;
+  }
+
   svg {
-    transform: scale(0.75, 0.75);
+    // transform: scale(0.75, 0.75);
     // fill: red;
   }
 }
@@ -418,17 +427,22 @@ a {
     fill: #333;
   }
 
+  &:active svg {
+    fill: blue;
+  }
+
   &--active svg {
     fill: blue;
   }
 }
 
 .table {
-  width: 100%;
+  width: calc(100% + 16px);
   border-collapse: collapse;
+  margin: 0 -8px;
 
   td, th {
-    padding: 5px 5px;
+    padding: 5px 8px;
     vertical-align: middle;
   }
 
@@ -438,16 +452,25 @@ a {
     text-transform: uppercase;
     text-align: left;
     padding-bottom: 10px;
-    border-bottom: 1px solid #ddd
+    border-bottom: 1px solid #ddd;
+
+    a {
+      color: #333;
+    }
   }
 
   td {
     border-bottom: 1px solid #ddd
   }
 
-  // tr:nth-child(odd) td {
-  //   background: #fff;
-  // }
+  &__short {
+    width: 45px;
+  }
+
+  tr:nth-child(odd) td {
+    // background: rgba(#fff, 0.5);
+    // background: rgba(#fff, 1);
+  }
 
   .btn {
     display: inline-block;
@@ -475,5 +498,30 @@ a {
   border-radius: 10px;
   min-width: 12px;
   text-align: center;
-  transform: translateY(-8px);
+  transform: translateY(-2px);
+  margin: 0 0 0 4px;
+}
+
+.editor {
+  &__trigger {
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+    transition: all ease 0.2s;
+
+    &:hover {
+      color: #000;
+    }
+
+    svg {
+      width: 10px;
+      vertical-align: middle;
+      display: inline-block;
+      opacity: 0;
+    }
+    
+    &:hover svg {
+      opacity: 1;
+    }
+  }
 }
