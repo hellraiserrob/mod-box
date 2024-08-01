@@ -308,6 +308,43 @@ a {
   }
 }
 
+.checkbox {
+  border: 1px solid #ddd;
+  width: 15px;
+  height: 15px;
+  border-radius: 2px;
+  background-color: #fff;
+  position: relative;
+  cursor: pointer;
+  transition: all ease 0.2s;
+
+  &:hover {
+    border-color: #ccc;
+  }
+
+  svg {
+    display: block;
+    fill: #333;
+    position: absolute;
+    top: -1px;
+    left:0;
+    width: 12px;
+  }
+
+  &--active {
+    background-color: blue;
+    border-color: blue;
+    
+    &:hover {
+      border-color: blue;
+    }
+
+    svg {
+      fill: #fff;
+    }
+  }
+}
+
 .toggle {
   border: 1px solid #ddd;
   width: 30px;

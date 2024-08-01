@@ -153,6 +153,7 @@ function generateRules() {
     if (folder.active) {
       folder.tabs.forEach((tab) => {
         if (tab.active) {
+          // blocking rules
           tab.blockedRequests?.forEach((request) => {
             if (request.active) {
               rules.push({
@@ -170,6 +171,7 @@ function generateRules() {
             }
           });
 
+          // request rules
           tab.requestHeaders?.forEach((request) => {
             if (request.active) {
               rules.push({
@@ -178,6 +180,27 @@ function generateRules() {
                 action: {
                   type: "modifyHeaders",
                   requestHeaders: [{ header: request.name, operation: "set", value: request.value }]
+                },
+                condition: {
+                  ...(request.condition.urlFilter !== "" && { urlFilter: request.condition.urlFilter }),
+                  ...(request.condition.requestDomains && { requestDomains: request.condition.requestDomains.split(",") }),
+                  resourceTypes: ["main_frame", "sub_frame", "stylesheet", "script", "image", "font", "object", "xmlhttprequest", "ping", "csp_report", "media", "websocket", "webtransport", "webbundle", "other"]
+                }
+              });
+
+              id += 1;
+            }
+          });
+          
+          // response rules
+          tab.responseHeaders?.forEach((request) => {
+            if (request.active) {
+              rules.push({
+                id,
+                priority: 1,
+                action: {
+                  type: "modifyHeaders",
+                  responseHeaders: [{ header: request.name, operation: "set", value: request.value }]
                 },
                 condition: {
                   ...(request.condition.urlFilter !== "" && { urlFilter: request.condition.urlFilter }),
