@@ -1,6 +1,6 @@
 <template>
   <div class="editor">
-    <div v-if="!isEditing" @click="edit" class="editor__trigger" title="Edit">
+    <div v-if="!isEditing" @click="edit" class="editor__trigger" title="Edit" :class="{'editor__trigger--locked' : locked}">
       {{ model || "..." }}
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -31,16 +31,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick } from "vue";
+import { ref, nextTick, toRefs } from "vue";
 import type { Ref } from "vue";
 
 const model = defineModel();
-const props = defineProps(["placeholder"]);
+const props = defineProps(["placeholder", "locked"]);
 
 const input:Ref<HTMLInputElement | null> = ref(null);
 const isEditing = ref(false);
 
-const { placeholder } = props;
+const { placeholder, locked } = toRefs(props);
 
 const resetValue = model.value;
 

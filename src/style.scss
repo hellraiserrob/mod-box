@@ -5,7 +5,7 @@
 body {
   color: #333;
   background: #fff;
-  min-width: 800px;
+  min-width: 780px;
 }
 
 html, body {
@@ -310,8 +310,8 @@ a {
 
 .checkbox {
   border: 1px solid #ddd;
-  width: 15px;
-  height: 15px;
+  width: 16px;
+  height: 16px;
   border-radius: 2px;
   background-color: #fff;
   position: relative;
@@ -327,8 +327,8 @@ a {
     fill: #333;
     position: absolute;
     top: -1px;
-    left:0;
-    width: 12px;
+    left: -1px;
+    width: 15px;
   }
 
   &--active {
@@ -545,6 +545,11 @@ a {
     color: #333;
     cursor: pointer;
     transition: all ease 0.2s;
+
+    &--locked {
+      text-decoration: line-through;
+      color: #999;
+    }
 
     &:hover {
       color: #000;
