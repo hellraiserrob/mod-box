@@ -1,6 +1,6 @@
-# ModBox
+[![ModBox screenshot](./public/images/screenshot.jpg)](https://hellraiserrob.github.io/autocomplete)
 
-## Summary
+# ModBox
 A compact and easy to use extension for modifying HTTP request & response headers and blocking HTTP requests.
 
 ## Features
