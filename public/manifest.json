@@ -1,21 +1,17 @@
 {
   "manifest_version": 3,
   "name": "ModBox",
-  "description": "Modify HTTP Headers & block requests, with no tracking or funny business.",
+  "description": "Block requests, modify HTTP request & response headers globally or by domain and url rules, organise by project and environment",
   "version": "0.0.1",
+  "author": {
+    "email": "robertjamesphillips@googlemail.com"
+  },
   "action": {
     "default_popup": "index.html"
   },
   "permissions": [
-    "activeTab",
-    "tabs",
     "storage",
-    "declarativeNetRequest",
-    "declarativeNetRequestWithHostAccess",
-    "declarativeNetRequestFeedback"
-  ],
-  "host_permissions": [
-    "*://*/*"
+    "declarativeNetRequest"
   ],
   "icons": {
     "16": "images/16_16.png",

@@ -173,7 +173,7 @@ function generateRules() {
 
           // request rules
           tab.requestHeaders?.forEach((request) => {
-            if (request.active) {
+            if (request.active && request.name !== "") {
               rules.push({
                 id,
                 priority: 1,
@@ -194,7 +194,7 @@ function generateRules() {
           
           // response rules
           tab.responseHeaders?.forEach((request) => {
-            if (request.active) {
+            if (request.active && request.name !== "") {
               rules.push({
                 id,
                 priority: 1,
@@ -241,7 +241,7 @@ async function save() {
     // set badge
     const color = totalRules.value > 0 ? "blue" : "black";
     chrome.action.setBadgeBackgroundColor({ color })
-    chrome.action.setBadgeText({ text: `${totalRules.value}` });
+    chrome.action.setBadgeText({ text: totalRules.value > 0 ? `${totalRules.value}`: '' });
 
   } else {
     window.localStorage.setItem("[ModBox]Data", JSON.stringify(data.value));
