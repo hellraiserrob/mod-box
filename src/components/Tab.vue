@@ -9,7 +9,7 @@
     </button>
 
     <div v-if="showSettings" class="panel">
-      <h2 class="mb20">Tab settings</h2>
+      <h3 class="mb20">Tab settings</h3>
 
       <div class="field mb20">
         <label class="field__label">Tab name</label>
@@ -40,10 +40,10 @@
     </div>
 
     <div class="panel">
-      <h2 class="mb10">
+      <h3 class="mb10">
         Add request headers
         <div class="badge">{{ requestHeaderTotal }}</div>
-      </h2>
+      </h3>
       <div class="empty" v-if="!tab.requestHeaders.length">
         No request headers
       </div>
@@ -110,7 +110,7 @@
         </tr>
       </table>
 
-      <button class="btn mt20" @click="addRequestHeader(tab)">
+      <button class="btn mt10" @click="addRequestHeader(tab)">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="16"
@@ -129,10 +129,10 @@
     </div>
 
     <div class="panel">
-      <h2 class="mb10">
+      <h3 class="mb10">
         Add response headers
         <div class="badge">{{ responseHeaderTotal }}</div>
-      </h2>
+      </h3>
       <div class="empty" v-if="!tab.responseHeaders.length">
         No response headers
       </div>
@@ -199,7 +199,7 @@
         </tr>
       </table>
 
-      <button class="btn mt20" @click="addResponseHeader(tab)">
+      <button class="btn mt10" @click="addResponseHeader(tab)">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="16"
@@ -218,10 +218,10 @@
     </div>
 
     <div class="panel">
-      <h2 class="mb10">
+      <h3 class="mb10">
         Block requests
         <div class="badge">{{ blockedTotal }}</div>
-      </h2>
+      </h3>
       <div class="empty" v-if="!tab.blockedRequests.length">
         No blocked requests
       </div>
@@ -315,7 +315,7 @@
         </tr>
       </table>
 
-      <button class="mt20 btn" @click="addBlockedRequest(tab)">
+      <button class="mt10 btn" @click="addBlockedRequest(tab)">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="16"

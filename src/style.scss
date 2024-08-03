@@ -33,12 +33,18 @@ h1, h2, h3, h4, h5 {
 }
 
 h1 {
-  font-size: 30px;
-  line-height: 35px;
+  font-size: 20px;
+  line-height: 25px;
   font-weight: 600;
 }
 
 h2 {
+  font-size: 18px;
+  font-weight: 600;
+  // margin-bottom: 10px;
+}
+
+h3 {
   font-size: 12px;
   font-weight: 400;
   // margin-bottom: 10px;
@@ -48,10 +54,6 @@ h2 {
   // border-bottom: 1px solid #ddd;
 }
 
-h3 {
-  font-size: 18px;
-  margin-bottom: 10px;
-}
 
 a {
   color: blue;
@@ -177,7 +179,7 @@ a {
 
     button {
       // margin-left: auto;
-      margin-left: 12px;
+      margin-left: 8px;
     }
   }
 }
@@ -191,7 +193,7 @@ a {
     border-bottom: 1px solid #ddd;
     margin-bottom: -1px;
     padding: 0 15px 0 0;
-    // border-radius: 4px;
+    // border-radius: 5px;
     background-color: transparent;
     display: flex;
     align-items: center;
@@ -200,19 +202,21 @@ a {
       // }
       
     &--active {
-      border-bottom: 2px solid blue;
-      margin-bottom: -2px;
+      border-bottom: 1px solid blue;
+      // margin-bottom: -2px;
       // background-color: #efefef;
     }
       
     &__label {
       cursor: pointer;
       border: 0;
-      padding: 10px 10px;
+      padding: 10px 10px 10px 0;
       background-color: transparent;
-      font-size: 14px;
-      // font-weight: 500;
+      font-size: 13px;
+      font-weight: 500;
+      text-transform: uppercase;
       color: #999;
+      transition: all ease 0.2s;
 
       &:hover {
         color: #333;
@@ -238,6 +242,36 @@ a {
   padding: 8px;
   background: #efefef;
   border-radius: 6px;
+  position: relative;
+  
+  &__close {
+    position: absolute;
+    right: 8px;
+    top: 8px;
+  }
+
+  &__modal {
+    position: absolute;
+    top: 0;
+    left:0;
+    right: 0;
+    bottom:0;
+    padding: 20px;
+    border-radius: 6px;
+
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    align-items: center;
+    justify-content: center;
+    background: rgba(#efefef, 0.75);
+    backdrop-filter: blur(5px);
+    
+    &__actions {
+      display: flex;
+      gap: 10px;
+    }
+  }
 }
 
 .panel + .panel {
@@ -276,7 +310,7 @@ a {
     border: 1px solid #ddd;
     border-radius: 5px;
     padding: 6px 10px;
-    width: 300px;
+    width: 100%;
     font-size: 15px;
     transition: all ease 0.2s;
 
@@ -399,6 +433,23 @@ a {
   }
 }
 
+.btn-link {
+  color: #666;
+  padding: 0;
+  border:0;
+  background-color: transparent;
+  font-size: 14px;
+  cursor: pointer;
+
+  &:hover {
+    color: #333;
+  }
+
+  &--active {
+    color: #999;
+  }
+}
+
 .btn {
   border: 1px solid #ddd;
   border-radius: 15px;
@@ -428,6 +479,11 @@ a {
     border-color: blue;
   }
 
+  &--danger, &--danger:hover {
+    color: rgb(255, 93, 120);
+    border-color: rgb(255, 93, 120);
+  }
+
   svg {
     // transform: scale(0.75, 0.75);
     // fill: red;
@@ -436,8 +492,8 @@ a {
 
 .btn-icon {
   // border: 1px solid #ddd;
-  // border-radius: 4px;
-  border: 0;
+  border-radius: 4px;
+  border: 1px solid transparent;
   width: 24px;
   height: 24px;
   background: transparent;
@@ -450,7 +506,7 @@ a {
   }
 
   svg {
-    width: 100%;
+    width: 18px;
     // height: 16px;
     position: absolute;
     top: 50%;
@@ -466,6 +522,10 @@ a {
 
   &:active svg {
     fill: blue;
+  }
+
+  &--active, &--active:hover {
+    border-color: blue;
   }
 
   &--active svg {
