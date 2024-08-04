@@ -2,7 +2,10 @@
   <div>
     <div v-if="data.folders" class="folders">
       <div class="folders__list">
-        <h1 class="mb10">ModBox</h1>
+        <h1 class="mb20 logo">
+          <img src="/images/16_16.png" alt="Modbox">
+          ModBox
+        </h1>
         <h3 class="mb10">Folders</h3>
         <div v-if="!data.folders.length">No folders</div>
         <div v-for="(folder, index) in data.folders" class="folders__list__item"

@@ -39,7 +39,7 @@ h1 {
 }
 
 h2 {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
   // margin-bottom: 10px;
 }
@@ -113,6 +113,12 @@ a {
   padding: 10px;
 }
 
+.logo {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
 .folders {
   display: flex;
   gap: 12px;
@@ -176,6 +182,7 @@ a {
   &__header {
     display: flex;
     align-items: center;
+    justify-content: space-between;
 
     button {
       // margin-left: auto;
@@ -210,7 +217,7 @@ a {
     &__label {
       cursor: pointer;
       border: 0;
-      padding: 10px 10px 10px 0;
+      padding: 10px 10px 10px 10px;
       background-color: transparent;
       font-size: 13px;
       font-weight: 500;
@@ -453,11 +460,11 @@ a {
 .btn {
   border: 1px solid #ddd;
   border-radius: 15px;
-  padding: 5px 12px 5px 12px;
+  padding: 5px 10px 5px 10px;
+  gap: 4px;
   background-color: #fff;
   display: flex;
   align-items: center;
-  gap: 10px;
   font-size: 14px;
   cursor: pointer;
   transition: all ease 0.2s;
