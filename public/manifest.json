@@ -1,6 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "ModBox",
+  "name": "ModBox - Add request & response headers, block requests and more",
+  "short_name": "ModBox",
   "description": "Block HTTP requests and sites, modify headers globally or by domain and url rules. Organise by folder and tab",
   "version": "0.0.2",
   "author": {
@@ -21,5 +22,9 @@
     "32": "images/32_32.png",
     "48": "images/48_48.png",
     "128": "images/128_128.png"
+  },
+  "background": {
+    "service_worker": "/scripts/service-worker.js",
+    "type": "module"
   }
 }

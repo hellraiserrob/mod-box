@@ -32,7 +32,7 @@
         <div class="folders__list__item">
           <button class="folders__list__item__label" @click="data.active = !data.active">{{ data.active ? "Disable all"
             :
-            "Enable all"}} <div class="badge">{{ totalRules }}</div></button>
+            "Enable all"}} <div class="badge">{{ totalActiveRules }}</div></button>
           <div class="toggle toggle--warning" @click="data.active = !data.active"
             :class="{ 'toggle--active': data.active }">
             <div class="toggle__text">
@@ -106,7 +106,7 @@ const data: Ref<DataType> = ref({
 });
 
 const activeFolder: Ref<number> = ref(0);
-const totalRules: Ref<number> = ref(0);
+const totalActiveRules: Ref<number> = ref(0);
 
 /**
  * methods
@@ -224,9 +224,9 @@ function generateRules() {
 }
 
 async function save() {
-  const newRules = generateRules();
-  totalRules.value = newRules.length;
-  console.log(newRules);
+  const activeRules = generateRules();
+  totalActiveRules.value = activeRules.length;
+  console.log(activeRules);
 
   if (isChrome) {
     const oldRules = await chrome.declarativeNetRequest.getDynamicRules();
@@ -234,29 +234,32 @@ async function save() {
 
     await chrome.declarativeNetRequest.updateDynamicRules({
       removeRuleIds: oldRuleIds,
-      addRules: newRules,
+      addRules: activeRules,
     });
 
-    chrome.storage.local.set({ data: JSON.stringify(data.value) }).then(() => {
-      console.log("Chrome data is set");
+    chrome.storage.local.set({ rules: JSON.stringify(data.value) }).then(() => {
+      console.log("Chrome storage rules set");
+    });
+
+    chrome.storage.local.set({ totalActiveRules: `${activeRules.length}` }).then(() => {
+      console.log("Chrome storage totalActiveRules set");
     });
 
     // set badge
-    const color = totalRules.value > 0 ? "blue" : "black";
-    chrome.action.setBadgeBackgroundColor({ color })
-    chrome.action.setBadgeText({ text: totalRules.value > 0 ? `${totalRules.value}`: '' });
+    chrome.action.setBadgeBackgroundColor({ color: "blue" })
+    chrome.action.setBadgeText({ text: totalActiveRules.value > 0 ? `${totalActiveRules.value}`: '' });
 
   } else {
-    window.localStorage.setItem("[ModBox]Data", JSON.stringify(data.value));
+    window.localStorage.setItem("rules", JSON.stringify(data.value));
   }
 }
 
 async function getData() {
-  const chromeData = await chrome.storage.local.get(["data"]);
+  const chromeData = await chrome.storage.local.get(["rules"]);
 
-  if (chromeData.data) {
-    console.log("restore data from chrome storage");
-    data.value = JSON.parse(chromeData.data);
+  if (chromeData.rules) {
+    console.log("restore rules from chrome storage");
+    data.value = JSON.parse(chromeData.rules);
     save();
   } else {
     console.log("nothing to restore from chrome");
@@ -285,7 +288,7 @@ onMounted(() => {
   if (isChrome) {
     getData();
   } else {
-    const lsData = window.localStorage.getItem("[ModBox]Data");
+    const lsData = window.localStorage.getItem("rules");
 
     if (lsData) {
       console.log("restore data from ls");
