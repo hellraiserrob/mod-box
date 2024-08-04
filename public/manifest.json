@@ -13,6 +13,9 @@
     "storage",
     "declarativeNetRequest"
   ],
+  "host_permissions": [
+    "*://*/*"
+  ],
   "icons": {
     "16": "images/16_16.png",
     "32": "images/32_32.png",
