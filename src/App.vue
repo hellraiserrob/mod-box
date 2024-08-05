@@ -1,4 +1,5 @@
 <template>
+  <Dragger />
   <div>
     <div v-if="data.folders" class="folders">
       <div class="folders__list">
@@ -8,22 +9,27 @@
         </h1>
         <h3 class="mb10">Folders</h3>
         <div v-if="!data.folders.length">No folders</div>
-        <div v-for="(folder, index) in data.folders" class="folders__list__item"
-          :class="{ 'folders__list__item--active': index === activeFolder }">
-          <button :title="'selectet ' + folder.name" @click="activeFolder = index" class="folders__list__item__label">{{
-            folder.name }}</button>
-          <!-- <span v-if="folder.active" class="folders__list__item__active"></span> -->
+        <div ref="parent">
+          <div v-for="(folder, index) in tapes" class="folders__list__item"
+          :key="index"
+            :class="{ 'folders__list__item--active': index === activeFolder }">
+            <button :title="'selectet ' + folder.name" @click="activeFolder = index"
+              class="folders__list__item__label">{{
+                folder.name }}</button>
 
-          <button class="toggle" @click="folder.active = !folder.active" :class="{ 'toggle--active': folder.active }"
-            :title="folder.active ? 'Disable folder rules' : 'Enable folder rules'">
-            <div class="toggle__text">
-              {{ folder.active ? "On" : "Off" }}
-            </div>
-          </button>
+            <button class="toggle" @click="folder.active = !folder.active" :class="{ 'toggle--active': folder.active }"
+              :title="folder.active ? 'Disable folder rules' : 'Enable folder rules'">
+              <div class="toggle__text">
+                {{ folder.active ? "On" : "Off" }}
+              </div>
+            </button>
+          </div>
         </div>
         <button class="mt20 mb20 btn" @click="addFolder">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"/>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg"
+            viewBox="0 0 16 16">
+            <path fill-rule="evenodd"
+              d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2" />
           </svg>
           Add folder
         </button>
@@ -32,7 +38,7 @@
         <div class="folders__list__item">
           <button class="folders__list__item__label" @click="data.active = !data.active">{{ data.active ? "Disable all"
             :
-            "Enable all"}} <div class="badge">{{ totalActiveRules }}</div></button>
+            "Enable all" }} <div class="badge">{{ totalActiveRules }}</div></button>
           <div class="toggle toggle--warning" @click="data.active = !data.active"
             :class="{ 'toggle--active': data.active }">
             <div class="toggle__text">
@@ -67,9 +73,11 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from "vue";
 import type { Ref } from "vue";
+import { useDragAndDrop } from "@formkit/drag-and-drop/vue";
 
 import { DataType, FolderType } from "./interaces"
 import Folder from "./components/Folder.vue";
+import Dragger from "./components/Dragger.vue";
 
 /**
  * static variables
@@ -81,7 +89,20 @@ const fallbackData = {
   active: true,
   folders: [
     {
-      name: "Default folder",
+      name: "Default folder 1",
+      active: true,
+      tabs: [
+        {
+          name: "Default tab",
+          active: true,
+          requestHeaders: [],
+          responseHeaders: [],
+          blockedRequests: [],
+        },
+      ],
+    },
+    {
+      name: "Default folder 2",
       active: true,
       tabs: [
         {
@@ -107,6 +128,14 @@ const data: Ref<DataType> = ref({
 
 const activeFolder: Ref<number> = ref(0);
 const totalActiveRules: Ref<number> = ref(0);
+
+/**
+ * drag and drop
+ */
+ const [parent, tapes] = useDragAndDrop(fallbackData.folders);
+
+console.log(tapes.value);
+
 
 /**
  * methods
@@ -194,7 +223,7 @@ function generateRules() {
               id += 1;
             }
           });
-          
+
           // response rules
           tab.responseHeaders?.forEach((request) => {
             if (request.active && request.name !== "") {
@@ -247,7 +276,7 @@ async function save() {
 
     // set badge
     chrome.action.setBadgeBackgroundColor({ color: "blue" })
-    chrome.action.setBadgeText({ text: totalActiveRules.value > 0 ? `${totalActiveRules.value}`: '' });
+    chrome.action.setBadgeText({ text: totalActiveRules.value > 0 ? `${totalActiveRules.value}` : '' });
 
   } else {
     window.localStorage.setItem("rules", JSON.stringify(data.value));
@@ -272,7 +301,7 @@ async function getData() {
  * watch
  */
 
- watch(
+watch(
   () => data,
   () => {
     save()

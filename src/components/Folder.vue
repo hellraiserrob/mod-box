@@ -48,7 +48,7 @@
       </div>
     </div>
 
-    <div class="tabs mb20">
+    <div class="tabs mb15">
       <div class="tabs__tab" v-for="(tab, index) in folder.tabs" :class="{ 'tabs__tab--active': index === activeTab }">
         <button class="tabs__tab__label" @click="activeTab = index">
           {{ tab.name }}

@@ -67,6 +67,10 @@ a {
   margin-bottom: 10px;
 }
 
+.mb15 {
+  margin-bottom: 15px;
+}
+
 .mb20 {
   margin-bottom: 20px;
 }
@@ -220,7 +224,7 @@ a {
       padding: 10px 10px 10px 10px;
       background-color: transparent;
       font-size: 13px;
-      font-weight: 500;
+      // font-weight: 500;
       text-transform: uppercase;
       color: #999;
       transition: all ease 0.2s;
@@ -631,6 +635,20 @@ a {
     
     &:hover svg {
       opacity: 1;
+    }
+  }
+}
+
+.dragger {
+  border: 1px solid red;
+
+  &__item {
+    padding: 20px 30px;
+    // border: 1px solid #ddd;
+    cursor: move;
+
+    &:hover {
+      background: #efefef;
     }
   }
 }
