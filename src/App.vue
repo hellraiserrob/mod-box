@@ -1,5 +1,5 @@
 <template>
-  <Dragger />
+  <!-- <Dragger /> -->
   <div>
     <div v-if="data.folders" class="folders">
       <div class="folders__list">
@@ -10,10 +10,10 @@
         <h3 class="mb10">Folders</h3>
         <div v-if="!data.folders.length">No folders</div>
         <div ref="parent">
-          <div v-for="(folder, index) in tapes" class="folders__list__item"
+          <div v-for="(folder, index) in data.folders" class="folders__list__item"
           :key="index"
             :class="{ 'folders__list__item--active': index === activeFolder }">
-            <button :title="'selectet ' + folder.name" @click="activeFolder = index"
+            <button :title="'selectet ' + folder.name" @click="setFolder(index)"
               class="folders__list__item__label">{{
                 folder.name }}</button>
 
@@ -73,7 +73,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from "vue";
 import type { Ref } from "vue";
-import { useDragAndDrop } from "@formkit/drag-and-drop/vue";
+// import { useDragAndDrop } from "@formkit/drag-and-drop/vue";
 
 import { DataType, FolderType } from "./interaces"
 import Folder from "./components/Folder.vue";
@@ -89,20 +89,7 @@ const fallbackData = {
   active: true,
   folders: [
     {
-      name: "Default folder 1",
-      active: true,
-      tabs: [
-        {
-          name: "Default tab",
-          active: true,
-          requestHeaders: [],
-          responseHeaders: [],
-          blockedRequests: [],
-        },
-      ],
-    },
-    {
-      name: "Default folder 2",
+      name: "Default folder",
       active: true,
       tabs: [
         {
@@ -132,14 +119,18 @@ const totalActiveRules: Ref<number> = ref(0);
 /**
  * drag and drop
  */
- const [parent, tapes] = useDragAndDrop(fallbackData.folders);
-
-console.log(tapes.value);
+//  const [parent, tapes] = useDragAndDrop(fallbackData.folders);
+// console.log(tapes.value);
 
 
 /**
  * methods
  */
+
+function setFolder(index: number) {
+  activeFolder.value = index;
+  window.localStorage.setItem("activeFolder", `${activeFolder.value}`);
+}
 
 function reset() {
   data.value = fallbackData;
@@ -273,26 +264,35 @@ async function save() {
     chrome.storage.local.set({ totalActiveRules: `${activeRules.length}` }).then(() => {
       console.log("Chrome storage totalActiveRules set");
     });
+    
+    chrome.storage.local.set({ activeFolder: `${activeFolder.value}` }).then(() => {
+      console.log("Chrome storage activeFolder set");
+    });
 
     // set badge
-    chrome.action.setBadgeBackgroundColor({ color: "blue" })
-    chrome.action.setBadgeText({ text: totalActiveRules.value > 0 ? `${totalActiveRules.value}` : '' });
+    // chrome.action.setBadgeBackgroundColor({ color: "blue" })
+    // chrome.action.setBadgeText({ text: totalActiveRules.value > 0 ? `${totalActiveRules.value}` : '' });
 
   } else {
     window.localStorage.setItem("rules", JSON.stringify(data.value));
+    window.localStorage.setItem("activeFolder", `${activeFolder.value}`);
   }
 }
 
 async function getData() {
-  const chromeData = await chrome.storage.local.get(["rules"]);
+  const chromeData = await chrome.storage.local.get(["rules", "activeFolder"]);
 
   if (chromeData.rules) {
     console.log("restore rules from chrome storage");
     data.value = JSON.parse(chromeData.rules);
-    save();
+    // save();
   } else {
     console.log("nothing to restore from chrome");
     data.value = fallbackData;
+  }
+
+  if (chromeData.activeFolder) {
+    activeFolder.value = parseInt(chromeData.activeFolder);
   }
 }
 
@@ -317,16 +317,24 @@ onMounted(() => {
   if (isChrome) {
     getData();
   } else {
-    const lsData = window.localStorage.getItem("rules");
+    const rules = window.localStorage.getItem("rules");
+    const af = window.localStorage.getItem("activeFolder");
 
-    if (lsData) {
+    if (rules) {
       console.log("restore data from ls");
-      data.value = JSON.parse(lsData);
-      save()
+      data.value = JSON.parse(rules);
     } else {
       console.log("nothing to restore from ls");
       data.value = fallbackData;
     }
+
+    if (af) {
+      activeFolder.value = parseInt(af);
+    }
+
+    // if(rules || af) {
+    //   save()
+    // }
   }
 
   // save()

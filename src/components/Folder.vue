@@ -33,7 +33,7 @@
       <div class="mb10">
         <div class="field">
           <label class="field__label" for="">Folder name</label>
-          <input class="field__input" type="text" v-model="folder.name" placeholder="Folder name" />
+          <input class="field__input" type="text" v-model="folder.name" placeholder="Folder name" ref="folderName" />
         </div>
       </div>
       <div>
@@ -78,7 +78,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, toRefs } from "vue";
+import { ref, toRefs, onMounted, nextTick } from "vue";
+import type { Ref } from "vue";
 
 import Tab from "./Tab.vue";
 
@@ -90,6 +91,8 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["deleteFolder"]);
+const folderName:Ref<HTMLInputElement | null> = ref(null);
+
 
 const { folder } = toRefs(props);
 
@@ -110,10 +113,27 @@ function addTab() {
     responseHeaders: [],
     blockedRequests: [],
   });
+
+  activeTab.value = folder.value.tabs.length - 1;
 }
 
 function deleteFolder() {
   emit("deleteFolder", folder.value);
   showDeleteConfirmation.value = false;
 }
+
+/**
+ * lifecycle hooks
+ */
+
+onMounted(() => {
+  if(folder.value.name === "New folder") {
+    showSettings.value = true;
+
+    nextTick(() => {
+      folderName.value?.focus();
+    })
+  }
+})
+
 </script>
