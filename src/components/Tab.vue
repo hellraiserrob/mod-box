@@ -273,7 +273,8 @@
           <th>Url Filter</th>
           <th>Domains</th>
           <th title="Block document">
-            <svg
+            Document
+            <!-- <svg
               xmlns="http://www.w3.org/2000/svg"
               width="16"
               height="16"
@@ -290,7 +291,7 @@
               <path
                 d="M16 12.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0m-4.854-1.354a.5.5 0 0 0 0 .708l.647.646-.647.646a.5.5 0 0 0 .708.708l.646-.647.646.647a.5.5 0 0 0 .708-.708l-.647-.646.647-.646a.5.5 0 0 0-.708-.708l-.646.647-.646-.647a.5.5 0 0 0-.708 0"
               />
-            </svg>
+            </svg> -->
           </th>
           <th class="table__short"></th>
         </tr>
@@ -489,6 +490,7 @@ onMounted(() => {
 
     nextTick(() => {
       tabName.value?.focus();
+      tabName.value?.select();
     });
   }
 });

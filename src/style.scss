@@ -640,15 +640,32 @@ a {
 }
 
 .dragger {
-  border: 1px solid red;
+  // border: 1px solid red;
+  margin-bottom: 30px;
 
   &__item {
-    padding: 20px 30px;
-    // border: 1px solid #ddd;
-    cursor: move;
-
+    padding: 20px 30px 20px 60px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    position: relative;
+    
+    &--active {
+      background-color: #ddd;
+    }
+    
     &:hover {
       background: #efefef;
+    }
+    
+    &__handle {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      width: 20px;
+      height: 20px;
+      background-color: red;
+      border-radius: 10px;
+      cursor: move;
     }
   }
 }

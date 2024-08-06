@@ -1,5 +1,5 @@
 <template>
-  <!-- <Dragger /> -->
+  <Dragger />
   <div>
     <div v-if="data.folders" class="folders">
       <div class="folders__list">
