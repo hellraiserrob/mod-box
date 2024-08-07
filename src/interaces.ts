@@ -1,5 +1,6 @@
 export interface TabType {
   name: string;
+  requestDomains?: string;
   active: boolean;
   requestHeaders?: any[];
   responseHeaders?: any[];

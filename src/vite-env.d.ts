@@ -1,4 +1,4 @@
 /// <reference types="vite/client" />
 
-declare var chrome: any
+declare var chrome: any;
 

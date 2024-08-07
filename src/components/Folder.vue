@@ -29,6 +29,7 @@
           <button class="btn" @click="showDeleteConfirmation = false">Cancel</button>
         </div>
       </div>
+
       <h3 class="mb10">Folder settings</h3>
       <div class="mb10">
         <div class="field">
@@ -36,20 +37,20 @@
           <input class="field__input" type="text" v-model="folder.name" placeholder="Folder name" ref="folderName" />
         </div>
       </div>
-      <div>
+      <div class="panel__actions btn-group">
         <button @click="showDeleteConfirmation = true" class="btn">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg"
-            viewBox="0 0 16 16">
-            <path
-              d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
-          </svg>
           Delete folder
+        </button>
+        <button @click="cloneFolder" class="btn">
+          Clone folder
         </button>
       </div>
     </div>
 
+    
     <div class="tabs mb15">
-      <div class="tabs__tab" v-for="(tab, index) in folder.tabs" :class="{ 'tabs__tab--active': index === activeTab }">
+      <TabDragger :tabs="folder.tabs" :active-tab="activeTab" @moveTab="moveTab" @toggleTab="toggleTab" @setTab="setTab" />
+      <!-- <div class="tabs__tab" v-for="(tab, index) in folder.tabs" :class="{ 'tabs__tab--active': index === activeTab }">
         <button class="tabs__tab__label" @click="activeTab = index">
           {{ tab.name }}
         </button>
@@ -59,7 +60,7 @@
             {{ tab.active ? "On" : "Off" }}
           </div>
         </div>
-      </div>
+      </div> -->
       <div class="tabs__tab">
         <button class="btn-icon" @click="addTab">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg"
@@ -72,7 +73,7 @@
     </div>
 
     <div v-for="(tab, index) in folder.tabs">
-      <Tab v-if="index === activeTab" :tab="tab" @deleteTab="deleteTab" />
+      <Tab v-if="index === activeTab" :tab="tab" @deleteTab="deleteTab" @cloneTab="cloneTab"/>
     </div>
   </div>
 </template>
@@ -82,6 +83,8 @@ import { ref, toRefs, onMounted, nextTick } from "vue";
 import type { Ref } from "vue";
 
 import Tab from "./Tab.vue";
+import TabDragger from "./TabDragger.vue";
+import { TabType } from "../interaces";
 
 const props = defineProps({
   folder: {
@@ -90,7 +93,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["deleteFolder"]);
+const emit = defineEmits(["deleteFolder", "cloneFolder"]);
 const folderName:Ref<HTMLInputElement | null> = ref(null);
 
 
@@ -100,9 +103,29 @@ const activeTab = ref(0);
 const showSettings = ref(false);
 const showDeleteConfirmation = ref(false);
 
+function setTab(index:number) {
+  activeTab.value = index;
+}
+
+function toggleTab(tab: TabType) {
+  tab.active = !tab.active
+}
+
+function moveTab(from:number, to:number) {
+  const tab = folder.value.tabs[from];
+
+  folder.value.tabs.splice(from, 1);
+  folder.value.tabs.splice(to, 0, tab);
+}
+
 function deleteTab(targetTab: any) {
   folder.value.tabs = folder.value.tabs.filter((tab: any) => tab !== targetTab);
   activeTab.value = 0;
+}
+
+function cloneTab(targetTab: any) {
+  folder.value.tabs.push({...targetTab, name: "Cloned tab"})
+  activeTab.value = folder.value.tabs.length - 1;
 }
 
 function addTab() {
@@ -122,16 +145,21 @@ function deleteFolder() {
   showDeleteConfirmation.value = false;
 }
 
+function cloneFolder() {
+  emit("cloneFolder", folder.value);
+}
+
 /**
  * lifecycle hooks
  */
 
 onMounted(() => {
-  if(folder.value.name === "New folder") {
+  if(folder.value.name === "New folder" || folder.value.name === "Cloned folder") {
     showSettings.value = true;
 
     nextTick(() => {
       folderName.value?.focus();
+      folderName.value?.select();
     })
   }
 })
