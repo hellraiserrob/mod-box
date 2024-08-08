@@ -116,6 +116,8 @@ function moveTab(from:number, to:number) {
 
   folder.value.tabs.splice(from, 1);
   folder.value.tabs.splice(to, 0, tab);
+
+  activeTab.value = to;
 }
 
 function deleteTab(targetTab: any) {
