@@ -56,7 +56,7 @@
 
     <div class="panel">
       <h3 class="mb10">
-        Add request headers
+        Request headers
         <div class="badge">{{ requestHeaderTotal }}</div>
       </h3>
       <div class="empty" v-if="!tab.requestHeaders.length">
@@ -66,9 +66,10 @@
       <table class="table" v-if="tab.requestHeaders.length">
         <tr>
           <th></th>
-          <th>Header name</th>
-          <th>Header value</th>
-          <th>Url Filter</th>
+          <th>Operation</th>
+          <th>Name</th>
+          <th>Value</th>
+          <th>Filter</th>
           <th>Domains</th>
           <th></th>
         </tr>
@@ -81,9 +82,12 @@
             </button>
           </td>
           <td>
+            <Dropdown v-model="header.operation" />
+          </td>
+          <td :colspan="header.operation !== 'remove' ? 1 : 2">
             <Editor v-model="header.name" placeholder="Header name" />
           </td>
-          <td>
+          <td v-if="header.operation !== 'remove'">
             <Editor v-model="header.value" placeholder="Header value" />
           </td>
           <td>
@@ -110,13 +114,13 @@
           <path fill-rule="evenodd"
             d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2" />
         </svg>
-        Add request header
+        Add
       </button>
     </div>
 
     <div class="panel">
       <h3 class="mb10">
-        Add response headers
+        Response headers
         <div class="badge">{{ responseHeaderTotal }}</div>
       </h3>
       <div class="empty" v-if="!tab.responseHeaders.length">
@@ -126,9 +130,10 @@
       <table class="table" v-if="tab.responseHeaders.length">
         <tr>
           <th></th>
-          <th>Header name</th>
-          <th>Header value</th>
-          <th>Url Filter</th>
+          <th>Operation</th>
+          <th>Name</th>
+          <th>Value</th>
+          <th>Filter</th>
           <th>Domains</th>
           <th></th>
         </tr>
@@ -141,9 +146,12 @@
             </button>
           </td>
           <td>
+            <Dropdown v-model="header.operation" />
+          </td>
+          <td :colspan="header.operation !== 'remove' ? 1 : 2">
             <Editor v-model="header.name" placeholder="Header name" />
           </td>
-          <td>
+          <td v-if="header.operation !== 'remove'">
             <Editor v-model="header.value" placeholder="Header value" />
           </td>
           <td>
@@ -170,7 +178,7 @@
           <path fill-rule="evenodd"
             d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2" />
         </svg>
-        Add response header
+        Add
       </button>
     </div>
 
@@ -252,6 +260,7 @@ import { ref, toRefs, computed, onMounted, nextTick } from "vue";
 import type { Ref } from "vue";
 
 import Editor from "./Editor.vue";
+import Dropdown from "./Dropdown.vue";
 
 const props = defineProps({
   tab: {

@@ -32,7 +32,7 @@ export function generateRules(data: DataType) {
             }
           });
 
-          // request rules
+          // request header rules
           tab.requestHeaders?.forEach((request:any) => {
             if (request.active && request.name !== "") {
               rules.push({
@@ -40,7 +40,12 @@ export function generateRules(data: DataType) {
                 priority: 1,
                 action: {
                   type: "modifyHeaders",
-                  requestHeaders: [{ header: request.name, operation: "set", value: request.value }]
+                  requestHeaders: [{ 
+                    header: request.name,
+                    operation: request.operation || "set",
+                    // remove operation cannot have a value
+                    ...(request.operation !== "remove" && { value: request.value })
+                  }]
                 },
                 condition: {
                   ...(request.condition.urlFilter !== "" && { urlFilter: request.condition.urlFilter }),
@@ -54,7 +59,7 @@ export function generateRules(data: DataType) {
             }
           });
 
-          // response rules
+          // response header rules
           tab.responseHeaders?.forEach((request:any) => {
             if (request.active && request.name !== "") {
               rules.push({
@@ -62,7 +67,12 @@ export function generateRules(data: DataType) {
                 priority: 1,
                 action: {
                   type: "modifyHeaders",
-                  responseHeaders: [{ header: request.name, operation: "set", value: request.value }]
+                  responseHeaders: [{ 
+                    header: request.name,
+                    operation: request.operation || "set",
+                    // remove operation cannot have a value
+                    ...(request.operation !== "remove" && { value: request.value })
+                  }]
                 },
                 condition: {
                   ...(request.condition.urlFilter !== "" && { urlFilter: request.condition.urlFilter }),

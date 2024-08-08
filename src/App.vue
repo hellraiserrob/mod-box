@@ -1,5 +1,6 @@
 <template>
   <div>
+    <div v-if="error" class="error">There was an error setting the rules, did you use an invalid header name</div>
     <div v-if="data.folders" class="folders">
       <div class="folders__list">
         <h1 class="mb20 logo">
@@ -93,6 +94,7 @@ const data: Ref<DataType> = ref({
 
 const activeFolder: Ref<number> = ref(0);
 const totalActiveRules: Ref<number> = ref(0);
+const error = ref(false);
 
 /**
  * methods
@@ -164,10 +166,19 @@ async function save() {
     const oldRules = await chrome.declarativeNetRequest.getDynamicRules();
     const oldRuleIds = oldRules.map((rule: any) => rule.id);
 
-    await chrome.declarativeNetRequest.updateDynamicRules({
-      removeRuleIds: oldRuleIds,
-      addRules: activeRules,
-    });
+    
+    try {
+      await chrome.declarativeNetRequest.updateDynamicRules({
+        removeRuleIds: oldRuleIds,
+        addRules: activeRules,
+      });
+
+      error.value = false;
+      
+    } catch (e) {
+      error.value = true;
+      console.log(e);
+    }
 
     chrome.storage.local.set({ rules: JSON.stringify(data.value) }).then(() => {
       console.log("Chrome storage rules set");

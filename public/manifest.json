@@ -3,7 +3,7 @@
   "name": "ModBox - Add request & response headers, block requests and more",
   "short_name": "ModBox",
   "description": "Block HTTP requests and sites, modify headers globally or by domain and url rules. Organise by folder and tab",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "author": {
     "email": "robertjamesphillips@googlemail.com"
   },
