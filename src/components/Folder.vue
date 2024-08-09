@@ -81,6 +81,7 @@
 <script setup lang="ts">
 import { ref, toRefs, onMounted, nextTick } from "vue";
 import type { Ref } from "vue";
+import * as _ from "lodash";
 
 import Tab from "./Tab.vue";
 import TabDragger from "./TabDragger.vue";
@@ -126,7 +127,7 @@ function deleteTab(targetTab: any) {
 }
 
 function cloneTab(targetTab: any) {
-  folder.value.tabs.push({...targetTab, name: "Cloned tab"})
+  folder.value.tabs.push({..._.cloneDeep(targetTab), name: "Cloned tab"})
   activeTab.value = folder.value.tabs.length - 1;
 }
 

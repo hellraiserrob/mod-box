@@ -50,6 +50,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from "vue";
 import type { Ref } from "vue";
+import * as _ from "lodash";
 
 import { DataType, FolderType } from "./interaces"
 import { generateRules } from "./utils"
@@ -120,7 +121,7 @@ function setFolder(index: number) {
 }
 
 function cloneFolder(folder: FolderType) {
-  data.value.folders.push({...folder, name: "Cloned folder"})
+  data.value.folders.push({..._.cloneDeep(folder), name: "Cloned folder"})
   activeFolder.value = data.value.folders.length - 1;
 }
 
