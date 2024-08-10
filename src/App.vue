@@ -118,16 +118,24 @@ function toggleActive(folder: FolderType) {
 function setFolder(index: number) {
   activeFolder.value = index;
   window.localStorage.setItem("activeFolder", `${activeFolder.value}`);
+
+  if(isChrome) {
+    chrome.storage.local.set({ activeFolder: `${activeFolder.value}` }).then(() => {
+      console.log("Chrome storage activeFolder set");
+    });
+  }
 }
 
 function cloneFolder(folder: FolderType) {
   data.value.folders.push({..._.cloneDeep(folder), name: "Cloned folder"})
-  activeFolder.value = data.value.folders.length - 1;
+
+  setFolder(data.value.folders.length - 1);
 }
 
 function reset() {
   data.value = fallbackData;
-  activeFolder.value = 0;
+
+  setFolder(0);
   save();
 }
 
@@ -147,7 +155,7 @@ function addFolder() {
     ],
   });
 
-  activeFolder.value = data.value.folders.length - 1;
+  setFolder(data.value.folders.length - 1);
 }
 
 function deleteFolder(targetFolder: FolderType) {
@@ -155,7 +163,7 @@ function deleteFolder(targetFolder: FolderType) {
     (folder) => folder !== targetFolder
   );
 
-  activeFolder.value = 0;
+  setFolder(0);
 }
 
 async function save() {
@@ -167,7 +175,6 @@ async function save() {
     const oldRules = await chrome.declarativeNetRequest.getDynamicRules();
     const oldRuleIds = oldRules.map((rule: any) => rule.id);
 
-    
     try {
       await chrome.declarativeNetRequest.updateDynamicRules({
         removeRuleIds: oldRuleIds,
@@ -189,17 +196,12 @@ async function save() {
       console.log("Chrome storage totalActiveRules set");
     });
 
-    chrome.storage.local.set({ activeFolder: `${activeFolder.value}` }).then(() => {
-      console.log("Chrome storage activeFolder set");
-    });
-
     // set badge
     chrome.action.setBadgeBackgroundColor({ color: "blue" })
     chrome.action.setBadgeText({ text: totalActiveRules.value > 0 ? `${totalActiveRules.value}` : '' });
 
   } else {
     window.localStorage.setItem("rules", JSON.stringify(data.value));
-    window.localStorage.setItem("activeFolder", `${activeFolder.value}`);
   }
 }
 
