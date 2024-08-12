@@ -644,7 +644,7 @@ a {
   }
 
   td {
-    border-bottom: 1px solid #ddd
+    border-bottom: 1px solid #ddd;
   }
 
   &__short {
@@ -692,10 +692,15 @@ a {
     color: #333;
     cursor: pointer;
     transition: all ease 0.2s;
-    padding: 0;
+    padding: 6px 0;
     background: transparent;
-    border: 0;
     text-align: left;
+    display: block;
+    border: 0;
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 
     &--locked {
       text-decoration: line-through;

@@ -53,7 +53,7 @@ import type { Ref } from "vue";
 import * as _ from "lodash";
 
 import { DataType, FolderType } from "./interaces"
-import { generateRules } from "./utils"
+import { generateRules, isChrome } from "./utils"
 
 import Folder from "./components/Folder.vue";
 import Dragger from "./components/FolderDragger.vue";
@@ -62,8 +62,6 @@ import Dragger from "./components/FolderDragger.vue";
  * static variables
  */
 
-const isChrome: boolean =
-  chrome && chrome.declarativeNetRequest && chrome.storage;
 const fallbackData = {
   active: true,
   folders: [
@@ -78,6 +76,7 @@ const fallbackData = {
           requestHeaders: [],
           responseHeaders: [],
           blockedRequests: [],
+          redirectRequests: [],
         },
       ],
     },
@@ -108,21 +107,32 @@ function moveFolder(from: number, to: number) {
   data.value.folders.splice(from, 1);
   data.value.folders.splice(to, 0, folder);
 
-  setFolder(to);
+  setFolder(to, false);
 }
 
 function toggleActive(folder: FolderType) {
   folder.active = !folder.active;
 }
 
-function setFolder(index: number) {
+function setFolder(index: number, saveTab:Boolean = true) {
   activeFolder.value = index;
-  window.localStorage.setItem("activeFolder", `${activeFolder.value}`);
-
+  
   if(isChrome) {
-    chrome.storage.local.set({ activeFolder: `${activeFolder.value}` }).then(() => {
+    chrome.storage.local.set({ activeFolder: `${activeFolder.value}`}).then(() => {
       console.log("Chrome storage activeFolder set");
     });
+    
+    if(saveTab) {
+      chrome.storage.local.set({ activeTab: "0" }).then(() => {
+        console.log("Chrome storage activeTab set");
+      });
+    }
+  }
+  else {
+    window.localStorage.setItem("activeFolder", `${activeFolder.value}`);
+    if(saveTab) {
+      window.localStorage.setItem("activeTab", "0");
+    }
   }
 }
 
@@ -151,6 +161,7 @@ function addFolder() {
         requestHeaders: [],
         responseHeaders: [],
         blockedRequests: [],
+        redirectRequests: []
       },
     ],
   });

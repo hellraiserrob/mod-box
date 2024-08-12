@@ -59,11 +59,11 @@
         Request headers
         <div class="badge">{{ requestHeaderTotal }}</div>
       </h3>
-      <div class="empty" v-if="!tab.requestHeaders.length">
+      <div class="empty" v-if="!tab.requestHeaders?.length">
         No request headers
       </div>
 
-      <table class="table" v-if="tab.requestHeaders.length">
+      <table class="table" v-if="tab.requestHeaders?.length">
         <tr>
           <th></th>
           <th>Operation</th>
@@ -123,11 +123,11 @@
         Response headers
         <div class="badge">{{ responseHeaderTotal }}</div>
       </h3>
-      <div class="empty" v-if="!tab.responseHeaders.length">
+      <div class="empty" v-if="!tab.responseHeaders?.length">
         No response headers
       </div>
 
-      <table class="table" v-if="tab.responseHeaders.length">
+      <table class="table" v-if="tab.responseHeaders?.length">
         <tr>
           <th></th>
           <th>Operation</th>
@@ -187,11 +187,11 @@
         Block requests
         <div class="badge">{{ blockedTotal }}</div>
       </h3>
-      <div class="empty" v-if="!tab.blockedRequests.length">
+      <div class="empty" v-if="!tab.blockedRequests?.length">
         No blocked requests
       </div>
 
-      <table v-if="tab.blockedRequests.length" class="table">
+      <table v-if="tab.blockedRequests?.length" class="table">
         <tr>
           <th class="table__short"></th>
           <th>Url Filter</th>
@@ -249,7 +249,64 @@
           <path fill-rule="evenodd"
             d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2" />
         </svg>
-        Add request
+        Add
+      </button>
+    </div>
+
+    <div class="panel">
+      <h3 class="mb10">
+        Redirect requests
+        <div class="badge">{{ redirectedTotal }}</div>
+      </h3>
+      <div class="empty" v-if="!tab.redirectRequests?.length">
+        No redirect requests
+      </div>
+
+      <table v-if="tab.redirectRequests?.length" class="table">
+        <tr>
+          <th class="table__short"></th>
+          <th>Url Filter</th>
+          <th>Domains</th>
+          <th>Url</th>
+          <th class="table__short"></th>
+        </tr>
+        <tr v-for="request in tab.redirectRequests">
+          <td class="table__short">
+            <button class="toggle" @click="request.active = !request.active"
+              :class="{ 'toggle--active': request.active }">
+              <div class="toggle__text">
+                {{ request.active ? "On" : "Off" }}
+              </div>
+            </button>
+          </td>
+          <td>
+            <Editor v-model="request.condition.urlFilter" placeholder="urlFilter" />
+          </td>
+          <td>
+            <Editor v-model="request.condition.requestDomains" placeholder="Request domains" :fallback="tab.requestDomains" />
+          </td>
+          <td>
+            <Editor v-model="request.url" placeholder="Url" />
+          </td>
+          <td class="table__short text-right">
+            <button class="btn-icon" @click="deleteRedirectRequest(request)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg"
+                viewBox="0 0 16 16">
+                <path
+                  d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
+              </svg>
+            </button>
+          </td>
+        </tr>
+      </table>
+
+      <button class="mt10 btn" @click="addRedirectRequest()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg"
+          viewBox="0 0 16 16">
+          <path fill-rule="evenodd"
+            d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2" />
+        </svg>
+        Add
       </button>
     </div>
   </div>
@@ -283,18 +340,23 @@ const showDeleteConfirmation = ref(false);
  * computed
  */
 const blockedTotal = computed(() => {
-  return tab.value.blockedRequests.filter((request: any) => request.active)
-    .length;
+  return tab.value.blockedRequests?.filter((request: any) => request.active)
+    .length || 0;
+});
+
+const redirectedTotal = computed(() => {
+  return tab.value.redirectRequests?.filter((request: any) => request.active)
+    .length || 0;
 });
 
 const requestHeaderTotal = computed(() => {
-  return tab.value.requestHeaders.filter((request: any) => request.active)
-    .length;
+  return tab.value.requestHeaders?.filter((request: any) => request.active)
+    .length || 0;
 });
 
 const responseHeaderTotal = computed(() => {
-  return tab.value.responseHeaders.filter((request: any) => request.active)
-    .length;
+  return tab.value.responseHeaders?.filter((request: any) => request.active)
+    .length || 0;
 });
 
 /**
@@ -343,6 +405,21 @@ function addBlockedRequest() {
   });
 }
 
+function addRedirectRequest() {
+  if(!tab.value.redirectRequests) {
+    tab.value.redirectRequests = []
+  }
+  
+  tab.value.redirectRequests.push({
+    active: true,
+    url: "",
+    condition: {
+      urlFilter: "",
+      requestDomains: ""
+    },
+  });
+}
+
 function deleteRequestHeader(targetHeader: any) {
   tab.value.requestHeaders = tab.value.requestHeaders.filter(
     (header: any) => header !== targetHeader
@@ -357,6 +434,12 @@ function deleteResponseHeader(targetHeader: any) {
 
 function deleteBlockRequest(targetRequest: any) {
   tab.value.blockedRequests = tab.value.blockedRequests.filter(
+    (request: any) => request !== targetRequest
+  );
+}
+
+function deleteRedirectRequest(targetRequest: any) {
+  tab.value.redirectRequests = tab.value.redirectRequests.filter(
     (request: any) => request !== targetRequest
   );
 }

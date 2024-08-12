@@ -1,7 +1,8 @@
 <template>
   <div class="editor">
-    <button v-if="!isEditing" @click="edit" class="editor__trigger" title="Edit"
-      :class="{ 'editor__trigger--locked': locked, 'editor__trigger--fallback': fallback && !model }">
+    <button v-if="!isEditing" @click="edit" class="editor__trigger"
+      :class="{ 'editor__trigger--locked': locked, 'editor__trigger--fallback': fallback && !model }"
+      :title="model || fallback || ''">
       {{ model || fallback || "-" }}
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil"
         viewBox="0 0 16 16">

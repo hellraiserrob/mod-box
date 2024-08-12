@@ -13,25 +13,6 @@ export function generateRules(data: DataType) {
     if (folder.active) {
       folder.tabs.forEach((tab: TabType) => {
         if (tab.active) {
-          // blocking rules
-          tab.blockedRequests?.forEach((request:any) => {
-            if (request.active) {
-              rules.push({
-                id,
-                priority: 1,
-                action: { type: "block" },
-                condition: {
-                  ...(request.condition.urlFilter !== "" && { urlFilter: request.condition.urlFilter }),
-                  ...(request.condition.requestDomains && { requestDomains: request.condition.requestDomains.split(",") }),
-                  ...(!request.condition.requestDomains && tab.requestDomains && { requestDomains: tab.requestDomains.split(",") }),
-                  ...(request.condition.document && { resourceTypes: ["main_frame"] }),
-                },
-              });
-
-              id += 1;
-            }
-          });
-
           // request header rules
           tab.requestHeaders?.forEach((request:any) => {
             if (request.active && request.name !== "") {
@@ -85,6 +66,43 @@ export function generateRules(data: DataType) {
               id += 1;
             }
           });
+
+          // redirect rules
+          tab.redirectRequests?.forEach((request:any) => {
+            if (request.active && request.url !== "") {
+              rules.push({
+                id,
+                priority: 1,
+                action: { type: "redirect", "redirect": { "url": request.url }},
+                condition: {
+                  ...(request.condition.urlFilter !== "" && { urlFilter: request.condition.urlFilter }),
+                  ...(request.condition.requestDomains && { requestDomains: request.condition.requestDomains.split(",") }),
+                  ...(!request.condition.requestDomains && tab.requestDomains && { requestDomains: tab.requestDomains.split(",") }),
+                },
+              });
+
+              id += 1;
+            }
+          });
+
+          // blocking rules
+          tab.blockedRequests?.forEach((request:any) => {
+            if (request.active) {
+              rules.push({
+                id,
+                priority: 1,
+                action: { type: "block" },
+                condition: {
+                  ...(request.condition.urlFilter !== "" && { urlFilter: request.condition.urlFilter }),
+                  ...(request.condition.requestDomains && { requestDomains: request.condition.requestDomains.split(",") }),
+                  ...(!request.condition.requestDomains && tab.requestDomains && { requestDomains: tab.requestDomains.split(",") }),
+                  ...(request.condition.document && { resourceTypes: ["main_frame"] }),
+                },
+              });
+
+              id += 1;
+            }
+          });
         }
       });
     }
@@ -92,3 +110,6 @@ export function generateRules(data: DataType) {
 
   return rules;
 }
+
+export const isChrome: boolean =
+  chrome && chrome.declarativeNetRequest && chrome.storage;

@@ -47,9 +47,10 @@
       </div>
     </div>
 
-    
+
     <div class="tabs mb15">
-      <TabDragger :tabs="folder.tabs" :active-tab="activeTab" @moveTab="moveTab" @toggleTab="toggleTab" @setTab="setTab" />
+      <TabDragger :tabs="folder.tabs" :active-tab="activeTab" @moveTab="moveTab" @toggleTab="toggleTab"
+        @setTab="setTab" />
       <!-- <div class="tabs__tab" v-for="(tab, index) in folder.tabs" :class="{ 'tabs__tab--active': index === activeTab }">
         <button class="tabs__tab__label" @click="activeTab = index">
           {{ tab.name }}
@@ -73,7 +74,7 @@
     </div>
 
     <div v-for="(tab, index) in folder.tabs">
-      <Tab v-if="index === activeTab" :tab="tab" @deleteTab="deleteTab" @cloneTab="cloneTab"/>
+      <Tab v-if="index === activeTab" :tab="tab" @deleteTab="deleteTab" @cloneTab="cloneTab" />
     </div>
   </div>
 </template>
@@ -83,6 +84,7 @@ import { ref, toRefs, onMounted, nextTick } from "vue";
 import type { Ref } from "vue";
 import * as _ from "lodash";
 
+import { isChrome } from "../utils"
 import Tab from "./Tab.vue";
 import TabDragger from "./TabDragger.vue";
 import { TabType } from "../interaces";
@@ -95,7 +97,7 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["deleteFolder", "cloneFolder"]);
-const folderName:Ref<HTMLInputElement | null> = ref(null);
+const folderName: Ref<HTMLInputElement | null> = ref(null);
 
 
 const { folder } = toRefs(props);
@@ -104,31 +106,41 @@ const activeTab = ref(0);
 const showSettings = ref(false);
 const showDeleteConfirmation = ref(false);
 
-function setTab(index:number) {
+function setTab(index: number) {
   activeTab.value = index;
+
+  if (isChrome) {
+    chrome.storage.local.set({ activeTab: `${activeTab.value}` }).then(() => {
+      console.log("Chrome storage activeTab set");
+    });
+  }
+  else {
+    window.localStorage.setItem("activeTab", `${activeTab.value}`);
+  }
 }
 
 function toggleTab(tab: TabType) {
   tab.active = !tab.active
 }
 
-function moveTab(from:number, to:number) {
+function moveTab(from: number, to: number) {
   const tab = folder.value.tabs[from];
 
   folder.value.tabs.splice(from, 1);
   folder.value.tabs.splice(to, 0, tab);
 
-  activeTab.value = to;
+  setTab(to);
 }
 
 function deleteTab(targetTab: any) {
   folder.value.tabs = folder.value.tabs.filter((tab: any) => tab !== targetTab);
-  activeTab.value = 0;
+
+  setTab(0);
 }
 
 function cloneTab(targetTab: any) {
-  folder.value.tabs.push({..._.cloneDeep(targetTab), name: "Cloned tab"})
-  activeTab.value = folder.value.tabs.length - 1;
+  folder.value.tabs.push({ ..._.cloneDeep(targetTab), name: "Cloned tab" })
+  setTab(folder.value.tabs.length - 1);
 }
 
 function addTab() {
@@ -138,9 +150,10 @@ function addTab() {
     requestHeaders: [],
     responseHeaders: [],
     blockedRequests: [],
+    redirectRequests: [],
   });
 
-  activeTab.value = folder.value.tabs.length - 1;
+  setTab(folder.value.tabs.length - 1);
 }
 
 function deleteFolder() {
@@ -152,18 +165,37 @@ function cloneFolder() {
   emit("cloneFolder", folder.value);
 }
 
+async function restoreTab() {
+  const chromeData = await chrome.storage.local.get(["activeTab"]);
+
+  if (chromeData.activeTab) {
+    console.log("restore activeTab from chrome storage");
+    activeTab.value = parseInt(chromeData.activeTab);
+  }
+}
+
 /**
  * lifecycle hooks
  */
 
 onMounted(() => {
-  if(folder.value.name === "New folder" || folder.value.name === "Cloned folder") {
+  // opens the folder settings automaticallly
+  if (folder.value.name === "New folder" || folder.value.name === "Cloned folder") {
     showSettings.value = true;
 
     nextTick(() => {
       folderName.value?.focus();
       folderName.value?.select();
     })
+  }
+
+  // restores the active tab
+  const aT = window.localStorage.getItem("activeTab");
+  if (isChrome) {
+    restoreTab()
+  }
+  else if(aT) {
+    activeTab.value = parseInt(aT);
   }
 })
 

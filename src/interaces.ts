@@ -5,6 +5,7 @@ export interface TabType {
   requestHeaders?: any[];
   responseHeaders?: any[];
   blockedRequests?: any[];
+  redirectRequests?: any[];
 }
 
 export interface FolderType {
