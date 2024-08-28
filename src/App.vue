@@ -1,8 +1,15 @@
 <template>
   <div>
     <div v-if="error" class="error">There was an error setting the rules, did you use an invalid header name</div>
-    <div v-if="data.folders" class="folders">
+    <div v-if="data.folders" class="folders" :class="{'folders--compact': compact}">
       <div class="folders__list">
+      <div class="folders__list__wrapper">
+        <button class="folders__list__toggle" @click="compact = !compact">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/>
+          </svg>
+        </button>
+
         <h1 class="mb20 logo">
           <img src="/images/16_16.png" alt="Modbox">
           ModBox
@@ -36,7 +43,7 @@
         <div class="folders__list__item">
           <button class="folders__list__item__label" @click="reset">Reset all</button>
         </div>
-
+      </div>
       </div>
       <div class="folders__detail">
         <div v-for="(folder, index) in data.folders">
@@ -95,6 +102,7 @@ const data: Ref<DataType> = ref({
 const activeFolder: Ref<number> = ref(0);
 const totalActiveRules: Ref<number> = ref(0);
 const error = ref(false);
+const compact = ref(false);
 
 /**
  * methods

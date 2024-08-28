@@ -125,10 +125,34 @@ a {
 
 .folders {
   display: flex;
-  gap: 12px;
 
   &__list {
     flex-basis: 175px;
+    margin-right: 12px;
+    position: relative;
+    transition: all ease 0.3s;
+    overflow: hidden;
+    
+    &__wrapper {
+      width: 175px;
+    }
+
+    &__toggle {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 20px;
+      height: 20px;
+      border-radius: 10px;
+      background: none;
+      border: 1px solid #000;
+      cursor: pointer;
+
+      svg {
+        display: block;
+        width: 12px;
+      }
+    }
 
     &__item {
       position: relative;
@@ -193,6 +217,10 @@ a {
   }
   &__detail {
     flex: 1;
+  }
+
+  &--compact &__list {
+    flex-basis: 50px;
   }
 }
 
@@ -697,7 +725,7 @@ a {
     text-align: left;
     display: block;
     border: 0;
-    max-width: 150px;
+    max-width: 125px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
