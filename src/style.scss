@@ -764,11 +764,16 @@ a {
     }
 
     &--chip {
-      // background: #fff;
-      // border-radius: 2px;
+      background: #fff;
+      border-radius: 2px;
       padding: 0;
       // font-family: monospace;
-      // font-size: 12px;
+      font-size: 12px;
+      padding: 0 5px;
+
+      &--placeholder {
+        color: #999;
+      }
 
       & + & {
         margin-top: 4px;
@@ -878,7 +883,7 @@ a {
     vertical-align: middle;
     fill:#000;
     width: 14px;
-    margin: 0 0 0 2px;
+    margin: -4px 0 0 2px;
   }
 
   &__window {
@@ -894,6 +899,8 @@ a {
     transform: translateX(-50%);
     border-radius: 4px;
     text-align: center;
+    font-size: 12px;
+    line-height: 1.23em;
 
     &:after {
       top: 100%;

@@ -30,6 +30,7 @@
         v-for="domain in splitDomains"
         @click="edit"
         class="editor__trigger editor__trigger--chip"
+        :class="{'editor__trigger--chip--placeholder': model === '' && typeof fallback === 'string'}"
         :title="cleanDomain(domain)"
       >
         {{ cleanDomain(domain) }}
@@ -101,8 +102,12 @@ function cancel() {
 }
 
 const splitDomains = computed(() => {
-  if (!props.domains || typeof model.value !== "string" || model.value === "") {
+  if (!props.domains || typeof model.value !== "string" || (model.value === "" && typeof fallback === undefined)) {
     return [];
+  }
+
+  if(model.value === "" && typeof fallback?.value === "string") {
+    return fallback.value.split(",")
   }
 
   return model.value.split(",");
