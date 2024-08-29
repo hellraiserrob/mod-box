@@ -41,13 +41,18 @@
           </div>
         </div>
         <div class="folders__list__item">
-          <button class="folders__list__item__label" @click="reset">Reset all</button>
+          <!-- <button class="folders__list__item__label" @click="reset">Reset all</button> -->
+          <button class="folders__list__item__label" @click="showSettings = true">Settings</button>
         </div>
       </div>
       </div>
       <div class="folders__detail">
-        <div v-for="(folder, index) in data.folders">
+        {{ showSettings }}
+        <div v-if="!showSettings" v-for="(folder, index) in data.folders">
           <Folder v-if="index === activeFolder" :folder="folder" @deleteFolder="deleteFolder" @cloneFolder="cloneFolder" />
+        </div>
+        <div v-else>
+          settings
         </div>
       </div>
     </div>
@@ -103,6 +108,7 @@ const activeFolder: Ref<number> = ref(0);
 const totalActiveRules: Ref<number> = ref(0);
 const error = ref(false);
 const compact = ref(false);
+const showSettings = ref(false);
 
 /**
  * methods
@@ -124,6 +130,7 @@ function toggleActive(folder: FolderType) {
 
 function setFolder(index: number, saveTab:Boolean = true) {
   activeFolder.value = index;
+  showSettings.value = false
   
   if(isChrome) {
     chrome.storage.local.set({ activeFolder: `${activeFolder.value}`}).then(() => {
