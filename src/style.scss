@@ -17,7 +17,8 @@ html, body {
 body,
 button,
 input,
-th {
+th,
+p {
   font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir,
     segoe ui, helvetica neue, helvetica, Cantarell, Ubuntu, roboto, noto,
     arial, sans-serif;
@@ -54,6 +55,11 @@ h3 {
   // border-bottom: 1px solid #ddd;
 }
 
+p {
+  margin: 0;
+  color: #666;
+  font-size: 15px;
+}
 
 a {
   color: blue;
@@ -113,6 +119,7 @@ a {
 
 #app {
   max-width: 800px;
+  min-height: 500px;
   margin: 0 auto;
   padding: 10px;
 }
@@ -135,6 +142,11 @@ a {
     
     &__wrapper {
       width: 175px;
+    }
+
+    &__settings {
+      position: sticky;
+      bottom: 0;
     }
 
     &__toggle {
@@ -162,9 +174,9 @@ a {
       cursor: pointer;
       align-items: center;
 
-      &:last-child {
-        margin-bottom: 20px;
-      }
+      // &:last-child {
+      //   margin-bottom: 20px;
+      // }
 
       &--active {
         background-color: #efefef;
@@ -661,7 +673,8 @@ a {
   th {
     font-weight: 400;
     font-size: 12px;
-    text-transform: uppercase;
+    // text-transform: uppercase;
+    color: #666;
     text-align: left;
     padding-bottom: 10px;
     border-bottom: 1px solid #ddd;

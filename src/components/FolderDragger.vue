@@ -1,6 +1,6 @@
 <template>
   <div v-for="(folder, index) in folders" class="folders__list__item"
-    :class="{ 'folders__list__item--active': index === activeFolder }" @click="active = index" :draggable="tmp >= 0"
+    :class="{ 'folders__list__item--active': index === activeFolder && !showSettings }" @click="active = index" :draggable="tmp >= 0"
     @dragover.prevent="" @drop="onDragDrop(index)" @dragstart="onDragStart(index)"
     @dragend="dragging = false; tmp = -1">
     <button :title="'select ' + folder.name" @click="setFolder(index)" class="folders__list__item__label">{{
@@ -34,6 +34,10 @@ const props = defineProps({
   },
   activeFolder: {
     type: Number,
+    required: true,
+  },
+  showSettings: {
+    type: Boolean,
     required: true,
   },
 });

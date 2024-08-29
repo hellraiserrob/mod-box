@@ -1,9 +1,9 @@
 {
   "manifest_version": 3,
-  "name": "ModBox",
+  "name": "ModBox - Modify headers, block & redirect requests",
   "short_name": "ModBox",
   "description": "Block HTTP requests and sites, modify headers globally or by domain and url rules. Organise by folder and tab",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "author": {
     "email": "robertjamesphillips@googlemail.com"
   },

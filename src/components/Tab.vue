@@ -66,7 +66,7 @@
       <table class="table" v-if="tab.requestHeaders?.length">
         <tr>
           <th></th>
-          <th>Operation</th>
+          <th></th>
           <th>Name</th>
           <th>Value</th>
           <th>Filter</th>
