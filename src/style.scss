@@ -330,6 +330,10 @@ a {
   background: #efefef;
   border-radius: 6px;
   position: relative;
+
+  &--large {
+    padding: 20px;
+  }
   
   &__close {
     position: absolute;
@@ -561,6 +565,8 @@ a {
   cursor: pointer;
   transition: all ease 0.2s;
   box-shadow: 0 1px 2px 0 rgba(#000, 0.05);
+  text-decoration: none;
+  color: #333;
 
   &--active {
     border-color: blue;
@@ -576,6 +582,11 @@ a {
   }
 
   &:active {
+    border-color: blue;
+  }
+  
+  &:focus {
+    outline: none;
     border-color: blue;
   }
 
@@ -738,7 +749,7 @@ a {
     text-align: left;
     display: block;
     border: 0;
-    max-width: 125px;
+    max-width: 100px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -750,6 +761,18 @@ a {
 
     &--fallback {
       color: #999;
+    }
+
+    &--chip {
+      // background: #fff;
+      // border-radius: 2px;
+      padding: 0;
+      // font-family: monospace;
+      // font-size: 12px;
+
+      & + & {
+        margin-top: 4px;
+      }
     }
 
     &:hover {
@@ -832,6 +855,64 @@ a {
         font-weight: 600;
       }
     }
+  }
+}
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+
+  &__trigger {
+    display: inline-block;
+    // width: 12px;
+    // height: 12px;
+    // background: #000;
+    // border-radius: 50%;
+    // color: #fff;
+    // margin: 0;
+    // text-align: center;
+    // font-size: 11px;
+    // line-height: 12px;
+    cursor: pointer;
+    vertical-align: middle;
+    fill:#000;
+    width: 14px;
+    margin: 0 0 0 2px;
+  }
+
+  &__window {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 4px);
+    left: 50%;
+    background: 000;
+    color: #fff;
+    background: #000;
+    padding: 4px 8px;
+    min-width: 120px;
+    transform: translateX(-50%);
+    border-radius: 4px;
+    text-align: center;
+
+    &:after {
+      top: 100%;
+      left: 50%;
+      border: solid transparent;
+      content: "";
+      height: 0;
+      width: 0;
+      position: absolute;
+      pointer-events: none;
+      border-color: rgba(0, 0, 0, 0);
+      border-top-color: #000;
+      border-width: 3px;
+      margin-left: -3px;
+    }
+  }
+
+  &:hover &__window {
+    display: block;
   }
 }
 

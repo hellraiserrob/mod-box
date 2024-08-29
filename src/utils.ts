@@ -30,8 +30,8 @@ export function generateRules(data: DataType) {
                 },
                 condition: {
                   ...(request.condition.urlFilter !== "" && { urlFilter: request.condition.urlFilter }),
-                  ...(request.condition.requestDomains && { requestDomains: request.condition.requestDomains.split(",") }),
-                  ...(!request.condition.requestDomains && tab.requestDomains && { requestDomains: tab.requestDomains.split(",") }),
+                  ...(request.condition.requestDomains && { requestDomains: parseDomains(request.condition.requestDomains) }),
+                  ...(!request.condition.requestDomains && tab.requestDomains && { requestDomains: parseDomains(tab.requestDomains) }),
                   resourceTypes: ["main_frame", "sub_frame", "stylesheet", "script", "image", "font", "object", "xmlhttprequest", "ping", "csp_report", "media", "websocket", "webtransport", "webbundle", "other"]
                 }
               });
@@ -57,8 +57,8 @@ export function generateRules(data: DataType) {
                 },
                 condition: {
                   ...(request.condition.urlFilter !== "" && { urlFilter: request.condition.urlFilter }),
-                  ...(request.condition.requestDomains && { requestDomains: request.condition.requestDomains.split(",") }),
-                  ...(!request.condition.requestDomains && tab.requestDomains && { requestDomains: tab.requestDomains.split(",") }),
+                  ...(request.condition.requestDomains && { requestDomains: parseDomains(request.condition.requestDomains) }),
+                  ...(!request.condition.requestDomains && tab.requestDomains && { requestDomains: parseDomains(tab.requestDomains) }),
                   resourceTypes: ["main_frame", "sub_frame", "stylesheet", "script", "image", "font", "object", "xmlhttprequest", "ping", "csp_report", "media", "websocket", "webtransport", "webbundle", "other"]
                 }
               });
@@ -76,8 +76,8 @@ export function generateRules(data: DataType) {
                 action: { type: "redirect", "redirect": { "url": request.url }},
                 condition: {
                   ...(request.condition.urlFilter !== "" && { urlFilter: request.condition.urlFilter }),
-                  ...(request.condition.requestDomains && { requestDomains: request.condition.requestDomains.split(",") }),
-                  ...(!request.condition.requestDomains && tab.requestDomains && { requestDomains: tab.requestDomains.split(",") }),
+                  ...(request.condition.requestDomains && { requestDomains: parseDomains(request.condition.requestDomains) }),
+                  ...(!request.condition.requestDomains && tab.requestDomains && { requestDomains: parseDomains(tab.requestDomains) }),
                 },
               });
 
@@ -94,8 +94,8 @@ export function generateRules(data: DataType) {
                 action: { type: "block" },
                 condition: {
                   ...(request.condition.urlFilter !== "" && { urlFilter: request.condition.urlFilter }),
-                  ...(request.condition.requestDomains && { requestDomains: request.condition.requestDomains.split(",") }),
-                  ...(!request.condition.requestDomains && tab.requestDomains && { requestDomains: tab.requestDomains.split(",") }),
+                  ...(request.condition.requestDomains && { requestDomains: parseDomains(request.condition.requestDomains) }),
+                  ...(!request.condition.requestDomains && tab.requestDomains && { requestDomains: parseDomains(tab.requestDomains) }),
                   ...(request.condition.document && { resourceTypes: ["main_frame"] }),
                 },
               });
@@ -113,3 +113,12 @@ export function generateRules(data: DataType) {
 
 export const isChrome: boolean =
   chrome && chrome.declarativeNetRequest && chrome.storage;
+
+export const parseDomains = (domains: string) => {
+  const domainsArray = domains.split(",");
+  return domainsArray.map(domain => cleanDomain(domain))
+}
+
+export const cleanDomain = (domain: string) => {
+  return domain.trim().replaceAll("https://", "").replaceAll("https://", "")
+}

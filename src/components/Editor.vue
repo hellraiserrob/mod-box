@@ -1,28 +1,78 @@
 <template>
   <div class="editor">
-    <button v-if="!isEditing" @click="edit" class="editor__trigger"
-      :class="{ 'editor__trigger--locked': locked, 'editor__trigger--fallback': fallback && !model }"
-      :title="model || fallback || ''">
+    <button
+      v-if="!isEditing && !domains"
+      @click="edit"
+      class="editor__trigger"
+      :class="{
+        'editor__trigger--locked': locked,
+        'editor__trigger--fallback': fallback && !model,
+      }"
+      :title="model || fallback || ''"
+    >
       {{ model || fallback || "-" }}
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil"
-        viewBox="0 0 16 16">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        fill="currentColor"
+        class="bi bi-pencil"
+        viewBox="0 0 16 16"
+      >
         <path
-          d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325" />
+          d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325"
+        />
       </svg>
     </button>
+
+    <div v-if="!isEditing && domains && splitDomains">
+      <button
+        v-for="domain in splitDomains"
+        @click="edit"
+        class="editor__trigger editor__trigger--chip"
+        :title="cleanDomain(domain)"
+      >
+        {{ cleanDomain(domain) }}
+      </button>
+      <button v-if="!splitDomains.length" @click="edit" class="editor__trigger">
+        -
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          fill="currentColor"
+          class="bi bi-pencil"
+          viewBox="0 0 16 16"
+        >
+          <path
+            d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325"
+          />
+        </svg>
+      </button>
+    </div>
+
     <div v-show="isEditing" class="field field--table">
-      <input ref="input" @blur="save" @keyup.enter="save" @keyup.esc="cancel" class="field__input" type="text"
-        v-model="model" :placeholder="placeholder" />
+      <input
+        ref="input"
+        @blur="save"
+        @keyup.enter="save"
+        @keyup.esc="cancel"
+        class="field__input"
+        type="text"
+        v-model="model"
+        :placeholder="placeholder"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick, toRefs } from "vue";
+import { ref, nextTick, toRefs, computed } from "vue";
 import type { Ref } from "vue";
+import { cleanDomain } from "../utils";
 
 const model = defineModel();
-const props = defineProps(["placeholder", "locked", "fallback"]);
+const props = defineProps(["placeholder", "locked", "fallback", "domains"]);
 
 const input: Ref<HTMLInputElement | null> = ref(null);
 const isEditing = ref(false);
@@ -49,4 +99,12 @@ function cancel() {
   isEditing.value = false;
   model.value = resetValue;
 }
+
+const splitDomains = computed(() => {
+  if (!props.domains || typeof model.value !== "string" || model.value === "") {
+    return [];
+  }
+
+  return model.value.split(",");
+});
 </script>

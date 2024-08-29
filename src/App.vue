@@ -105,7 +105,7 @@
             </button> -->
           </div>
 
-          <div class="panel mb20">
+          <div class="panel panel--large mb20">
             <div v-if="showDeleteConfirmation" class="panel__modal">
               <h3 class="mb10">Confirm rules deletion</h3>
               <div class="panel__modal__actions">
@@ -122,17 +122,23 @@
               undone so please use carefully.
             </p>
 
-            <div class="panel__actions btn-group">
+            <div class="panel__actions">
               <button @click="showDeleteConfirmation = true" class="btn">
                 Delete all
               </button>
             </div>
           </div>
-          <div class="panel">
+          <div class="panel panel--large">
             <h3 class="mb10">About</h3>
-            <p>
+            <p class="mb20">
               ModBox is a hobby project with the aim of providing developers and hackers with a tool for testing and debugging.  The inspiration was being let down by similar projects with nefarious intension.
             </p>
+
+            <div class="panel__actions">
+              <a href="https://www.linkedin.com/in/frontendrob/" class="btn" target="_blank">
+                LinkedIn
+              </a>
+            </div>
           </div>
         </div>
       </div>
