@@ -65,9 +65,7 @@
       <div class="field mb20">
         <label class="field__label">
           Tab request domains
-          <Tooltip>
-            Single or comma separated domains
-          </Tooltip>
+          <Tooltip> Single or comma separated domains </Tooltip>
         </label>
         <input
           class="field__input"
@@ -103,13 +101,16 @@
           <th></th>
           <th>Name</th>
           <th>Value</th>
-          <th>Filter</th>
+          <th>
+            Url Filter
+            <Tooltip>
+              The pattern which is matched against the network request url
+            </Tooltip>
+          </th>
           <th>
             Domains
-            
-            <Tooltip>
-              Single or comma separated domains
-            </Tooltip>
+
+            <Tooltip> Single or comma separated domains </Tooltip>
           </th>
           <th></th>
         </tr>
@@ -126,7 +127,7 @@
             </button>
           </td>
           <td>
-            <Dropdown v-model="header.operation" />
+            <Dropdown v-model="header.operation" :options="operationOptions" />
           </td>
           <td :colspan="header.operation !== 'remove' ? 1 : 2">
             <Editor v-model="header.name" placeholder="Header name" />
@@ -201,11 +202,19 @@
       <table class="table" v-if="tab.responseHeaders?.length">
         <tr>
           <th></th>
-          <th>Operation</th>
+          <th></th>
           <th>Name</th>
           <th>Value</th>
-          <th>Filter</th>
-          <th>Domains</th>
+          <th>
+            Url Filter
+            <Tooltip>
+              The pattern which is matched against the network request url
+            </Tooltip>
+          </th>
+          <th>
+            Domains
+            <Tooltip>Single or comma separated domains</Tooltip>
+          </th>
           <th></th>
         </tr>
         <tr v-for="header in tab.responseHeaders">
@@ -221,7 +230,7 @@
             </button>
           </td>
           <td>
-            <Dropdown v-model="header.operation" />
+            <Dropdown v-model="header.operation" :options="operationOptions" />
           </td>
           <td :colspan="header.operation !== 'remove' ? 1 : 2">
             <Editor v-model="header.name" placeholder="Header name" />
@@ -240,6 +249,7 @@
               v-model="header.condition.requestDomains"
               placeholder="Request domains"
               :fallback="tab.requestDomains"
+              :domains="true"
             />
           </td>
           <td class="table__short text-right">
@@ -295,21 +305,16 @@
       <table v-if="tab.blockedRequests?.length" class="table">
         <tr>
           <th class="table__short"></th>
-          <th>Url Filter</th>
-          <th>Domains</th>
-          <th title="Block document">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              fill="currentColor"
-              class="bi bi-ban"
-              viewBox="0 0 16 16"
-            >
-              <path
-                d="M15 8a6.97 6.97 0 0 0-1.71-4.584l-9.874 9.875A7 7 0 0 0 15 8M2.71 12.584l9.874-9.875a7 7 0 0 0-9.874 9.874ZM16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0"
-              />
-            </svg>
+          <th>Type</th>
+          <th>
+            Url Filter
+            <Tooltip>
+              The pattern which is matched against the network request url
+            </Tooltip>
+          </th>
+          <th>
+            Domains
+            <Tooltip> Single or comma separated domains</Tooltip>
           </th>
           <th class="table__short"></th>
         </tr>
@@ -326,7 +331,14 @@
             </button>
           </td>
           <td>
+            <Dropdown
+              v-model="request.condition.document"
+              :options="blockOptions"
+            />
+          </td>
+          <td>
             <Editor
+              v-if="!request.condition.document"
               v-model="request.condition.urlFilter"
               placeholder="urlFilter"
               :locked="request.condition.document"
@@ -337,27 +349,8 @@
               v-model="request.condition.requestDomains"
               placeholder="Request domains"
               :fallback="tab.requestDomains"
+              :domains="true"
             />
-          </td>
-          <td>
-            <button
-              class="checkbox"
-              @click="request.condition.document = !request.condition.document"
-              :class="{ 'checkbox--active': request.condition.document }"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                fill="currentColor"
-                class="bi bi-check-lg"
-                viewBox="0 0 16 16"
-              >
-                <path
-                  d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z"
-                />
-              </svg>
-            </button>
           </td>
           <td class="table__short text-right">
             <button class="btn-icon" @click="deleteBlockRequest(request)">
@@ -408,9 +401,20 @@
       <table v-if="tab.redirectRequests?.length" class="table">
         <tr>
           <th class="table__short"></th>
-          <th>Url Filter</th>
-          <th>Domains</th>
-          <th>Url</th>
+          <th>
+            Url Filter
+            <Tooltip>
+              The pattern which is matched against the network request url
+            </Tooltip>
+          </th>
+          <th>
+            Domains
+            <Tooltip> Single or comma separated domains</Tooltip>
+          </th>
+          <th>
+            Destination
+            <Tooltip> An absolute destination Url </Tooltip>
+          </th>
           <th class="table__short"></th>
         </tr>
         <tr v-for="request in tab.redirectRequests">
@@ -436,6 +440,7 @@
               v-model="request.condition.requestDomains"
               placeholder="Request domains"
               :fallback="tab.requestDomains"
+              :domains="true"
             />
           </td>
           <td>
@@ -498,6 +503,28 @@ const emit = defineEmits(["deleteTab", "cloneTab"]);
 
 const { tab } = toRefs(props);
 const tabName: Ref<HTMLInputElement | null> = ref(null);
+
+const operationOptions = [
+  {
+    label: "Set",
+    value: "set",
+  },
+  {
+    label: "Remove",
+    value: "remove",
+  },
+];
+
+const blockOptions = [
+  {
+    label: "Assets",
+    value: false,
+  },
+  {
+    label: "Domain",
+    value: true,
+  },
+];
 
 /**
  * reactive

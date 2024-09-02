@@ -96,7 +96,8 @@ export function generateRules(data: DataType) {
                   ...(request.condition.urlFilter !== "" && { urlFilter: request.condition.urlFilter }),
                   ...(request.condition.requestDomains && { requestDomains: parseDomains(request.condition.requestDomains) }),
                   ...(!request.condition.requestDomains && tab.requestDomains && { requestDomains: parseDomains(tab.requestDomains) }),
-                  ...(request.condition.document && { resourceTypes: ["main_frame"] }),
+                  ...(!request.condition.document && { resourceTypes: ["stylesheet", "script", "image", "font", "object", "xmlhttprequest", "ping", "csp_report", "media", "websocket", "webtransport", "webbundle", "other"] }),
+                  ...(request.condition.document && { resourceTypes: ["main_frame", "sub_frame"] }),
                 },
               });
 

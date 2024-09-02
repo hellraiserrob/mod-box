@@ -332,7 +332,9 @@ a {
   position: relative;
 
   &--large {
-    padding: 20px;
+    padding: 10px;
+    background-color: transparent;
+    border: 1px solid #ddd;
   }
   
   &__close {
@@ -689,6 +691,7 @@ a {
     text-align: left;
     padding-bottom: 10px;
     border-bottom: 1px solid #ddd;
+    white-space: nowrap;
 
     a {
       color: #333;
@@ -744,7 +747,7 @@ a {
     color: #333;
     cursor: pointer;
     transition: all ease 0.2s;
-    padding: 6px 0;
+    padding: 4px 0;
     background: transparent;
     text-align: left;
     display: block;
@@ -867,6 +870,7 @@ a {
   position: relative;
   display: inline-block;
   vertical-align: middle;
+  white-space: wrap;
 
   &__trigger {
     display: inline-block;
@@ -881,8 +885,8 @@ a {
     // line-height: 12px;
     cursor: pointer;
     vertical-align: middle;
-    fill:#000;
-    width: 14px;
+    fill: #666;
+    width: 12px;
     margin: -4px 0 0 2px;
   }
 

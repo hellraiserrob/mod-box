@@ -131,7 +131,7 @@
           <div class="panel panel--large">
             <h3 class="mb10">About</h3>
             <p class="mb20">
-              ModBox is a hobby project with the aim of providing developers and hackers with a tool for testing and debugging.  The inspiration was being let down by similar projects with nefarious intension.
+              ModBox is a hobby project with the aim of providing developers and hackers with a tool for testing and debugging.
             </p>
 
             <div class="panel__actions">

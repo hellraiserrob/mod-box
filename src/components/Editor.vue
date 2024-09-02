@@ -35,6 +35,7 @@
       >
         {{ cleanDomain(domain) }}
       </button>
+      
       <button v-if="!splitDomains.length" @click="edit" class="editor__trigger">
         -
         <svg
@@ -106,7 +107,12 @@ const splitDomains = computed(() => {
     return [];
   }
 
+  // 
+
   if(model.value === "" && typeof fallback?.value === "string") {
+    if(fallback?.value === "") {
+      return [];
+    }
     return fallback.value.split(",")
   }
 
