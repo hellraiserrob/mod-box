@@ -22,7 +22,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, toRefs, type PropType } from "vue";
+import { ref, toRefs } from "vue";
 // import { FolderType } from "../interaces";
 
 const props = defineProps({
