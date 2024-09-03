@@ -493,6 +493,7 @@ a {
   position: relative;
   cursor: pointer;
   transition: all ease 0.2s;
+  // box-shadow: inset 0 0 5px rgba(#000, 0.10);
 
   &--large {
     height: 28px;
@@ -673,10 +674,44 @@ a {
   }
 }
 
+.handle {
+  // opacity: 0;
+  // visibility: hidden;
+  border: 0;
+  background: none;
+  cursor: move;
+  padding: 0;
+  display: inline-block;
+  // display: inline-block;
+  // position: absolute;
+  // top: 50%;
+  // left: -4px;
+  // transform: translateY(-50%);
+  // display: none;
+  
+  svg {
+    display: block;
+    transition: all ease 0.2s;
+    fill:#999
+  }
+
+  &:disabled {
+    cursor: default;
+
+    svg {
+      fill: #ccc !important;
+    }
+  }
+}
+
 .table {
   width: calc(100% + 16px);
   border-collapse: collapse;
   margin: 0 -8px;
+
+  tr {
+    position: relative;
+  }
 
   td, th {
     padding: 5px 8px;
@@ -713,6 +748,22 @@ a {
 
   .btn {
     display: inline-block;
+  }
+
+  &__handle {
+    // padding-left: 0 !important;
+    padding-right: 0 !important;
+    width: 10px;
+  }
+
+  tr:hover .handle {
+    svg {
+      fill: #333;
+    }
+  }
+
+  &__moving {
+    background: #fff;
   }
 }
 

@@ -99,6 +99,7 @@
         <tr>
           <th></th>
           <th></th>
+          <th></th>
           <th>Name</th>
           <th>Value</th>
           <th>
@@ -114,7 +115,15 @@
           </th>
           <th></th>
         </tr>
-        <tr v-for="header in tab.requestHeaders">
+
+        <RuleDragger
+          v-for="(header, index) in tab.requestHeaders"
+          :index="index"
+          :tmp="requestHeadersTmp"
+          :total="tab.requestHeaders?.length"
+          @onSetTmp="onSetRequestHeaderTmp"
+          @onMoveRule="moveRequestHeaderRule"
+        >
           <td class="table__short">
             <button
               class="toggle"
@@ -169,7 +178,7 @@
               </svg>
             </button>
           </td>
-        </tr>
+        </RuleDragger>
       </table>
 
       <button class="btn mt10" @click="addRequestHeader()">
@@ -203,6 +212,7 @@
         <tr>
           <th></th>
           <th></th>
+          <th></th>
           <th>Name</th>
           <th>Value</th>
           <th>
@@ -217,7 +227,14 @@
           </th>
           <th></th>
         </tr>
-        <tr v-for="header in tab.responseHeaders">
+        <RuleDragger
+          v-for="(header, index) in tab.responseHeaders"
+          :index="index"
+          :tmp="responseHeadersTmp"
+          :total="tab.responseHeaders?.length"
+          @onSetTmp="onSetResponseHeaderTmp"
+          @onMoveRule="moveResponseHeaderRule"
+        >
           <td class="table__short">
             <button
               class="toggle"
@@ -272,7 +289,7 @@
               </svg>
             </button>
           </td>
-        </tr>
+        </RuleDragger>
       </table>
 
       <button class="btn mt10" @click="addResponseHeader()">
@@ -304,6 +321,7 @@
 
       <table v-if="tab.blockedRequests?.length" class="table">
         <tr>
+          <th></th>
           <th class="table__short"></th>
           <th>Type</th>
           <th>
@@ -318,7 +336,14 @@
           </th>
           <th class="table__short"></th>
         </tr>
-        <tr v-for="request in tab.blockedRequests">
+        <RuleDragger
+          v-for="(request, index) in tab.blockedRequests"
+          :index="index"
+          :tmp="blockedRequestsTmp"
+          :total="tab.blockedRequests?.length"
+          @onSetTmp="onSetBlockedTmp"
+          @onMoveRule="moveBlockedRule"
+        >
           <td class="table__short">
             <button
               class="toggle"
@@ -368,7 +393,7 @@
               </svg>
             </button>
           </td>
-        </tr>
+        </RuleDragger>
       </table>
 
       <button class="mt10 btn" @click="addBlockedRequest()">
@@ -400,6 +425,7 @@
 
       <table v-if="tab.redirectRequests?.length" class="table">
         <tr>
+          <th></th>
           <th class="table__short"></th>
           <th>
             Url Filter
@@ -417,7 +443,15 @@
           </th>
           <th class="table__short"></th>
         </tr>
-        <tr v-for="request in tab.redirectRequests">
+        <!-- <tr v-for="request in tab.redirectRequests"> -->
+        <RuleDragger
+          v-for="(request, index) in tab.redirectRequests"
+          :index="index"
+          :tmp="redirectRequestsTmp"
+          :total="tab.redirectRequests?.length"
+          @onSetTmp="onSetRedirectTmp"
+          @onMoveRule="moveRedirectRule"
+        >
           <td class="table__short">
             <button
               class="toggle"
@@ -462,7 +496,7 @@
               </svg>
             </button>
           </td>
-        </tr>
+        </RuleDragger>
       </table>
 
       <button class="mt10 btn" @click="addRedirectRequest()">
@@ -492,6 +526,7 @@ import type { Ref } from "vue";
 import Editor from "./Editor.vue";
 import Dropdown from "./Dropdown.vue";
 import Tooltip from "./Tooltip.vue";
+import RuleDragger from "./RuleDragger.vue";
 
 const props = defineProps({
   tab: {
@@ -531,6 +566,10 @@ const blockOptions = [
  */
 const showSettings = ref(false);
 const showDeleteConfirmation = ref(false);
+const requestHeadersTmp = ref(-1);
+const responseHeadersTmp = ref(-1);
+const blockedRequestsTmp = ref(-1);
+const redirectRequestsTmp = ref(-1);
 
 /**
  * computed
@@ -566,6 +605,55 @@ const responseHeaderTotal = computed(() => {
 /**
  * methods
  */
+
+// request header specifics
+function onSetRequestHeaderTmp(tmp: number) {
+  requestHeadersTmp.value = tmp;
+}
+
+function moveRequestHeaderRule(from: number, to: number) {
+  const rule = tab.value.requestHeaders[from];
+
+  tab.value.requestHeaders.splice(from, 1);
+  tab.value.requestHeaders.splice(to, 0, rule);
+}
+
+// response headers specifics
+function onSetResponseHeaderTmp(tmp: number) {
+  responseHeadersTmp.value = tmp;
+}
+
+function moveResponseHeaderRule(from: number, to: number) {
+  const rule = tab.value.responseHeaders[from];
+
+  tab.value.responseHeaders.splice(from, 1);
+  tab.value.responseHeaders.splice(to, 0, rule);
+}
+
+// blocked request specifics
+function onSetBlockedTmp(tmp: number) {
+  blockedRequestsTmp.value = tmp;
+}
+
+function moveBlockedRule(from: number, to: number) {
+  const rule = tab.value.blockedRequests[from];
+
+  tab.value.blockedRequests.splice(from, 1);
+  tab.value.blockedRequests.splice(to, 0, rule);
+}
+
+// redirect requests specifics
+function onSetRedirectTmp(tmp: number) {
+  redirectRequestsTmp.value = tmp;
+}
+
+function moveRedirectRule(from: number, to: number) {
+  const rule = tab.value.redirectRequests[from];
+
+  tab.value.redirectRequests.splice(from, 1);
+  tab.value.redirectRequests.splice(to, 0, rule);
+}
+
 function deleteTab() {
   emit("deleteTab", tab?.value);
 }
