@@ -1,8 +1,18 @@
 <template>
   <div v-for="(folder, index) in folders" class="folders__list__item"
-    :class="{ 'folders__list__item--active': index === activeFolder && !showSettings }" @click="active = index" :draggable="tmp >= 0"
-    @dragover.prevent="" @drop="onDragDrop(index)" @dragstart="onDragStart(index)"
-    @dragend="dragging = false; tmp = -1">
+    :class="{ 
+      'folders__list__item--active': index === activeFolder && !showSettings,
+      'folders__list__item--bottom': index === target && target > tmp && target !== tmp,
+      'folders__list__item--top': index === target && target < tmp
+    }"
+    @click="active = index"
+    :draggable="tmp >= 0"
+    @dragover.prevent="target = index"
+    @drop="onDragDrop(index)"
+    @dragstart="onDragStart(index)"
+    @dragend="dragging = false; tmp = -1; target = -1"
+    @dragenter="target = index"
+  >
     <button :title="'select ' + folder.name" @click="setFolder(index)" class="folders__list__item__label">{{
       folder.name }}</button>
 
@@ -49,6 +59,7 @@ const activeFolder = propRefs.activeFolder;
 const emit = defineEmits(["moveFolder", "toggleActive", "setFolder"]);
 
 const tmp = ref(-1);
+const target = ref(-1);
 const active = ref(0);
 const dragging = ref(false);
 

@@ -1,7 +1,19 @@
 <template>
-  <div v-for="(tab, index) in tabs" class="tabs__tab" :class="{ 'tabs__tab--active': index === activeTab }"
-    @click="active = index" :draggable="tmp >= 0" @dragover.prevent="" @drop="onDragDrop(index)"
-    @dragstart="onDragStart(index)" @dragend="dragging = false; tmp = -1">
+  <div 
+    v-for="(tab, index) in tabs"
+    class="tabs__tab"
+    :class="{ 
+      'tabs__tab--active': index === activeTab,
+      'tabs__tab--right': index === target && target > tmp && target !== tmp,
+      'tabs__tab--left': index === target && target < tmp
+    }"
+    @click="active = index" :draggable="tmp >= 0" 
+    @dragover.prevent="target = index"
+    @drop="onDragDrop(index)"
+    @dragstart="onDragStart(index)"
+    @dragend="dragging = false; tmp = -1; target = -1"
+    @dragenter="target = index"
+    >
 
     <div v-if="tabs.length > 1" class="tabs__tab__handle" @mousedown="tmp = index" @mouseup="tmp = -1" title="drag to move">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-grip-horizontal"
@@ -47,6 +59,7 @@ const activeTab = propRefs.activeTab;
 const emit = defineEmits(["moveTab", "toggleTab", "setTab"]);
 
 const tmp = ref(-1);
+const target = ref(-1);
 const active = ref(0);
 const dragging = ref(false);
 

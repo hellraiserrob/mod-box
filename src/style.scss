@@ -174,12 +174,30 @@ a {
       cursor: pointer;
       align-items: center;
 
-      // &:last-child {
-      //   margin-bottom: 20px;
-      // }
+      &:before {
+        content: "";
+        background-color: #666;
+        transition: opacity ease 0.2s;
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 1px;
+        opacity: 0;
+        top: 0;
+      }
 
       &--active {
         background-color: #efefef;
+      }      
+
+      &--top:before {
+        opacity: 1;
+      }
+  
+      &--bottom:before {
+        opacity: 1;
+        top: auto;
+        bottom: 0;
       }
 
       &__handle {
@@ -268,14 +286,31 @@ a {
     background-color: transparent;
     display: flex;
     align-items: center;
-    // & + & {
-      //   margin-left: 10px;
-      // }
+    position: relative;
+    
+    &:after {
+      content: "";
+      position: absolute;
+      width: 1px;
+      opacity: 0;
+      transition: all ease 0.2s;
+      background-color: #666;
+      top: 5px;
+      bottom: 5px
+    }
       
     &--active {
       border-bottom: 1px solid blue;
-      // margin-bottom: -2px;
-      // background-color: #efefef;
+    }
+
+    &--right:after {
+      right: 0;
+      opacity: 1;
+    }
+
+    &--left:after {
+      left: 0;
+      opacity: 1;
     }
 
     &__handle {
@@ -735,6 +770,18 @@ a {
 
   td {
     border-bottom: 1px solid #ddd;
+    transition: all ease 0.2s;
+
+    &:before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 0;
+      background-color: #666;
+      transition: all ease 0.2s;
+    }   
   }
 
   &__short {
@@ -764,6 +811,19 @@ a {
 
   &__moving {
     background: #fff;
+  }
+
+  &__target--bottom td {
+    border-width: 1px;
+    border-color: #666;
+  }
+
+  &__target--top td {
+    position: relative;
+    
+    &:before {
+      height: 1px;
+    }    
   }
 }
 

@@ -120,8 +120,10 @@
           v-for="(header, index) in tab.requestHeaders"
           :index="index"
           :tmp="requestHeadersTmp"
+          :target="requestHeadersTarget"
           :total="tab.requestHeaders?.length"
           @onSetTmp="onSetRequestHeaderTmp"
+          @onSetTarget="onSetRequestHeaderTarget"
           @onMoveRule="moveRequestHeaderRule"
         >
           <td class="table__short">
@@ -231,8 +233,10 @@
           v-for="(header, index) in tab.responseHeaders"
           :index="index"
           :tmp="responseHeadersTmp"
+          :target="responseHeadersTarget"
           :total="tab.responseHeaders?.length"
           @onSetTmp="onSetResponseHeaderTmp"
+          @onSetTarget="onSetResponseHeaderTarget"
           @onMoveRule="moveResponseHeaderRule"
         >
           <td class="table__short">
@@ -340,8 +344,10 @@
           v-for="(request, index) in tab.blockedRequests"
           :index="index"
           :tmp="blockedRequestsTmp"
+          :target="blockedRequestsTarget"
           :total="tab.blockedRequests?.length"
           @onSetTmp="onSetBlockedTmp"
+          @onSetTarget="onSetBlockedTarget"
           @onMoveRule="moveBlockedRule"
         >
           <td class="table__short">
@@ -448,8 +454,10 @@
           v-for="(request, index) in tab.redirectRequests"
           :index="index"
           :tmp="redirectRequestsTmp"
+          :target="redirectRequestsTarget"
           :total="tab.redirectRequests?.length"
           @onSetTmp="onSetRedirectTmp"
+          @onSetTarget="onSetRedirectTarget"
           @onMoveRule="moveRedirectRule"
         >
           <td class="table__short">
@@ -566,10 +574,18 @@ const blockOptions = [
  */
 const showSettings = ref(false);
 const showDeleteConfirmation = ref(false);
+
 const requestHeadersTmp = ref(-1);
+const requestHeadersTarget = ref(-1);
+
 const responseHeadersTmp = ref(-1);
+const responseHeadersTarget = ref(-1);
+
 const blockedRequestsTmp = ref(-1);
+const blockedRequestsTarget = ref(-1);
+
 const redirectRequestsTmp = ref(-1);
+const redirectRequestsTarget = ref(-1);
 
 /**
  * computed
@@ -610,6 +626,9 @@ const responseHeaderTotal = computed(() => {
 function onSetRequestHeaderTmp(tmp: number) {
   requestHeadersTmp.value = tmp;
 }
+function onSetRequestHeaderTarget(tmp: number) {
+  requestHeadersTarget.value = tmp;
+}
 
 function moveRequestHeaderRule(from: number, to: number) {
   const rule = tab.value.requestHeaders[from];
@@ -622,6 +641,10 @@ function moveRequestHeaderRule(from: number, to: number) {
 function onSetResponseHeaderTmp(tmp: number) {
   responseHeadersTmp.value = tmp;
 }
+function onSetResponseHeaderTarget(tmp: number) {
+  responseHeadersTarget.value = tmp;
+}
+
 
 function moveResponseHeaderRule(from: number, to: number) {
   const rule = tab.value.responseHeaders[from];
@@ -634,6 +657,9 @@ function moveResponseHeaderRule(from: number, to: number) {
 function onSetBlockedTmp(tmp: number) {
   blockedRequestsTmp.value = tmp;
 }
+function onSetBlockedTarget(tmp: number) {
+  blockedRequestsTarget.value = tmp;
+}
 
 function moveBlockedRule(from: number, to: number) {
   const rule = tab.value.blockedRequests[from];
@@ -645,6 +671,9 @@ function moveBlockedRule(from: number, to: number) {
 // redirect requests specifics
 function onSetRedirectTmp(tmp: number) {
   redirectRequestsTmp.value = tmp;
+}
+function onSetRedirectTarget(tmp: number) {
+  redirectRequestsTarget.value = tmp;
 }
 
 function moveRedirectRule(from: number, to: number) {
