@@ -6,9 +6,16 @@
       </svg>
     </button>
     <div v-show="isOpen" class="dropdown__menu">
-      <button v-for="option in options" @click="option.action(rule); isOpen = false" class="dropdown__menu__item">
-        {{ option.label }}
-      </button>
+      <div v-for="(option, index) in options">
+        <button @click="handleClick(option, index, false)" class="dropdown__menu__item">
+          {{ option.label }}
+        </button>
+        <div v-if="confirmationOpen === index" class="dropdown__menu__item__confirm">
+          Confirm
+          <button class="" @click="handleClick(option, index, true)">yes</button>
+          <button class="" @click="confirmationOpen = -1">no</button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -17,13 +24,14 @@
 import { ref, toRefs } from "vue";
 import type { Ref, PropType } from "vue";
 
-const model = defineModel();
 const root: Ref<HTMLElement | null> = ref(null);
 const isOpen = ref(false);
+const confirmationOpen = ref(-1);
 
 interface Option {
-  label: string,
-  action: Function
+  label: String,
+  action: Function,
+  confirm?: Boolean
 }
 
 const props = defineProps({
@@ -39,11 +47,23 @@ const props = defineProps({
 
 const propRefs = toRefs(props);
 const options = propRefs.options;
+const rule = propRefs.rule;
 
 
 /**
  * functions
  */
+
+function handleClick(option: Option, index: number, override: Boolean) {
+  if(option.confirm && !override) {
+    confirmationOpen.value = index;
+  }
+  else {
+    confirmationOpen.value = -1;
+    option.action(rule.value);
+    isOpen.value = false
+  }
+ }
 
 function toggle() {
   isOpen.value = !isOpen.value;
@@ -57,6 +77,7 @@ function toggle() {
 
 function close() {
   isOpen.value = false;
+  confirmationOpen.value = -1;
   window.removeEventListener("click", outsideClick)
 }
 
@@ -64,11 +85,6 @@ function outsideClick(e: any) {
   if (!root.value?.contains(e.target)) {
     close();
   }
-}
-
-function set(val: string | boolean) {
-  model.value = val;
-  isOpen.value = false;
 }
 
 </script>

@@ -1,4 +1,24 @@
 <template>
+  <div class="toast" :class="{'toast--active' : toast.active}">
+    <div class="toast__text">
+      {{ toast.message }}
+    </div>
+    
+    <button class="btn-icon" @click="toast.active = false">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        fill="currentColor"
+        class="bi bi-x-lg"
+        viewBox="0 0 16 16"
+      >
+        <path
+          d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"
+        />
+      </svg>
+    </button>
+  </div>
   <div class="tab" :class="{ 'tab--active': tab.active }">
     <div class="folder__header mb10">
       <h3>Tab ({{ tab.name }})</h3>
@@ -552,6 +572,7 @@ const tabName: Ref<HTMLInputElement | null> = ref(null);
 const requestActions = [
   {
     label: "Delete",
+    confirm: true,
     action: (rule:any) => {
       deleteRequestHeader(rule)
     },
@@ -603,6 +624,10 @@ const blockedRequestsTarget = ref(-1);
 
 const redirectRequestsTmp = ref(-1);
 const redirectRequestsTarget = ref(-1);
+const toast = ref({
+  active: false,
+  message: ""
+});
 
 /**
  * computed
@@ -639,12 +664,28 @@ const responseHeaderTotal = computed(() => {
  * methods
  */
 
- async function showToast(rule: any) {
+async function showToast(rule: any) {
   try {
-    await navigator.clipboard.writeText(`${rule.name}:${rule.value}`);
+    await navigator.clipboard.writeText(`${rule.name}:${rule.value}`).then(() => {
+      toast.value.message = "Copied to clipboard...";
+      toast.value.active = true;
+      hideToast();
+    });
   } catch (error) {
-    console.error("Copying error");
+    toast.value.message = "Couldn't copy to clipboard...";
+    toast.value.active = true;
+    hideToast();
   }
+}
+
+let timer: ReturnType<typeof setTimeout> = setTimeout(() => {});
+
+function hideToast() {
+  clearTimeout(timer);
+
+  timer = window.setTimeout(() => {
+    toast.value.active = false;
+  }, 3000)
 }
 
 // request header specifics

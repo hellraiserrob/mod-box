@@ -951,6 +951,7 @@ a {
     width: 150px;
     overflow: hidden;
     z-index: 10;
+    padding: 4px 0;
 
     &__item {
       display: block;
@@ -961,17 +962,32 @@ a {
       text-align: left;
       color: #666;
       transition: all ease 0.2s;
-      font-size: 14px;
+      font-size: 12px;
       cursor: pointer;
+      position: relative;
       
       &:hover {
         color: #333;
         background-color: #efefef;
       }
-
+      
       &--active {
         color: #333;
         font-weight: 600;
+        background-color: rgba(#efefef, 0.5);
+      }
+
+      &__confirm {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        // bottom: 0;
+        background: rgba(#fff, 0.5);
+        backdrop-filter: blur(4px);
+        display: flex;
+        gap: 4px;
+        font-size: 12px;
       }
     }
   }
@@ -1055,4 +1071,52 @@ a {
   margin-bottom: 10px;
   z-index: 1;
   font-size: 14px;
+}
+
+.toast {
+  z-index: 10;
+  display: flex;
+  position: fixed;
+  bottom: -50px;
+  right: 10px;
+  width: 200px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #fff;
+  box-shadow: 0 0 10px rgba(#000000, 0.1);
+  font-size: 14px;
+  padding: 4px 10px;
+  align-content: center;
+  align-items: center;
+  overflow: hidden;
+  justify-content: space-between;
+  transition: all ease 0.3s;
+
+  &--active {
+    bottom: 10px;
+  }
+  
+  &__text {
+    flex: 1;
+  }
+  
+  &--active:after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba(blue, 0.075);
+    animation: timer 3s linear;
+  }
+}
+
+@keyframes timer {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0;
+  }
 }
