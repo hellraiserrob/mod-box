@@ -161,7 +161,8 @@
             />
           </td>
           <td class="table__short text-right">
-            <button
+            <DropdownMenu :options="requestActions" :rule="header" />
+            <!-- <button
               class="btn-icon"
               @click="deleteRequestHeader(header)"
               title="Delete"
@@ -178,7 +179,7 @@
                   d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"
                 />
               </svg>
-            </button>
+            </button> -->
           </td>
         </RuleDragger>
       </table>
@@ -533,6 +534,7 @@ import type { Ref } from "vue";
 
 import Editor from "./Editor.vue";
 import Dropdown from "./Dropdown.vue";
+import DropdownMenu from "./DropdownMenu.vue";
 import Tooltip from "./Tooltip.vue";
 import RuleDragger from "./RuleDragger.vue";
 
@@ -546,6 +548,21 @@ const emit = defineEmits(["deleteTab", "cloneTab"]);
 
 const { tab } = toRefs(props);
 const tabName: Ref<HTMLInputElement | null> = ref(null);
+
+const requestActions = [
+  {
+    label: "Delete",
+    action: (rule:any) => {
+      deleteRequestHeader(rule)
+    },
+  },
+  {
+    label: "Copy to clipboard",
+    action: (rule: any) => {
+      showToast(rule);
+    },
+  }
+];
 
 const operationOptions = [
   {
@@ -621,6 +638,14 @@ const responseHeaderTotal = computed(() => {
 /**
  * methods
  */
+
+ async function showToast(rule: any) {
+  try {
+    await navigator.clipboard.writeText(`${rule.name}:${rule.value}`);
+  } catch (error) {
+    console.error("Copying error");
+  }
+}
 
 // request header specifics
 function onSetRequestHeaderTmp(tmp: number) {

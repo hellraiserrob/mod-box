@@ -27,14 +27,18 @@
 
     <div v-if="!isEditing && domains && splitDomains">
       <button
-        v-for="domain in splitDomains"
+        v-if="splitDomains.length > 0"
         @click="edit"
         class="editor__trigger editor__trigger--chip"
         :class="{'editor__trigger--chip--placeholder': model === '' && typeof fallback === 'string'}"
-        :title="cleanDomain(domain)"
+        :title="cleanDomain(splitDomains[0])"
       >
-        {{ cleanDomain(domain) }}
+        {{ cleanDomain(splitDomains[0]) }}
       </button>
+
+      <Tooltip v-if="splitDomains.length > 1" :trigger="splitDomains.length - 1">
+        <div v-for="domain in splitDomains">{{ cleanDomain(domain) }}</div>
+      </Tooltip>
       
       <button v-if="!splitDomains.length" @click="edit" class="editor__trigger">
         -
@@ -72,6 +76,8 @@
 import { ref, nextTick, toRefs, computed } from "vue";
 import type { Ref } from "vue";
 import { cleanDomain } from "../utils";
+
+import Tooltip from "./Tooltip.vue";
 
 const model = defineModel();
 const props = defineProps(["placeholder", "locked", "fallback", "domains"]);

@@ -858,10 +858,10 @@ a {
     color: #333;
     cursor: pointer;
     transition: all ease 0.2s;
-    padding: 4px 0;
+    padding: 4px 2px;
     background: transparent;
     text-align: left;
-    display: block;
+    display: inline-block;
     border: 0;
     max-width: 100px;
     overflow: hidden;
@@ -879,7 +879,7 @@ a {
 
     &--chip {
       background: #fff;
-      border-radius: 2px;
+      border-radius: 10px;
       padding: 0;
       // font-family: monospace;
       font-size: 12px;
@@ -914,7 +914,7 @@ a {
 .dropdown {
   position: relative;
 
-  &__trigger {
+  &--select &__trigger {
     display: flex;
     align-items: center;
     gap: 5px;
@@ -975,6 +975,11 @@ a {
       }
     }
   }
+
+  &--right &__menu {
+    left: auto;
+    right: 0;
+  }
 }
 
 .tooltip {
@@ -982,23 +987,22 @@ a {
   display: inline-block;
   vertical-align: middle;
   white-space: wrap;
+  margin: -4px 0 0 2px;
 
   &__trigger {
     display: inline-block;
-    // width: 12px;
-    // height: 12px;
-    // background: #000;
-    // border-radius: 50%;
-    // color: #fff;
-    // margin: 0;
-    // text-align: center;
-    // font-size: 11px;
-    // line-height: 12px;
+   
     cursor: pointer;
-    vertical-align: middle;
-    fill: #666;
-    width: 12px;
-    margin: -4px 0 0 2px;
+    display: inline-block;
+    font-size: 8px;
+    line-height: 8px;
+    background: #333;
+    color: #fff;
+    padding: 2px 3px;
+    border-radius: 10px;
+    min-width: 12px;
+    text-align: center;
+    // transform: translateY(-2px);
   }
 
   &__window {

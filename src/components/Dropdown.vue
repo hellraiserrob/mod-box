@@ -1,5 +1,5 @@
 <template>
-  <div ref="root" class="dropdown" :class="{ 'dropdown--open': isOpen }">
+  <div ref="root" class="dropdown dropdown--select" :class="{ 'dropdown--open': isOpen }">
     <button @click="toggle" class="dropdown__trigger">
       {{ defaultOption?.label }}
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-down-fill" viewBox="0 0 16 16">
@@ -7,7 +7,7 @@
       </svg>
     </button>
     <div v-show="isOpen" class="dropdown__menu">
-      <button v-for="option in options" @click="set(option.value)" class="dropdown__menu__item" :class="{'dropdown__menu__item--active' : model === option.value}">
+      <button v-for="option in options" @click="option.action ? option.action() : set(option.value)" class="dropdown__menu__item" :class="{'dropdown__menu__item--active' : model === option.value}">
         {{ option.label }}
       </button>
     </div>
@@ -24,7 +24,8 @@ const isOpen = ref(false);
 
 interface Option {
   label: string,
-  value: string | boolean
+  value: string | boolean,
+  action?: Function
 }
 
 const props = defineProps({
