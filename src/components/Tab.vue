@@ -182,24 +182,6 @@
           </td>
           <td class="table__short text-right">
             <DropdownMenu :options="requestActions" :rule="header" />
-            <!-- <button
-              class="btn-icon"
-              @click="deleteRequestHeader(header)"
-              title="Delete"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                fill="currentColor"
-                class="bi bi-x-lg"
-                viewBox="0 0 16 16"
-              >
-                <path
-                  d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"
-                />
-              </svg>
-            </button> -->
           </td>
         </RuleDragger>
       </table>
@@ -295,24 +277,7 @@
             />
           </td>
           <td class="table__short text-right">
-            <button
-              class="btn-icon"
-              @click="deleteResponseHeader(header)"
-              title="Delete"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                fill="currentColor"
-                class="bi bi-x-lg"
-                viewBox="0 0 16 16"
-              >
-                <path
-                  d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"
-                />
-              </svg>
-            </button>
+            <DropdownMenu :options="responseActions" :rule="header" />
           </td>
         </RuleDragger>
       </table>
@@ -405,20 +370,7 @@
             />
           </td>
           <td class="table__short text-right">
-            <button class="btn-icon" @click="deleteBlockRequest(request)">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                fill="currentColor"
-                class="bi bi-x-lg"
-                viewBox="0 0 16 16"
-              >
-                <path
-                  d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"
-                />
-              </svg>
-            </button>
+            <DropdownMenu :options="blockActions" :rule="request" />
           </td>
         </RuleDragger>
       </table>
@@ -461,12 +413,12 @@
             </Tooltip>
           </th>
           <th>
-            Domains
-            <Tooltip> Single or comma separated domains</Tooltip>
-          </th>
-          <th>
             Destination
             <Tooltip> An absolute destination Url </Tooltip>
+          </th>
+          <th>
+            Domains
+            <Tooltip> Single or comma separated domains</Tooltip>
           </th>
           <th class="table__short"></th>
         </tr>
@@ -499,6 +451,9 @@
             />
           </td>
           <td>
+            <Editor v-model="request.url" placeholder="Url" />
+          </td>
+          <td>
             <Editor
               v-model="request.condition.requestDomains"
               placeholder="Request domains"
@@ -506,24 +461,8 @@
               :domains="true"
             />
           </td>
-          <td>
-            <Editor v-model="request.url" placeholder="Url" />
-          </td>
           <td class="table__short text-right">
-            <button class="btn-icon" @click="deleteRedirectRequest(request)">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                fill="currentColor"
-                class="bi bi-x-lg"
-                viewBox="0 0 16 16"
-              >
-                <path
-                  d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"
-                />
-              </svg>
-            </button>
+            <DropdownMenu :options="redirectActions" :rule="request" />
           </td>
         </RuleDragger>
       </table>
@@ -580,7 +519,43 @@ const requestActions = [
   {
     label: "Copy to clipboard",
     action: (rule: any) => {
-      showToast(rule);
+      showToast(`${rule.name}${rule.value ? ':' + rule.value : ''}`);
+    },
+  }
+];
+
+const responseActions = [
+  {
+    label: "Delete",
+    confirm: true,
+    action: (rule:any) => {
+      deleteResponseHeader(rule)
+    },
+  },
+  {
+    label: "Copy to clipboard",
+    action: (rule: any) => {
+      showToast(`${rule.name}${rule.value ? ':' + rule.value : ''}`);
+    },
+  }
+];
+
+const blockActions = [
+  {
+    label: "Delete",
+    confirm: true,
+    action: (rule:any) => {
+      deleteBlockRequest(rule)
+    },
+  }
+];
+
+const redirectActions = [
+  {
+    label: "Delete",
+    confirm: true,
+    action: (rule:any) => {
+      deleteRedirectRequest(rule)
     },
   }
 ];
@@ -664,9 +639,9 @@ const responseHeaderTotal = computed(() => {
  * methods
  */
 
-async function showToast(rule: any) {
+async function showToast(text: string) {
   try {
-    await navigator.clipboard.writeText(`${rule.name}:${rule.value}`).then(() => {
+    await navigator.clipboard.writeText(text).then(() => {
       toast.value.message = "Copied to clipboard...";
       toast.value.active = true;
       hideToast();

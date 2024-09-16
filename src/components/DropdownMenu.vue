@@ -6,14 +6,15 @@
       </svg>
     </button>
     <div v-show="isOpen" class="dropdown__menu">
-      <div v-for="(option, index) in options">
+      <div v-for="(option, index) in options" style="position: relative;">
         <button @click="handleClick(option, index, false)" class="dropdown__menu__item">
           {{ option.label }}
         </button>
-        <div v-if="confirmationOpen === index" class="dropdown__menu__item__confirm">
-          Confirm
-          <button class="" @click="handleClick(option, index, true)">yes</button>
-          <button class="" @click="confirmationOpen = -1">no</button>
+        <div v-if="option.confirm" :class="{'dropdown__menu__item__confirm--active': confirmationOpen === index}" class="dropdown__menu__item__confirm">
+          <div class="btn-group">
+            <button class="btn btn--danger" @click="handleClick(option, index, true)">Yes</button>
+            <button class="btn" @click="confirmationOpen = -1">No</button>
+          </div>
         </div>
       </div>
     </div>

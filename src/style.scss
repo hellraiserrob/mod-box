@@ -980,14 +980,43 @@ a {
       &__confirm {
         position: absolute;
         top: 0;
+        // bottom: 0;
         left: 0;
         right: 0;
         // bottom: 0;
-        background: rgba(#fff, 0.5);
-        backdrop-filter: blur(4px);
-        display: flex;
-        gap: 4px;
+        // background: rgba(pink, 0.5);
+        // backdrop-filter: blur(4px);
+        // display: flex;
+        // gap: 4px;
         font-size: 12px;
+        padding: 2px 4px;
+        opacity: 0;
+        transition: all ease 0.2s;
+        visibility: hidden;
+        transform: translateX(20px);
+
+        &--active {
+          opacity: 1;
+          visibility: visible;
+          transform: translateX(0);
+        }
+
+        .btn-group {
+          display: flex;
+          justify-content: flex-end;
+        }
+
+        .btn {
+          // border-radius: 0;
+          font-size: 12px;
+          padding-top: 2px;
+          padding-bottom: 2px;
+          // flex: 1;
+
+          &--danger {
+            z-index: 1;
+          }
+        }
       }
     }
   }
