@@ -6,7 +6,7 @@
       </svg>
     </button>
     <div v-show="isOpen" class="dropdown__menu">
-      <div v-for="(option, index) in options" style="position: relative;">
+      <div v-for="(option, index) in options" class="dropdown__menu__wrapper">
         <button @click="handleClick(option, index, false)" class="dropdown__menu__item">
           {{ option.label }}
         </button>

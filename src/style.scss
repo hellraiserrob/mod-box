@@ -947,11 +947,20 @@ a {
 
     background: #fff;
     box-shadow: 0 0 10px rgba(#000, 0.1);
+    border: 1px solid rgba(#000, 0.15);
     border-radius: 5px;
     width: 150px;
     overflow: hidden;
     z-index: 10;
     padding: 4px 0;
+
+    &__wrapper {
+      position: relative;
+
+      & + & {
+        border-top: 1px solid rgba(#ddd, 0.75);
+      }
+    }
 
     &__item {
       display: block;
@@ -969,6 +978,10 @@ a {
       &:hover {
         color: #333;
         background-color: #efefef;
+      }
+
+      & + & {
+        border-top: 1px solid rgba(#ddd, 0.75);
       }
       
       &--active {
