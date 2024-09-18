@@ -15,7 +15,8 @@
     "declarativeNetRequest"
   ],
   "optional_permissions": [
-    "clipboardWrite"
+    "clipboardWrite",
+    "downloads"
   ],
   "host_permissions": [
     "*://*/*"

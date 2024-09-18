@@ -128,6 +128,33 @@
               </button>
             </div>
           </div>
+          
+          <div class="panel panel--large">
+            <h3 class="mb10">Import / Export</h3>
+            <p class="mb20">
+              Lorem ipsum, dolor sit amet consectetur adipisicing elit. Repellendus, dolorum iste.
+            </p>
+
+            <div class="mb20">
+              <label class="checkbox" :class="{'checkbox--active' : selectedExport.includes(index)}" v-for="(folder, index) in data.folders">
+                <input type="checkbox" v-model="selectedExport" :value="index" />
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check" viewBox="0 0 16 16">
+                  <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425z"/>
+                </svg>
+                {{  folder.name }}
+              </label>
+            </div>
+
+            <div class="panel__actions btn-group">
+              <button class="btn" @click="download" :disabled="!selectedExport.length">
+                Export
+              </button>
+              <button class="btn">
+                Import
+              </button>
+            </div>
+          </div>
+
           <div class="panel panel--large">
             <h3 class="mb10">About</h3>
             <p class="mb20">
@@ -162,6 +189,7 @@ import Dragger from "./components/FolderDragger.vue";
  */
 
 const fallbackData = {
+  version: 1,
   active: true,
   folders: [
     {
@@ -187,6 +215,7 @@ const fallbackData = {
  */
 
 const data: Ref<DataType> = ref({
+  version: 1,
   active: true,
   folders: [],
 });
@@ -197,10 +226,28 @@ const error = ref(false);
 const compact = ref(false);
 const showSettings = ref(false);
 const showDeleteConfirmation = ref(false);
+const selectedExport = ref([]);
 
 /**
  * methods
  */
+
+function download() {
+  const exportData:FolderType[] = data.value.folders.filter((folder, index) => {
+    return selectedExport.value.includes(index);
+  });
+
+  const json = JSON.stringify(exportData);
+  const blob = new Blob([json], {type: "application/json"});
+  const url  = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+
+  anchor.href = url;
+  anchor.download = `modbox-export-${Math.floor(Date.now() / 1000)}.json`;
+  document.body.appendChild(anchor);
+  anchor.click();
+  document.body.removeChild(anchor);
+}
 
 // move the position of a folder
 function moveFolder(from: number, to: number) {
