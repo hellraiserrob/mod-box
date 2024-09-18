@@ -226,15 +226,19 @@ const error = ref(false);
 const compact = ref(false);
 const showSettings = ref(false);
 const showDeleteConfirmation = ref(false);
-const selectedExport = ref([]);
+const selectedExport: Ref<number[]> = ref([]);
 
 /**
  * methods
  */
 
 function download() {
-  const exportData:FolderType[] = data.value.folders.filter((folder, index) => {
-    return selectedExport.value.includes(index);
+  let exportData:FolderType[] = [];
+  
+  data.value.folders.forEach((folder:FolderType, index:number) => {
+    if(selectedExport.value.includes(index)) {
+      exportData.push(folder);
+    }
   });
 
   const json = JSON.stringify(exportData);
