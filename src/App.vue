@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="error" class="error">
+    <div v-if="error" class="error error--top">
       There was an error setting the rules, did you use an invalid header name
     </div>
     <div
@@ -130,9 +130,9 @@
           </div>
           
           <div class="panel panel--large">
-            <h3 class="mb10">Import / Export</h3>
+            <h3 class="mb10">Export</h3>
             <p class="mb20">
-              Lorem ipsum, dolor sit amet consectetur adipisicing elit. Repellendus, dolorum iste.
+              You can export your rules into .json packages to backup, or send to friends/colleagues.  Check the folders you want and click export.
             </p>
 
             <div class="mb20">
@@ -145,15 +145,48 @@
               </label>
             </div>
 
-            <div class="panel__actions btn-group">
+            <div class="panel__actions">
               <button class="btn" @click="download" :disabled="!selectedExport.length">
                 Export
               </button>
-              <button class="btn">
-                Import
+            </div>
+          </div>
+
+          <div class="panel panel--large">
+            <h3 class="mb10">Import</h3>
+            <p class="mb20">
+              You can select and import modbox backup files and append them to your current set of folders, tabs and rules.
+            </p>
+
+            <div class="mb20">
+              <!-- <label for="file">Choose file to upload</label> -->
+              <input type="file" ref="fileupload" accept=".json" @change="onFileChange($event)" class="file-upload" />
+            </div>
+
+            <div v-if="importData.length" class="mb20">
+              <label class="checkbox" :class="{'checkbox--active' : selectedImport.includes(index)}" v-for="(folder, index) in importData">
+                <input type="checkbox" v-model="selectedImport" :value="index" />
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check" viewBox="0 0 16 16">
+                  <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425z"/>
+                </svg>
+                {{  folder.name }}
+              </label>
+            </div>
+
+            <div v-if="importError.length > 0" class="error mb20">
+              {{ importError }}
+            </div>
+
+            <div class="panel__actions btn-group">
+              <button class="btn" @click="clearImported" :disabled="!importData.length">
+                Clear
+              </button>
+              <button class="btn" @click="appendImported" :disabled="!selectedImport.length">
+                Append
               </button>
             </div>
           </div>
+
 
           <div class="panel panel--large">
             <h3 class="mb10">About</h3>
@@ -189,7 +222,6 @@ import Dragger from "./components/FolderDragger.vue";
  */
 
 const fallbackData = {
-  version: 1,
   active: true,
   folders: [
     {
@@ -213,9 +245,9 @@ const fallbackData = {
 /**
  * reactive variables
  */
+const fileupload: Ref<HTMLFormElement | null> = ref(null);
 
 const data: Ref<DataType> = ref({
-  version: 1,
   active: true,
   folders: [],
 });
@@ -227,10 +259,69 @@ const compact = ref(false);
 const showSettings = ref(false);
 const showDeleteConfirmation = ref(false);
 const selectedExport: Ref<number[]> = ref([]);
+const selectedImport: Ref<number[]> = ref([]);
+
+const importData: Ref<FolderType[]> = ref([]);
+const importError = ref("");
 
 /**
  * methods
  */
+
+ function clearImported() {
+  if(fileupload.value && fileupload.value.value) {
+    fileupload.value.value = null;
+  }
+
+  importError.value = "";
+  importData.value = [];
+  selectedImport.value = [];
+ }
+
+ function appendImported() { 
+  if(fileupload.value && fileupload.value.value) {
+    fileupload.value.value = null;
+  }
+
+  let selectedFolders:FolderType[] = [];
+  
+  importData.value.forEach((folder:FolderType, index:number) => {
+    if(selectedImport.value.includes(index)) {
+      selectedFolders.push(folder);
+    }
+  });
+
+  data.value.folders.push(...selectedFolders);
+
+  importError.value = "";
+  importData.value = [];
+  selectedImport.value = [];
+ }
+
+function onFileChange(e: any) {
+  const file = e.target.files[0];
+
+  const fr = new FileReader();
+
+  fr.onload = (e:any) => {
+    try {
+      const payload = JSON.parse(e.target.result);
+
+      if(payload.name === "modbox" && payload.version === 1 && payload.folders) {
+        importData.value = payload.folders
+      }
+      else {
+        // throw Error("not modbox or version version");
+        importError.value = "We don't think this is a modbox backup file";
+      }
+    } catch (error) {
+      // console.log(error);
+      importError.value = "we had an unexpected error during import";
+    }
+    
+  }
+  fr.readAsText(file);
+}
 
 function download() {
   let exportData:FolderType[] = [];
@@ -241,7 +332,13 @@ function download() {
     }
   });
 
-  const json = JSON.stringify(exportData);
+  const payload = {
+    name: "modbox",
+    version: 1,
+    folders: exportData
+  }
+
+  const json = JSON.stringify(payload);
   const blob = new Blob([json], {type: "application/json"});
   const url  = URL.createObjectURL(blob);
   const anchor = document.createElement('a');
@@ -251,6 +348,8 @@ function download() {
   document.body.appendChild(anchor);
   anchor.click();
   document.body.removeChild(anchor);
+
+  selectedExport.value = [];
 }
 
 // move the position of a folder

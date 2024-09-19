@@ -367,7 +367,8 @@ a {
   position: relative;
 
   &--large {
-    padding: 15px 60px 15px 15px;
+    padding: 15px 50px 15px 15px;
+    line-height: 1.3em;
     // background-color: transparent;
     // border: 1px solid #ddd;
 
@@ -484,7 +485,7 @@ a {
 }
 
 .checkbox {
-  padding: 0 0 0 22px;
+  padding: 0 0 0 25px;
   font-size: 14px;
   color: #666;
   position: relative;
@@ -524,11 +525,19 @@ a {
 
   svg {
     display: block;
-    fill: #666;
+    fill: #ccc;
     position: absolute;
     top: 2px;
     left: 0px;
     // width: 16px;
+    transition: all ease 0.2s;
+    transform: scale(0, 0);
+  }
+
+  &:hover {
+    svg {
+      transform: scale(1, 1);
+    }
   }
 
   &--active {
@@ -546,6 +555,7 @@ a {
 
     svg {
       fill: #fff;
+      transform: scale(1, 1);
     }
   }
 }
@@ -673,8 +683,6 @@ a {
     cursor: not-allowed;
     border-color: #efefef !important;
     z-index: initial;
-    // &:hover {
-    // }
   }
 }
 
@@ -793,12 +801,12 @@ a {
   th {
     font-weight: 400;
     font-size: 12px;
+    white-space: nowrap;
     // text-transform: uppercase;
     color: #666;
     text-align: left;
     padding-bottom: 10px;
     border-bottom: 1px solid #ddd;
-    white-space: nowrap;
 
     a {
       color: #333;
@@ -1145,10 +1153,6 @@ a {
 }
 
 .error {
-  position: fixed;
-  top: 8px;
-  left: 8px;
-  right: 8px;
   color: #721c24;
   background-color: #f8d7da;
   border: 1px solid #f5c6cb;
@@ -1157,6 +1161,13 @@ a {
   margin-bottom: 10px;
   z-index: 1;
   font-size: 14px;
+  
+  &--top {
+    position: fixed;
+    top: 8px;
+    left: 8px;
+    right: 8px;
+  }
 }
 
 .toast {
@@ -1205,4 +1216,41 @@ a {
   to {
     width: 0;
   }
+}
+
+
+.file-upload {
+  color: transparent;
+  
+  &:before {
+    content: 'Select a backup file';
+    border: 1px solid #ddd;
+    border-radius: 15px;
+    padding: 4px 10px 4px 10px;
+    background-color: #fff;
+    display: inline-block;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all ease 0.2s;
+    box-shadow: 0 1px 2px 0 rgba(#000, 0.05);
+    text-decoration: none;
+    color: #333;
+  }
+
+  &:hover:before {
+    border-color: #999;
+  }
+
+  &:active:before {
+    border-color: blue;
+    outline: 0;
+  }
+  
+  &:focus {
+    outline: none;
+    border-color: blue;
+  }
+}
+.file-upload::-webkit-file-upload-button {
+  visibility: hidden;
 }
