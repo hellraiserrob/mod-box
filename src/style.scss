@@ -31,6 +31,17 @@ h1, h2, h3, h4, h5 {
   font-size: 15px;
   margin: 0;
   padding: 0;
+
+  .tag {
+    display: inline-block;
+    font-size: 10px;
+    line-height: 10px;
+    background-color: blue;
+    color: #fff;
+    padding: 2px 3px;
+    border-radius: 3px;
+    margin-left: 4px;
+  }
 }
 
 h1 {
@@ -128,6 +139,18 @@ a {
   display: flex;
   gap: 10px;
   align-items: center;
+
+  img {
+    width: 20px;
+    transition: all ease 0.2s;
+  }
+
+  &--compact {
+    gap: 0;
+    img {
+      width: 24px;
+    }
+  }
 }
 
 .folders {
@@ -150,19 +173,14 @@ a {
     }
 
     &__toggle {
-      position: absolute;
-      bottom: 0;
-      right: 0;
-      width: 20px;
-      height: 20px;
-      border-radius: 10px;
-      background: none;
-      border: 1px solid #000;
-      cursor: pointer;
-
-      svg {
-        display: block;
-        width: 12px;
+      position: absolute !important;
+      bottom: 12px;
+      left: 150px;
+      transition: all ease 0.3s;
+      
+      &--active {
+        left: 12px;
+        background-color: blue;
       }
     }
 
@@ -234,10 +252,37 @@ a {
         &:hover {
           color: #333;
         }
+
+
       }
 
       &--active &__label {
-        color: blue
+        color: blue;
+      }
+      
+      &--compact &__label {
+        border: 1px solid #ccc;
+        min-width: 24px;
+        height: 24px;
+        line-height: 24px;
+        border-radius: 4px;
+        padding: 0;
+        text-align: center;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        
+        & + & {
+          margin-top: 4px;
+        }
+      }
+      
+      &--compact#{&}--active &__label {
+        border-color: blue;
+      }
+      
+      &--compact + &--compact {
+        margin-top: 8px;
       }
 
       .toggle {
@@ -250,7 +295,13 @@ a {
   }
 
   &--compact &__list {
-    flex-basis: 50px;
+    flex-basis: 48px;
+    background-color: #efefef;
+    padding: 12px;
+    border-radius: 4px;
+  }
+  &--compact &__list__wrapper {
+    width: auto;
   }
 }
 
@@ -743,6 +794,10 @@ a {
 
   &:active svg {
     fill: blue;
+  }
+
+  &--with--border {
+    border-color: #ccc;
   }
 
   &--active, &--active:hover {

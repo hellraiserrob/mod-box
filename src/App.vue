@@ -10,17 +10,17 @@
     >
       <div class="folders__list">
         <div class="folders__list__wrapper">
-          <!-- <button class="folders__list__toggle" @click="compact = !compact">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/>
-          </svg>
-        </button> -->
+          <button class="btn-icon btn-icon--with--border folders__list__toggle" @click="setCompact" :class="{'folders__list__toggle--active': compact}">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrows-expand-vertical" viewBox="0 0 16 16">
+              <path d="M8 15a.5.5 0 0 1-.5-.5v-13a.5.5 0 0 1 1 0v13a.5.5 0 0 1-.5.5M.146 8.354a.5.5 0 0 1 0-.708l2-2a.5.5 0 1 1 .708.708L1.707 7.5H5.5a.5.5 0 0 1 0 1H1.707l1.147 1.146a.5.5 0 0 1-.708.708zM10 8a.5.5 0 0 1 .5-.5h3.793l-1.147-1.146a.5.5 0 0 1 .708-.708l2 2a.5.5 0 0 1 0 .708l-2 2a.5.5 0 0 1-.708-.708L14.293 8.5H10.5A.5.5 0 0 1 10 8"/>
+            </svg>
+          </button>
 
-          <h1 class="mb20 logo">
-            <img src="/images/16_16.png" alt="Modbox" />
-            ModBox
+          <h1 class="mb20 logo" :class="{ 'logo--compact': compact }">
+            <img src="/images/48_48.png" alt="Modbox" />
+            <span v-if="!compact">ModBox</span>
           </h1>
-          <h3 class="mb10">Folders</h3>
+          <h3 v-if="!compact" class="mb10">Folders</h3>
           <div v-if="!data.folders.length">No folders</div>
 
           <Dragger
@@ -30,9 +30,10 @@
             @setFolder="setFolder"
             :activeFolder="activeFolder"
             :showSettings="showSettings"
+            :compact="compact"
           />
 
-          <button class="mt20 mb20 btn" @click="addFolder">
+          <button class="mt20 mb20 btn-icon btn-icon--with--border" @click="addFolder">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="16"
@@ -46,11 +47,11 @@
                 d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"
               />
             </svg>
-            Add folder
+            <!-- Add folder -->
           </button>
 
           <div class="folders__list__settings">
-            <h3 class="mb10">Global</h3>
+            <h3 v-if="!compact" class="mb10">Global</h3>
             <div class="folders__list__item">
               <button
                 class="folders__list__item__label"
@@ -130,7 +131,7 @@
           </div>
           
           <div class="panel panel--large">
-            <h3 class="mb10">Export</h3>
+            <h3 class="mb10">Export <div class="tag">New</div></h3>
             <p class="mb20">
               You can export your rules into .json packages to backup, or send to friends/colleagues.  Check the folders you want and click export.
             </p>
@@ -153,7 +154,7 @@
           </div>
 
           <div class="panel panel--large">
-            <h3 class="mb10">Import</h3>
+            <h3 class="mb10">Import <div class="tag">New</div></h3>
             <p class="mb20">
               You can select and import modbox backup files and append them to your current set of folders, tabs and rules.
             </p>
@@ -390,6 +391,20 @@ function setFolder(index: number, saveTab: Boolean = true) {
   }
 }
 
+function setCompact() {
+  compact.value = !compact.value;
+
+  if (isChrome) {
+    chrome.storage.local
+      .set({ compact: `${compact.value}` })
+      .then(() => {
+        console.log("Chrome storage compact set");
+      });
+  } else {
+    window.localStorage.setItem("compact", `${compact.value}`);
+  }
+}
+
 function cloneFolder(folder: FolderType) {
   data.value.folders.push({ ..._.cloneDeep(folder), name: "Cloned folder" });
 
@@ -513,6 +528,7 @@ onMounted(() => {
   } else {
     const rules = window.localStorage.getItem("rules");
     const af = window.localStorage.getItem("activeFolder");
+    const cp = window.localStorage.getItem("compact");
 
     if (rules) {
       console.log("restore data from ls");
@@ -524,6 +540,10 @@ onMounted(() => {
 
     if (af) {
       activeFolder.value = parseInt(af);
+    }
+
+    if (cp) {
+      compact.value = cp === 'true';
     }
 
     // if(rules || af) {

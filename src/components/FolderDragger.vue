@@ -3,7 +3,8 @@
     :class="{ 
       'folders__list__item--active': index === activeFolder && !showSettings,
       'folders__list__item--bottom': index === target && target > tmp && target !== tmp,
-      'folders__list__item--top': index === target && target < tmp
+      'folders__list__item--top': index === target && target < tmp,
+      'folders__list__item--compact': compact
     }"
     @click="active = index"
     :draggable="tmp >= 0"
@@ -14,9 +15,9 @@
     @dragenter="target = index"
   >
     <button :title="'select ' + folder.name" @click="setFolder(index)" class="folders__list__item__label">{{
-      folder.name }}</button>
+      name(folder) }}</button>
 
-    <div v-if="folders.length > 1" class="folders__list__item__handle" @mousedown="tmp = index" @mouseup="tmp = -1" title="drag to move">
+    <div v-if="folders.length > 1 && !compact" class="folders__list__item__handle" @mousedown="tmp = index" @mouseup="tmp = -1" title="drag to move">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-grip-vertical"
         viewBox="0 0 16 16">
         <path
@@ -24,7 +25,7 @@
       </svg>
     </div>
 
-    <button class="toggle" @click="toggle(folder)" :class="{ 'toggle--active': folder.active }"
+    <button v-if="!compact" class="toggle" @click="toggle(folder)" :class="{ 'toggle--active': folder.active }"
       :title="folder.active ? 'Disable folder rules' : 'Enable folder rules'">
       <div class="toggle__text">
         {{ folder.active ? "On" : "Off" }}
@@ -50,11 +51,16 @@ const props = defineProps({
     type: Boolean,
     required: true,
   },
+  compact: {
+    type: Boolean,
+    required: true,
+  },
 });
 
 const propRefs = toRefs(props);
 const folders = propRefs.folders;
 const activeFolder = propRefs.activeFolder;
+const compact = propRefs.compact;
 
 const emit = defineEmits(["moveFolder", "toggleActive", "setFolder"]);
 
@@ -82,5 +88,20 @@ function toggle(folder: any) {
 
 function setFolder(index: number) {
   emit("setFolder", index);
+}
+
+function name(folder:FolderType) {
+  if(compact.value) {
+    const words = folder.name.split(" ");
+    let letters = "";
+    
+    words.forEach(word => {
+      letters += word.substring(0,1)
+    })
+
+    return letters.substring(0,2)
+  }
+
+  return folder.name
 }
 </script>
