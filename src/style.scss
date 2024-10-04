@@ -1,3 +1,7 @@
+
+$bg--active: blue;
+$bg--new: #D56062;
+
 * {
   box-sizing: border-box;
 }
@@ -36,11 +40,12 @@ h1, h2, h3, h4, h5 {
     display: inline-block;
     font-size: 10px;
     line-height: 10px;
-    background-color: blue;
+    background-color: $bg--new;
     color: #fff;
-    padding: 2px 3px;
+    padding: 2px 5px 2px 3px;
     border-radius: 3px;
     margin-left: 4px;
+    font-style: italic;
   }
 }
 
@@ -73,7 +78,7 @@ p {
 }
 
 a {
-  color: blue;
+  color: $bg--active;
 
   &:focus {
     outline: black 2px solid;
@@ -160,8 +165,8 @@ a {
     flex-basis: 175px;
     margin-right: 12px;
     position: relative;
-    transition: all ease 0.3s;
-    overflow: hidden;
+    // transition: all ease 0.3s;
+    // overflow: hidden;
     
     &__wrapper {
       width: 175px;
@@ -180,7 +185,7 @@ a {
       
       &--active {
         left: 12px;
-        background-color: blue;
+        // background-color: $bg--active;
       }
     }
 
@@ -191,6 +196,10 @@ a {
       border-radius: 4px;
       cursor: pointer;
       align-items: center;
+
+      &--compact {
+        padding-right: 0;
+      }
 
       &:before {
         content: "";
@@ -253,15 +262,27 @@ a {
           color: #333;
         }
 
-
+        .pip {
+          position: absolute;
+          top: -1px;
+          right: -1px;
+        }
       }
 
+      
       &--active &__label {
-        color: blue;
+        color: $bg--active;
+      }
+   
+      &--disabled &__label {
+        text-decoration: line-through;
+        color: #666;
       }
       
       &--compact &__label {
         border: 1px solid #ccc;
+        background-color: #fff;
+        box-shadow: 0 1px 2px 0 rgba(#000, 0.05);
         min-width: 24px;
         height: 24px;
         line-height: 24px;
@@ -275,10 +296,16 @@ a {
         & + & {
           margin-top: 4px;
         }
+
+        svg {
+          position: absolute;
+          top: 50%;
+          transform: translate(-50%, -50%);
+        }
       }
       
       &--compact#{&}--active &__label {
-        border-color: blue;
+        border-color: $bg--active;
       }
       
       &--compact + &--compact {
@@ -306,7 +333,6 @@ a {
 }
 
 .folder {
-  opacity: 0.5;
   transition: all ease 0.2s;
 
   &--active {
@@ -351,7 +377,7 @@ a {
     }
       
     &--active {
-      border-bottom: 1px solid blue;
+      border-bottom: 1px solid $bg--active;
     }
 
     &--right:after {
@@ -388,7 +414,7 @@ a {
       font-size: 13px;
       // font-weight: 500;
       text-transform: uppercase;
-      color: #999;
+      color: #666;
       transition: all ease 0.2s;
 
       &:hover {
@@ -397,13 +423,17 @@ a {
     }
 
     &--active &__label {
-      color: blue
+      color: $bg--active
+    }
+
+    &--disabled &__label {
+      text-decoration: line-through;
+      color: #666
     }
   }
 }
 
 .tab {
-  opacity: 0.5;
   transition: all ease 0.2s;
   
   &--active {
@@ -595,13 +625,13 @@ a {
     color: #333;
 
     &:before {
-      background-color: blue;
-      border-color: blue;
+      background-color: $bg--active;
+      border-color: $bg--active;
 
     }
     
     &:hover:before {
-      border-color: blue;
+      border-color: $bg--active;
     }
 
     svg {
@@ -654,7 +684,7 @@ a {
   }
 
   &--active &__text {
-    background-color: blue;
+    background-color: $bg--active;
     left: 15px;
   }
 
@@ -662,12 +692,12 @@ a {
     left: 25px;
   }
   
-  &--warning &__text {
-    background-color: red;
-  }
-  &--active#{&}--warning &__text {
-    background-color: blue;
-  }
+  // &--warning &__text {
+  //   background-color: red;
+  // }
+  // &--active#{&}--warning &__text {
+  //   background-color: $bg--active;
+  // }
 }
 
 .btn-link {
@@ -690,7 +720,7 @@ a {
 .btn {
   border: 1px solid #ddd;
   border-radius: 15px;
-  padding: 4px 10px 4px 10px;
+  padding: 5px 10px 5px 10px;
   gap: 4px;
   background-color: #fff;
   display: flex;
@@ -703,8 +733,8 @@ a {
   color: #333;
 
   &--active {
-    border-color: blue;
-    color: blue
+    border-color: $bg--active;
+    color: $bg--active
   }
 
   &--borderless {
@@ -716,12 +746,12 @@ a {
   }
 
   &:active {
-    border-color: blue;
+    border-color: $bg--active;
   }
   
   &:focus {
     outline: none;
-    border-color: blue;
+    border-color: $bg--active;
   }
 
   &--danger, &--danger:hover {
@@ -793,7 +823,7 @@ a {
   }
 
   &:active svg {
-    fill: blue;
+    fill: $bg--active;
   }
 
   &--with--border {
@@ -801,11 +831,17 @@ a {
   }
 
   &--active, &--active:hover {
-    border-color: blue;
+    border-color: $bg--active;
   }
 
   &--active svg {
-    fill: blue;
+    fill: $bg--active;
+  }
+
+  .pip {
+    position: absolute;
+    top: -1px;
+    right: -1px;
   }
 }
 
@@ -1041,9 +1077,9 @@ a {
   }
 
   &--open &__trigger {
-    color: blue;
+    color: $bg--active;
     svg {
-      fill: blue
+      fill: $bg--active
     }
   }
 
@@ -1297,15 +1333,22 @@ a {
   }
 
   &:active:before {
-    border-color: blue;
+    border-color: $bg--active;
     outline: 0;
   }
   
   &:focus {
     outline: none;
-    border-color: blue;
+    border-color: $bg--active;
   }
 }
 .file-upload::-webkit-file-upload-button {
   visibility: hidden;
+}
+
+.pip {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: $bg--new;
 }

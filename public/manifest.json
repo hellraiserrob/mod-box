@@ -2,8 +2,8 @@
   "manifest_version": 3,
   "name": "ModBox – Modify headers, block requests",
   "short_name": "ModBox",
-  "description": "Modify HTTP headers, block assets or entire domains & redirect requests. Organise rules by folder and tab, optionally scope to domains.",
-  "version": "0.1.1",
+  "description": "Modify HTTP headers, block assets or domains & redirect requests. Organise rules by folder and tab, optionally scope to domains.",
+  "version": "0.2.1",
   "author": {
     "email": "robertjamesphillips@googlemail.com"
   },
@@ -15,8 +15,7 @@
     "declarativeNetRequest"
   ],
   "optional_permissions": [
-    "clipboardWrite",
-    "downloads"
+    "clipboardWrite"
   ],
   "host_permissions": [
     "*://*/*"

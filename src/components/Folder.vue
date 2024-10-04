@@ -3,6 +3,7 @@
     <div class="folder__header mb10">
       <h3>Folder ({{ folder.name }})</h3>
       <button @click="showSettings = !showSettings" class="btn-icon" :class="{ 'btn-icon--active': showSettings }">
+        <div class="pip"></div>
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
           class="bi bi-gear-wide-connected" viewBox="0 0 16 16">
           <path
@@ -43,6 +44,9 @@
         </button>
         <button @click="cloneFolder" class="btn">
           Clone folder
+        </button>
+        <button @click="toggleActive" class="btn">
+          {{ folder.active ? "Disable folder" : "Enable folder"}}
         </button>
       </div>
     </div>
@@ -96,7 +100,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["deleteFolder", "cloneFolder"]);
+const emit = defineEmits(["deleteFolder", "cloneFolder", "toggleActive"]);
 const folderName: Ref<HTMLInputElement | null> = ref(null);
 
 
@@ -163,6 +167,10 @@ function deleteFolder() {
 
 function cloneFolder() {
   emit("cloneFolder", folder.value);
+}
+
+function toggleActive() {
+  emit("toggleActive", folder.value);
 }
 
 async function restoreTab() {

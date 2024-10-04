@@ -5,7 +5,8 @@
     :class="{ 
       'tabs__tab--active': index === activeTab,
       'tabs__tab--right': index === target && target > tmp && target !== tmp,
-      'tabs__tab--left': index === target && target < tmp
+      'tabs__tab--left': index === target && target < tmp,
+      'tabs__tab--disabled': !tab.active
     }"
     @click="active = index" :draggable="tmp >= 0" 
     @dragover.prevent="target = index"

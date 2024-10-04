@@ -4,7 +4,8 @@
       'folders__list__item--active': index === activeFolder && !showSettings,
       'folders__list__item--bottom': index === target && target > tmp && target !== tmp,
       'folders__list__item--top': index === target && target < tmp,
-      'folders__list__item--compact': compact
+      'folders__list__item--compact': compact,
+      'folders__list__item--disabled': !folder.active,
     }"
     @click="active = index"
     :draggable="tmp >= 0"
