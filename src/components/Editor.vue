@@ -1,7 +1,7 @@
 <template>
   <div class="editor">
     <button
-      v-if="!isEditing && !domains"
+      v-if="!domains"
       @click="edit"
       class="editor__trigger"
       :class="{
@@ -25,7 +25,7 @@
       </svg>
     </button>
 
-    <div v-if="!isEditing && domains && splitDomains">
+    <div v-if="domains && splitDomains">
       <button
         v-if="splitDomains.length > 0"
         @click="edit"
@@ -57,17 +57,20 @@
       </button>
     </div>
 
-    <div v-show="isEditing" class="field field--table">
-      <input
-        ref="input"
-        @blur="save"
-        @keyup.enter="save"
-        @keyup.esc="cancel"
-        class="field__input"
-        type="text"
-        v-model="model"
-        :placeholder="placeholder"
-      />
+    <div v-show="isEditing" class="editor__modal">
+      <div class="field">
+        <label v-if="label" for="" class="field__label">{{label}}</label>
+        <input
+          ref="input"
+          @keyup.enter="save"
+          @keyup.esc="cancel"
+          @blur="save"
+          class="field__input"
+          type="text"
+          v-model="model"
+          :placeholder="placeholder"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -80,7 +83,7 @@ import { cleanDomain } from "../utils";
 import Tooltip from "./Tooltip.vue";
 
 const model = defineModel();
-const props = defineProps(["placeholder", "locked", "fallback", "domains"]);
+const props = defineProps(["placeholder", "locked", "fallback", "domains", "label"]);
 
 const input: Ref<HTMLInputElement | null> = ref(null);
 const isEditing = ref(false);

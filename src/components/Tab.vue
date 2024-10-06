@@ -161,7 +161,7 @@
             <Dropdown v-model="header.operation" :options="operationOptions" />
           </td>
           <td :colspan="header.operation !== 'remove' ? 1 : 2">
-            <Editor v-model="header.name" placeholder="Header name" />
+            <Editor v-model="header.name" placeholder="Header name" label="Header name" />
           </td>
           <td v-if="header.operation !== 'remove'">
             <Editor v-model="header.value" placeholder="Header value" />

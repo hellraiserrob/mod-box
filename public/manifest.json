@@ -3,7 +3,7 @@
   "name": "ModBox – Modify headers, block requests",
   "short_name": "ModBox",
   "description": "Modify HTTP headers, block assets or domains & redirect requests. Organise rules by folder and tab, optionally scope to domains.",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "author": {
     "email": "robertjamesphillips@googlemail.com"
   },
