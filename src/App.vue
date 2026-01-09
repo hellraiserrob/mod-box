@@ -51,21 +51,11 @@
               </svg>
             </template>
             <template v-else>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                fill="currentColor"
-                class="bi bi-plus"
-                viewBox="0 0 16 16"
-              >
-                <path
-                  d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"
-                />
-              </svg>
               Add
             </template>
           </button>
+
+          <hr />
 
           <div class="folders__list__settings">
             <h3 v-if="!compact" class="mb10">Global</h3>
@@ -115,13 +105,12 @@
                     />
                   </svg>
                 </template>
-                <div class="pip"></div>
               </button>
             </div>
           </div>
         </div>
       </div>
-      <div class="folders__detail">
+      <div class="folders__detail" :class="{ 'folders__detail--compact': compact }">
         <div v-if="!showSettings" v-for="(folder, index) in data.folders">
           <Folder
             v-if="index === activeFolder"

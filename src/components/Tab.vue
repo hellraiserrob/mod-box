@@ -109,10 +109,10 @@
     <div class="panel">
       <h3 class="mb10">
         Request headers
-        <div class="badge">{{ requestHeaderTotal }}</div>
+         - {{ requestHeaderTotal }}
       </h3>
       <div class="empty" v-if="!tab.requestHeaders?.length">
-        No request headers
+        Zero request headers
       </div>
 
       <table class="table" v-if="tab.requestHeaders?.length">
@@ -124,21 +124,21 @@
           <th>Value</th>
           <th>
             Url Filter
-            <Tooltip>
+            <!-- <Tooltip>
               The pattern which is matched against the network request url
-            </Tooltip>
+            </Tooltip> -->
           </th>
           <th>
             Domains
 
-            <Tooltip> Single or comma separated domains </Tooltip>
+            <!-- <Tooltip> Single or comma separated domains </Tooltip> -->
           </th>
           <th></th>
         </tr>
 
         <RuleDragger
           v-for="(header, index) in tab.requestHeaders"
-          :index="index"
+          :index="Number(index)"
           :tmp="requestHeadersTmp"
           :target="requestHeadersTarget"
           :total="tab.requestHeaders?.length"
@@ -176,6 +176,7 @@
             <Editor
               v-model="header.condition.requestDomains"
               placeholder="Request domains"
+              :aligned="'right'"
               :fallback="tab.requestDomains"
               :domains="true"
             />
@@ -187,20 +188,16 @@
       </table>
 
       <button class="btn mt10" @click="addRequestHeader()">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
-              <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
-            </svg>
         Add
       </button>
     </div>
 
     <div class="panel">
       <h3 class="mb10">
-        Response headers
-        <div class="badge">{{ responseHeaderTotal }}</div>
+        Response headers - {{ responseHeaderTotal }}
       </h3>
       <div class="empty" v-if="!tab.responseHeaders?.length">
-        No response headers
+        Zero response headers
       </div>
 
       <table class="table" v-if="tab.responseHeaders?.length">
@@ -212,19 +209,19 @@
           <th>Value</th>
           <th>
             Url Filter
-            <Tooltip>
+            <!-- <Tooltip>
               The pattern which is matched against the network request url
-            </Tooltip>
+            </Tooltip> -->
           </th>
           <th>
             Domains
-            <Tooltip>Single or comma separated domains</Tooltip>
+            <!-- <Tooltip>Single or comma separated domains</Tooltip> -->
           </th>
           <th></th>
         </tr>
         <RuleDragger
           v-for="(header, index) in tab.responseHeaders"
-          :index="index"
+          :index="Number(index)"
           :tmp="responseHeadersTmp"
           :target="responseHeadersTarget"
           :total="tab.responseHeaders?.length"
@@ -264,6 +261,7 @@
               placeholder="Request domains"
               :fallback="tab.requestDomains"
               :domains="true"
+              :aligned="'right'"
             />
           </td>
           <td class="table__short text-right">
@@ -273,20 +271,16 @@
       </table>
 
       <button class="btn mt10" @click="addResponseHeader()">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
-              <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
-            </svg>
         Add
       </button>
     </div>
 
     <div class="panel">
       <h3 class="mb10">
-        Block requests
-        <div class="badge">{{ blockedTotal }}</div>
+        Block requests - {{ blockedTotal }}
       </h3>
       <div class="empty" v-if="!tab.blockedRequests?.length">
-        No blocked requests
+        Zero blocked requests
       </div>
 
       <table v-if="tab.blockedRequests?.length" class="table">
@@ -296,19 +290,19 @@
           <th>Type</th>
           <th>
             Url Filter
-            <Tooltip>
+            <!-- <Tooltip>
               The pattern which is matched against the network request url
-            </Tooltip>
+            </Tooltip> -->
           </th>
           <th>
             Domains
-            <Tooltip> Single or comma separated domains</Tooltip>
+            <!-- <Tooltip> Single or comma separated domains</Tooltip> -->
           </th>
           <th class="table__short"></th>
         </tr>
         <RuleDragger
           v-for="(request, index) in tab.blockedRequests"
-          :index="index"
+          :index="Number(index)"
           :tmp="blockedRequestsTmp"
           :target="blockedRequestsTarget"
           :total="tab.blockedRequests?.length"
@@ -347,6 +341,7 @@
               placeholder="Request domains"
               :fallback="tab.requestDomains"
               :domains="true"
+              :aligned="'right'"
             />
           </td>
           <td class="table__short text-right">
@@ -356,20 +351,16 @@
       </table>
 
       <button class="mt10 btn" @click="addBlockedRequest()">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
-              <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
-            </svg>
         Add
       </button>
     </div>
 
     <div class="panel">
       <h3 class="mb10">
-        Redirect requests
-        <div class="badge">{{ redirectedTotal }}</div>
+        Redirect requests - {{ redirectedTotal }}
       </h3>
       <div class="empty" v-if="!tab.redirectRequests?.length">
-        No redirect requests
+        Zero redirect requests
       </div>
 
       <table v-if="tab.redirectRequests?.length" class="table">
@@ -378,24 +369,24 @@
           <th class="table__short"></th>
           <th>
             Url Filter
-            <Tooltip>
+            <!-- <Tooltip>
               The pattern which is matched against the network request url
-            </Tooltip>
+            </Tooltip> -->
           </th>
           <th>
             Destination
-            <Tooltip> An absolute destination Url </Tooltip>
+            <!-- <Tooltip> An absolute destination Url </Tooltip> -->
           </th>
           <th>
             Domains
-            <Tooltip> Single or comma separated domains</Tooltip>
+            <!-- <Tooltip> Single or comma separated domains</Tooltip> -->
           </th>
           <th class="table__short"></th>
         </tr>
         <!-- <tr v-for="request in tab.redirectRequests"> -->
         <RuleDragger
           v-for="(request, index) in tab.redirectRequests"
-          :index="index"
+          :index="Number(index)"
           :tmp="redirectRequestsTmp"
           :target="redirectRequestsTarget"
           :total="tab.redirectRequests?.length"
@@ -429,6 +420,7 @@
               placeholder="Request domains"
               :fallback="tab.requestDomains"
               :domains="true"
+              :aligned="'right'"
             />
           </td>
           <td class="table__short text-right">
@@ -438,9 +430,6 @@
       </table>
 
       <button class="mt10 btn" @click="addRedirectRequest()">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
-              <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
-            </svg>
         Add
       </button>
     </div>

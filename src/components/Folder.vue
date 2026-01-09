@@ -3,7 +3,7 @@
     <div class="folder__header mb10">
       <h3>Folder ({{ folder.name }})</h3>
       <button @click="showSettings = !showSettings" class="btn-icon" :class="{ 'btn-icon--active': showSettings }">
-        <div class="pip"></div>
+        
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
           class="bi bi-gear-wide-connected" viewBox="0 0 16 16">
           <path

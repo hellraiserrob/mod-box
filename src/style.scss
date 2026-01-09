@@ -21,6 +21,7 @@ html, body {
 body,
 button,
 input,
+textarea,
 th,
 p {
   font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir,
@@ -85,6 +86,12 @@ a {
   }
 }
 
+hr {
+  border: 0;
+  border-top: 1px solid #efefef;
+  margin: 20px 0;
+}
+
 .mb10 {
   margin-bottom: 10px;
 }
@@ -134,7 +141,7 @@ a {
 }
 
 #app {
-  max-width: 800px;
+  // max-width: 750px;
   min-height: 500px;
   margin: 0 auto;
   padding: 10px;
@@ -196,6 +203,11 @@ a {
       border-radius: 4px;
       cursor: pointer;
       align-items: center;
+      border: 1px solid #efefef;
+
+      & + & {
+        margin-top: -1px;
+      }
 
       &--compact {
         padding-right: 0;
@@ -530,7 +542,7 @@ a {
     width: 100%;
     font-size: 15px;
     transition: all ease 0.2s;
-    box-shadow: inset 0 0 10px rgba(#000, 0.075);
+    box-shadow: inset 0 0 5px rgba(#000, 0.075);
 
     &:hover {
       border-color: #ccc;
@@ -720,8 +732,8 @@ a {
 
 .btn {
   border: 1px solid #ddd;
-  border-radius: 15px;
-  padding: 5px 10px 5px 10px;
+  border-radius: 4px;
+  padding: 3px 8px;
   gap: 4px;
   background-color: #fff;
   display: flex;
@@ -781,13 +793,13 @@ a {
     }
 
     &:first-child {
-      border-radius: 15px 0 0 15px;
+      border-radius: 4px 0 0 4px;
       // border-right: 0;
       // padding-left: 15px;
     }
 
     &:last-child {
-      border-radius: 0 15px 15px 0;
+      border-radius: 0 4px 4px 0;
       // padding-right: 15px;
     }
   }
@@ -886,7 +898,7 @@ a {
   // }
 
   td, th {
-    padding: 5px 8px;
+    padding: 5px 2px;
     vertical-align: middle;
   }
 
@@ -991,21 +1003,31 @@ a {
 
 .editor {
   position: relative;
+  transition: ease all 0.2s;
+
+  &--open {
+    background: #fff;
+    border-radius: 4px;
+  }
 
   &__trigger {
     font-size: 14px;
     color: #333;
     cursor: pointer;
     transition: all ease 0.2s;
-    padding: 4px 2px;
+    padding: 0 2px;
     background: transparent;
     text-align: left;
     display: inline-block;
     border: 0;
-    max-width: 100px;
+    max-width: 75px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+
+    .folders__detail--compact & {
+      max-width: 100px;
+    }
 
     &--locked {
       text-decoration: line-through;
@@ -1047,6 +1069,10 @@ a {
     &:hover svg {
       opacity: 1;
     }
+  }
+
+  &__domains {
+    display: flex;
   }
 
   &__modal {
@@ -1092,6 +1118,16 @@ a {
       border-top-color: #ccc;
       border-width: 5px;
       margin-left: -5px;
+    }
+  }
+
+  &--align-right &__modal {
+    left: auto;
+    right: -15px;
+
+    &::before, &::after {
+      left: auto;
+      right: 20px;
     }
   }
 }
@@ -1253,6 +1289,8 @@ a {
     min-width: 12px;
     text-align: center;
     // transform: translateY(-2px);
+
+    white-space: nowrap;
   }
 
   &__window {
