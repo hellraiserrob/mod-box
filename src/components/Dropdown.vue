@@ -7,7 +7,7 @@
       </svg>
     </button>
     <div v-show="isOpen" class="dropdown__menu">
-      <button v-for="option in options" @click="option.action ? option.action() : set(option.value)" class="dropdown__menu__item" :class="{'dropdown__menu__item--active' : model === option.value}">
+      <button v-for="(option, index) in options" :key="index" @click="option.action ? option.action() : set(option.value)" class="dropdown__menu__item" :class="{'dropdown__menu__item--active' : model === option.value}">
         {{ option.label }}
       </button>
     </div>
@@ -17,10 +17,11 @@
 <script setup lang="ts">
 import { ref, toRefs, computed } from "vue";
 import type { Ref, PropType } from "vue";
+import { useOutsideClick } from "../composables";
 
 const model = defineModel();
 const root: Ref<HTMLElement | null> = ref(null);
-const isOpen = ref(false);
+const { isOpen, toggle, close } = useOutsideClick(root);
 
 interface Option {
   label: string,
@@ -39,53 +40,20 @@ const propRefs = toRefs(props);
 const options = propRefs.options;
 
 const defaultOption = computed(() => {
-  // if(!options) {
-  //   return {
-  //     label: "empty",
-  //     value: "empty"
-  //   }
-  // }
-  // console.log(model.value);
   if(typeof model.value !== "undefined" && model.value !== "") {
     return options.value.find(option => option.value === model.value)
   }
   
   return options.value[0]
-
-  // return {
-  //     label: "empty",
-  //     value: "empty"
-  //   }
 })
 
 /**
  * functions
  */
 
-function toggle() {
-  isOpen.value = !isOpen.value;
-
-  if (isOpen.value) {
-    window.addEventListener("click", outsideClick)
-  } else {
-    window.removeEventListener("click", outsideClick)
-  }
-}
-
-function close() {
-  isOpen.value = false;
-  window.removeEventListener("click", outsideClick)
-}
-
-function outsideClick(e: any) {
-  if (!root.value?.contains(e.target)) {
-    close();
-  }
-}
-
 function set(val: string | boolean) {
   model.value = val;
-  isOpen.value = false;
+  close();
 }
 
 </script>

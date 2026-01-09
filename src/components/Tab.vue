@@ -437,7 +437,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, toRefs, computed, onMounted, nextTick } from "vue";
+import { ref, toRefs, computed, onMounted, onUnmounted, nextTick } from "vue";
 import type { Ref } from "vue";
 
 import Editor from "./Editor.vue";
@@ -768,5 +768,9 @@ onMounted(() => {
       tabName.value?.select();
     });
   }
+});
+
+onUnmounted(() => {
+  clearTimeout(timer);
 });
 </script>

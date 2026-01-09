@@ -1,6 +1,7 @@
 <template>
   <div 
     v-for="(tab, index) in tabs"
+    :key="`tab-drag-${index}`"
     class="tabs__tab"
     :class="{ 
       'tabs__tab--active': index === activeTab,
@@ -40,7 +41,7 @@
 
 <script setup lang="ts">
 import { ref, toRefs, type PropType } from "vue";
-import { TabType } from "../interaces";
+import { TabType } from "../interfaces";
 
 const props = defineProps({
   tabs: {
