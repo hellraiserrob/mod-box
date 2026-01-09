@@ -181,6 +181,13 @@
         >
           My LinkedIn
         </a>
+        <a
+          href="https://www.buymeacoffee.com/robphillips"
+          class="btn"
+          target="_blank"
+        >
+          Tip Jar
+        </a>
       </div>
     </div>
   </div>
@@ -189,7 +196,7 @@
 <script setup lang="ts">
 import { ref, type PropType } from "vue";
 import type { Ref } from "vue";
-import { FolderType } from "../interfaces";
+import { FolderType, isValidExportPayload } from "../interfaces";
 
 const props = defineProps({
   folders: {
@@ -268,17 +275,15 @@ function onFileChange(e: Event) {
       
       const payload = JSON.parse(result);
 
-      if (
-        payload.name === "modbox" &&
-        payload.version === 1 &&
-        payload.folders
-      ) {
-        importData.value = payload.folders;
-      } else {
-        importError.value = "We don't think this is a modbox backup file";
+      if (!isValidExportPayload(payload)) {
+        importError.value = "Invalid file format. Please select a valid ModBox backup file.";
+        return;
       }
+
+      importData.value = payload.folders;
+      importError.value = "";
     } catch {
-      importError.value = "We had an unexpected error during import";
+      importError.value = "Failed to parse file. Please ensure it's a valid JSON file.";
     }
   };
   fr.readAsText(file);

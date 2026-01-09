@@ -208,15 +208,33 @@ export const isChrome: boolean =
 
 /**
  * Domain parsing utilities
+ * Supports comma-separated strings, newline-separated strings, or arrays
+ * Automatically deduplicates and cleans domains
  */
-export function parseDomains(domains: string): string[] {
-  if (!domains || typeof domains !== "string") {
+export function parseDomains(domains: string | string[]): string[] {
+  if (!domains) {
     return [];
   }
-  return domains
-    .split(",")
+  
+  // Handle array input
+  if (Array.isArray(domains)) {
+    const cleaned = domains
+      .map(domain => cleanDomain(domain))
+      .filter(domain => domain !== "");
+    return [...new Set(cleaned)]; // Deduplicate
+  }
+  
+  if (typeof domains !== "string") {
+    return [];
+  }
+  
+  // Split by comma or newline
+  const cleaned = domains
+    .split(/[,\n]/)
     .map(domain => cleanDomain(domain))
     .filter(domain => domain !== "");
+  
+  return [...new Set(cleaned)]; // Deduplicate
 }
 
 export function cleanDomain(domain: string): string {

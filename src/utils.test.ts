@@ -606,4 +606,196 @@ describe('cleanDomain', () => {
   it('preserves path and query string', () => {
     expect(cleanDomain("https://example.com/path?query=1")).toBe("example.com/path?query=1");
   });
+
+  it('handles mixed case protocols', () => {
+    expect(cleanDomain("HtTpS://example.com")).toBe("example.com");
+    expect(cleanDomain("HtTp://example.com")).toBe("example.com");
+  });
+
+  it('handles empty string', () => {
+    expect(cleanDomain("")).toBe("");
+  });
+
+  it('handles whitespace-only string', () => {
+    expect(cleanDomain("   ")).toBe("");
+  });
+
+  it('handles domain with port', () => {
+    expect(cleanDomain("https://example.com:8080")).toBe("example.com:8080");
+  });
+
+  it('handles domain with subdomain', () => {
+    expect(cleanDomain("https://api.sub.example.com")).toBe("api.sub.example.com");
+  });
+});
+
+describe('parseDomains edge cases', () => {
+  it('handles domains with ports', () => {
+    expect(parseDomains("example.com:8080")).toEqual(["example.com:8080"]);
+  });
+
+  it('handles multiple domains with protocols mixed', () => {
+    expect(parseDomains("https://a.com, http://b.com, c.com")).toEqual(["a.com", "b.com", "c.com"]);
+  });
+
+  it('handles commas with varying whitespace', () => {
+    expect(parseDomains("a.com,b.com,  c.com  ,d.com")).toEqual(["a.com", "b.com", "c.com", "d.com"]);
+  });
+
+  it('handles newline-separated domains', () => {
+    expect(parseDomains("a.com\nb.com\nc.com")).toEqual(["a.com", "b.com", "c.com"]);
+  });
+
+  it('handles mixed comma and newline separators', () => {
+    expect(parseDomains("a.com, b.com\nc.com")).toEqual(["a.com", "b.com", "c.com"]);
+  });
+
+  it('filters out duplicate domains', () => {
+    expect(parseDomains("example.com, example.com")).toEqual(["example.com"]);
+  });
+
+  it('filters out duplicates when protocols differ', () => {
+    expect(parseDomains("https://example.com, http://example.com")).toEqual(["example.com"]);
+  });
+
+  it('handles array input', () => {
+    expect(parseDomains(["a.com", "b.com"])).toEqual(["a.com", "b.com"]);
+  });
+
+  it('cleans domains in array input', () => {
+    expect(parseDomains(["https://a.com", "  b.com  "])).toEqual(["a.com", "b.com"]);
+  });
+});
+
+describe('generateRules security and limits', () => {
+  it('handles very long domain lists', () => {
+    const domains = Array.from({ length: 100 }, (_, i) => `domain${i}.com`).join(',');
+    const data = createData({
+      folders: [
+        createFolder({
+          tabs: [
+            createTab({
+              requestDomains: domains,
+              requestHeaders: [createHeaderRule()],
+            }),
+          ],
+        }),
+      ],
+    });
+
+    const rules = generateRules(data);
+    expect(rules).toHaveLength(1);
+    expect(rules[0].condition.requestDomains).toHaveLength(100);
+  });
+
+  it('handles deeply nested folder/tab structure', () => {
+    const data = createData({
+      folders: Array.from({ length: 10 }, (_, i) => 
+        createFolder({
+          name: `Folder ${i}`,
+          tabs: Array.from({ length: 5 }, (_, j) => 
+            createTab({
+              name: `Tab ${j}`,
+              requestHeaders: [createHeaderRule({ name: `Header-${i}-${j}` })],
+            })
+          ),
+        })
+      ),
+    });
+
+    const rules = generateRules(data);
+    // 10 folders * 5 tabs * 1 header rule each = 50 rules
+    expect(rules).toHaveLength(50);
+    // Each should have a unique sequential id
+    rules.forEach((rule, index) => {
+      expect(rule.id).toBe(index + 1);
+    });
+  });
+
+  it('handles special characters in header values', () => {
+    const data = createData({
+      folders: [
+        createFolder({
+          tabs: [
+            createTab({
+              requestHeaders: [
+                createHeaderRule({
+                  name: 'X-Special',
+                  value: 'value with "quotes" and \'apostrophes\' and <brackets>',
+                }),
+              ],
+            }),
+          ],
+        }),
+      ],
+    });
+
+    const rules = generateRules(data);
+    expect(rules).toHaveLength(1);
+    expect(rules[0].action.requestHeaders?.[0].value).toBe(
+      'value with "quotes" and \'apostrophes\' and <brackets>'
+    );
+  });
+
+  it('handles unicode in domain names', () => {
+    const data = createData({
+      folders: [
+        createFolder({
+          tabs: [
+            createTab({
+              requestDomains: 'münchen.de',
+              requestHeaders: [createHeaderRule()],
+            }),
+          ],
+        }),
+      ],
+    });
+
+    const rules = generateRules(data);
+    expect(rules[0].condition.requestDomains).toEqual(['münchen.de']);
+  });
+
+  it('handles empty strings in header values', () => {
+    const data = createData({
+      folders: [
+        createFolder({
+          tabs: [
+            createTab({
+              requestHeaders: [
+                createHeaderRule({ name: 'X-Empty', value: '' }),
+              ],
+            }),
+          ],
+        }),
+      ],
+    });
+
+    const rules = generateRules(data);
+    expect(rules).toHaveLength(1);
+    expect(rules[0].action.requestHeaders?.[0].value).toBe('');
+  });
+
+  it('generates unique IDs across mixed rule types', () => {
+    const data = createData({
+      folders: [
+        createFolder({
+          tabs: [
+            createTab({
+              requestHeaders: [createHeaderRule()],
+              responseHeaders: [createHeaderRule({ name: 'Response-Header' })],
+              blockedRequests: [createBlockRule()],
+              redirectRequests: [createRedirectRule()],
+            }),
+          ],
+        }),
+      ],
+    });
+
+    const rules = generateRules(data);
+    const ids = rules.map(r => r.id);
+    const uniqueIds = new Set(ids);
+    expect(uniqueIds.size).toBe(rules.length);
+    // IDs should be sequential starting from 1
+    expect(ids).toEqual([1, 2, 3, 4]);
+  });
 });
