@@ -6,7 +6,7 @@
       </svg>
     </button>
     <div v-show="isOpen" class="dropdown__menu">
-      <div v-for="(option, index) in options" class="dropdown__menu__wrapper">
+      <div v-for="(option, index) in options" :key="index" class="dropdown__menu__wrapper">
         <button @click="handleClick(option, index, false)" class="dropdown__menu__item">
           {{ option.label }}
         </button>
@@ -22,12 +22,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref, toRefs } from "vue";
+import { ref, toRefs, watch } from "vue";
 import type { Ref, PropType } from "vue";
+import { useOutsideClick } from "../composables";
 
 const root: Ref<HTMLElement | null> = ref(null);
-const isOpen = ref(false);
+const { isOpen, toggle, close } = useOutsideClick(root);
 const confirmationOpen = ref(-1);
+
+// Reset confirmation when dropdown closes
+watch(isOpen, (newVal) => {
+  if (!newVal) {
+    confirmationOpen.value = -1;
+  }
+});
 
 interface Option {
   label: String,
@@ -62,30 +70,8 @@ function handleClick(option: Option, index: number, override: Boolean) {
   else {
     confirmationOpen.value = -1;
     option.action(rule.value);
-    isOpen.value = false
-  }
- }
-
-function toggle() {
-  isOpen.value = !isOpen.value;
-
-  if (isOpen.value) {
-    window.addEventListener("click", outsideClick)
-  } else {
-    window.removeEventListener("click", outsideClick)
-  }
-}
-
-function close() {
-  isOpen.value = false;
-  confirmationOpen.value = -1;
-  window.removeEventListener("click", outsideClick)
-}
-
-function outsideClick(e: any) {
-  if (!root.value?.contains(e.target)) {
     close();
   }
-}
+ }
 
 </script>

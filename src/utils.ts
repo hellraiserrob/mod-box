@@ -1,5 +1,4 @@
-// @ts-ignore  
-import { DataType, FolderType, TabType } from "../interaces.ts"
+import { DataType, FolderType, TabType } from "./interfaces"
 
 export function generateRules(data: DataType) {
   const rules: any = [];
@@ -121,5 +120,5 @@ export const parseDomains = (domains: string) => {
 }
 
 export const cleanDomain = (domain: string) => {
-  return domain.trim().replaceAll("https://", "").replaceAll("https://", "")
+  return domain.trim().replace(/^https?:\/\//i, "")
 }

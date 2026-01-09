@@ -77,7 +77,7 @@
       </div>
     </div>
 
-    <div v-for="(tab, index) in folder.tabs">
+    <div v-for="(tab, index) in folder.tabs" :key="`tab-${index}`">
       <Tab v-if="index === activeTab" :tab="tab" @deleteTab="deleteTab" @cloneTab="cloneTab" />
     </div>
   </div>
@@ -91,7 +91,7 @@ import * as _ from "lodash";
 import { isChrome } from "../utils"
 import Tab from "./Tab.vue";
 import TabDragger from "./TabDragger.vue";
-import { TabType } from "../interaces";
+import { TabType } from "../interfaces";
 
 const props = defineProps({
   folder: {

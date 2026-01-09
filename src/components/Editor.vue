@@ -26,7 +26,7 @@
       </button>
 
       <Tooltip v-if="splitDomains.length > 1" :trigger="splitDomains.length - 1">
-        <div v-for="domain in splitDomains">{{ cleanDomain(domain) }}</div>
+        <div v-for="(domain, idx) in splitDomains" :key="idx">{{ cleanDomain(domain) }}</div>
       </Tooltip>
       
       <button v-if="!splitDomains.length" @click="edit" class="editor__trigger">

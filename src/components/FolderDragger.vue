@@ -1,5 +1,5 @@
 <template>
-  <div v-for="(folder, index) in folders" class="folders__list__item"
+  <div v-for="(folder, index) in folders" :key="`folder-drag-${index}`" class="folders__list__item"
     :class="{ 
       'folders__list__item--active': index === activeFolder && !showSettings,
       'folders__list__item--bottom': index === target && target > tmp && target !== tmp,
@@ -37,7 +37,7 @@
 
 <script setup lang="ts">
 import { ref, toRefs, type PropType } from "vue";
-import { FolderType } from "../interaces";
+import { FolderType } from "../interfaces";
 
 const props = defineProps({
   folders: {
