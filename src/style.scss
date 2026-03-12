@@ -1135,6 +1135,12 @@ hr {
 .dropdown {
   position: relative;
 
+  &--up &__menu {
+    top: auto;
+    bottom: 100%;
+    margin-bottom: 2px;
+  }
+
   &--select &__trigger {
     display: flex;
     align-items: center;
@@ -1345,6 +1351,26 @@ hr {
     top: 8px;
     left: 8px;
     right: 8px;
+  }
+
+  &--warning {
+    color: #856404;
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+}
+
+.hint {
+  font-size: 12px;
+  font-weight: normal;
+  color: #666;
+  
+  &--warning {
+    color: #856404;
   }
 }
 

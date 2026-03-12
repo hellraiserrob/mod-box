@@ -433,6 +433,80 @@
         Add
       </button>
     </div>
+
+    <div class="panel">
+      <h3 class="mb10">
+        Network conditions - {{ networkConditionsTotal }}
+        <span v-if="!isNetworkConditionsSupported" class="hint hint--warning">
+          (Requires Chrome 145+)
+        </span>
+      </h3>
+      <div class="empty" v-if="!tab.networkConditions?.length">
+        Zero network condition rules
+      </div>
+
+      <table v-if="tab.networkConditions?.length" class="table">
+        <tr>
+          <th></th>
+          <th class="table__short"></th>
+          <th>Preset</th>
+          <th>
+            Url Filter
+          </th>
+          <th>
+            Domains
+          </th>
+          <th class="table__short"></th>
+        </tr>
+        <RuleDragger
+          v-for="(condition, index) in tab.networkConditions"
+          :index="Number(index)"
+          :tmp="networkConditionsTmp"
+          :target="networkConditionsTarget"
+          :total="tab.networkConditions?.length"
+          @onSetTmp="onSetNetworkConditionTmp"
+          @onSetTarget="onSetNetworkConditionTarget"
+          @onMoveRule="moveNetworkConditionRule"
+        >
+          <td class="table__short">
+            <button
+              class="toggle"
+              @click="condition.active = !condition.active"
+              :class="{ 'toggle--active': condition.active }"
+            >
+              <div class="toggle__text">
+                {{ condition.active ? "On" : "Off" }}
+              </div>
+            </button>
+          </td>
+          <td>
+            <Dropdown v-model="condition.preset" :options="networkPresetOptions" />
+          </td>
+          <td>
+            <Editor
+              v-model="condition.condition.urlFilter"
+              placeholder="urlFilter"
+            />
+          </td>
+          <td>
+            <Editor
+              v-model="condition.condition.requestDomains"
+              placeholder="Request domains"
+              :fallback="tab.requestDomains"
+              :domains="true"
+              :aligned="'right'"
+            />
+          </td>
+          <td class="table__short text-right">
+            <DropdownMenu :options="networkConditionActions" :rule="condition" />
+          </td>
+        </RuleDragger>
+      </table>
+
+      <button class="mt10 btn" @click="addNetworkCondition()">
+        Add
+      </button>
+    </div>
   </div>
 </template>
 
@@ -440,11 +514,15 @@
 import { ref, toRefs, computed, onMounted, onUnmounted, nextTick } from "vue";
 import type { Ref } from "vue";
 
+import { isNetworkConditionsSupported as checkNetworkConditionsSupport } from "../utils";
+
 import Editor from "./Editor.vue";
 import Dropdown from "./Dropdown.vue";
 import DropdownMenu from "./DropdownMenu.vue";
 import Tooltip from "./Tooltip.vue";
 import RuleDragger from "./RuleDragger.vue";
+
+const isNetworkConditionsSupported = checkNetworkConditionsSupport();
 
 const props = defineProps({
   tab: {
@@ -509,6 +587,16 @@ const redirectActions = [
   }
 ];
 
+const networkConditionActions = [
+  {
+    label: "Delete",
+    confirm: true,
+    action: (rule:any) => {
+      deleteNetworkCondition(rule)
+    },
+  }
+];
+
 const operationOptions = [
   {
     label: "Set",
@@ -531,6 +619,25 @@ const blockOptions = [
   },
 ];
 
+const networkPresetOptions = [
+  {
+    label: "Offline",
+    value: "offline",
+  },
+  {
+    label: "Slow 3G",
+    value: "slow3g",
+  },
+  {
+    label: "Slow 4G",
+    value: "slow4g",
+  },
+  {
+    label: "Fast 4G",
+    value: "fast4g",
+  },
+];
+
 /**
  * reactive
  */
@@ -548,6 +655,10 @@ const blockedRequestsTarget = ref(-1);
 
 const redirectRequestsTmp = ref(-1);
 const redirectRequestsTarget = ref(-1);
+
+const networkConditionsTmp = ref(-1);
+const networkConditionsTarget = ref(-1);
+
 const toast = ref({
   active: false,
   message: ""
@@ -580,6 +691,13 @@ const requestHeaderTotal = computed(() => {
 const responseHeaderTotal = computed(() => {
   return (
     tab.value.responseHeaders?.filter((request: any) => request.active)
+      .length || 0
+  );
+});
+
+const networkConditionsTotal = computed(() => {
+  return (
+    tab.value.networkConditions?.filter((condition: any) => condition.active)
       .length || 0
   );
 });
@@ -673,6 +791,21 @@ function moveRedirectRule(from: number, to: number) {
   tab.value.redirectRequests.splice(to, 0, rule);
 }
 
+// network conditions specifics
+function onSetNetworkConditionTmp(tmp: number) {
+  networkConditionsTmp.value = tmp;
+}
+function onSetNetworkConditionTarget(tmp: number) {
+  networkConditionsTarget.value = tmp;
+}
+
+function moveNetworkConditionRule(from: number, to: number) {
+  const rule = tab.value.networkConditions[from];
+
+  tab.value.networkConditions.splice(from, 1);
+  tab.value.networkConditions.splice(to, 0, rule);
+}
+
 function deleteTab() {
   emit("deleteTab", tab?.value);
 }
@@ -731,6 +864,21 @@ function addRedirectRequest() {
   });
 }
 
+function addNetworkCondition() {
+  if (!tab.value.networkConditions) {
+    tab.value.networkConditions = [];
+  }
+
+  tab.value.networkConditions.push({
+    active: true,
+    preset: "slow3g",
+    condition: {
+      urlFilter: "",
+      requestDomains: "",
+    },
+  });
+}
+
 function deleteRequestHeader(targetHeader: any) {
   tab.value.requestHeaders = tab.value.requestHeaders.filter(
     (header: any) => header !== targetHeader
@@ -752,6 +900,12 @@ function deleteBlockRequest(targetRequest: any) {
 function deleteRedirectRequest(targetRequest: any) {
   tab.value.redirectRequests = tab.value.redirectRequests.filter(
     (request: any) => request !== targetRequest
+  );
+}
+
+function deleteNetworkCondition(targetCondition: any) {
+  tab.value.networkConditions = tab.value.networkConditions.filter(
+    (condition: any) => condition !== targetCondition
   );
 }
 

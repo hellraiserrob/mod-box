@@ -21,7 +21,7 @@ import { ref, onMounted, watch } from "vue";
 import type { Ref } from "vue";
 
 import { DataType, FolderType } from "./interfaces";
-import { generateRules, isChrome } from "./utils";
+import { generateRules, generateNetworkConditionRules, isChrome } from "./utils";
 
 import FolderPanel from "./components/FolderPanel.vue";
 
@@ -43,6 +43,7 @@ const fallbackData: DataType = {
           responseHeaders: [],
           blockedRequests: [],
           redirectRequests: [],
+          networkConditions: [],
         },
       ],
     },
@@ -127,6 +128,12 @@ async function save() {
 
     chrome.storage.local.set({ rules: JSON.stringify(data.value) });
     chrome.storage.local.set({ totalActiveRules: `${activeRules.length}` });
+
+    // Save network conditions for service worker
+    const networkConditions = generateNetworkConditionRules(data.value);
+    chrome.storage.local.set({ 
+      networkConditions: networkConditions ? JSON.stringify(networkConditions) : null 
+    });
 
     // Update badge
     chrome.action.setBadgeBackgroundColor({ color: "blue" });

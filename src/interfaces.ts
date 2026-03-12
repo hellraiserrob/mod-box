@@ -23,6 +23,59 @@ export interface RedirectRequest {
   condition: Omit<RuleCondition, 'document'>;
 }
 
+/**
+ * Network condition preset types and configuration
+ */
+export type NetworkConditionPreset = 'offline' | 'slow3g' | 'slow4g' | 'fast4g';
+
+export interface NetworkPresetConfig {
+  label: string;
+  latency: number;           // milliseconds
+  downloadThroughput: number; // bytes/sec, -1 for unlimited
+  uploadThroughput: number;   // bytes/sec, -1 for unlimited
+  offline: boolean;
+}
+
+/**
+ * Standard network throttling presets based on Chrome DevTools values
+ */
+export const NETWORK_PRESETS: Record<NetworkConditionPreset, NetworkPresetConfig> = {
+  offline: {
+    label: 'Offline',
+    latency: 0,
+    downloadThroughput: 0,
+    uploadThroughput: 0,
+    offline: true,
+  },
+  slow3g: {
+    label: 'Slow 3G',
+    latency: 2000,
+    downloadThroughput: 50000,   // ~50 KB/s
+    uploadThroughput: 50000,     // ~50 KB/s
+    offline: false,
+  },
+  slow4g: {
+    label: 'Slow 4G',
+    latency: 563,
+    downloadThroughput: 180000,  // ~180 KB/s
+    uploadThroughput: 84375,     // ~84 KB/s
+    offline: false,
+  },
+  fast4g: {
+    label: 'Fast 4G',
+    latency: 165,
+    downloadThroughput: 1012500, // ~1 MB/s
+    uploadThroughput: 168750,    // ~169 KB/s
+    offline: false,
+  },
+};
+
+export interface NetworkConditionRule {
+  active: boolean;
+  preset: NetworkConditionPreset;
+  condition: Omit<RuleCondition, 'document'>;
+}
+
 export interface TabType {
   name: string;
   requestDomains?: string;
@@ -31,6 +84,7 @@ export interface TabType {
   responseHeaders: HeaderRule[];
   blockedRequests: BlockedRequest[];
   redirectRequests: RedirectRequest[];
+  networkConditions?: NetworkConditionRule[];
 }
 
 export interface FolderType {
@@ -96,6 +150,22 @@ export function isValidRedirectRequest(obj: unknown): obj is RedirectRequest {
   );
 }
 
+const VALID_PRESETS = ['offline', 'slow3g', 'slow4g', 'fast4g'];
+
+export function isValidNetworkConditionRule(obj: unknown): obj is NetworkConditionRule {
+  if (!obj || typeof obj !== 'object') return false;
+  const rule = obj as Record<string, unknown>;
+  return (
+    typeof rule.active === 'boolean' &&
+    typeof rule.preset === 'string' &&
+    VALID_PRESETS.includes(rule.preset) &&
+    rule.condition !== null &&
+    typeof rule.condition === 'object' &&
+    typeof (rule.condition as Record<string, unknown>).urlFilter === 'string' &&
+    typeof (rule.condition as Record<string, unknown>).requestDomains === 'string'
+  );
+}
+
 export function isValidTab(obj: unknown): obj is TabType {
   if (!obj || typeof obj !== 'object') return false;
   const tab = obj as Record<string, unknown>;
@@ -106,7 +176,8 @@ export function isValidTab(obj: unknown): obj is TabType {
     Array.isArray(tab.requestHeaders) &&
     Array.isArray(tab.responseHeaders) &&
     Array.isArray(tab.blockedRequests) &&
-    Array.isArray(tab.redirectRequests)
+    Array.isArray(tab.redirectRequests) &&
+    (tab.networkConditions === undefined || Array.isArray(tab.networkConditions))
   );
 }
 

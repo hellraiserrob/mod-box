@@ -1,4 +1,17 @@
-import { DataType, HeaderRule, BlockedRequest, RedirectRequest } from "./interfaces"
+import { DataType, HeaderRule, BlockedRequest, RedirectRequest, NetworkConditionRule, NETWORK_PRESETS } from "./interfaces"
+
+/**
+ * Chrome version detection for feature support
+ */
+export function getChromeVersion(): number {
+  if (typeof navigator === 'undefined') return 0;
+  const match = navigator.userAgent.match(/Chrome\/(\d+)/);
+  return match ? parseInt(match[1], 10) : 0;
+}
+
+export function isNetworkConditionsSupported(): boolean {
+  return getChromeVersion() >= 145;
+}
 
 /**
  * Chrome declarativeNetRequest resource types
@@ -242,4 +255,125 @@ export function cleanDomain(domain: string): string {
     return "";
   }
   return domain.trim().replace(/^https?:\/\//i, "");
+}
+
+/**
+ * Network condition rule for Chrome DevTools Protocol
+ */
+export interface NetworkConditionRuleOutput {
+  urlPattern: string;
+  latency: number;
+  downloadThroughput: number;
+  uploadThroughput: number;
+}
+
+export interface NetworkConditionsOutput {
+  offline: boolean;
+  matchedNetworkConditions: NetworkConditionRuleOutput[];
+}
+
+/**
+ * Build URL pattern for network conditions from rule condition
+ * Uses URLPattern syntax: https://urlpattern.spec.whatwg.org/
+ */
+function buildUrlPattern(
+  condition: { urlFilter?: string; requestDomains?: string },
+  fallbackDomains?: string
+): string {
+  // If urlFilter is provided, use it directly (assume it's a valid URLPattern)
+  if (condition.urlFilter && condition.urlFilter.trim() !== "") {
+    return condition.urlFilter.trim();
+  }
+  
+  // If domains are provided, build a pattern matching those domains
+  const domains = condition.requestDomains || fallbackDomains;
+  if (domains && domains.trim() !== "") {
+    const domainList = parseDomains(domains);
+    if (domainList.length === 1) {
+      return `*://${domainList[0]}/*`;
+    }
+    if (domainList.length > 1) {
+      // URLPattern doesn't support multiple domains in one pattern,
+      // so we use the first one. In practice, users should create
+      // separate rules for each domain or use a urlFilter pattern.
+      return `*://${domainList[0]}/*`;
+    }
+  }
+  
+  // Default: match all requests
+  return "*://*/*";
+}
+
+/**
+ * Validation helper for network condition rules
+ */
+function isValidNetworkConditionRule(rule: NetworkConditionRule | undefined): rule is NetworkConditionRule {
+  return Boolean(
+    rule?.active && 
+    rule.preset &&
+    NETWORK_PRESETS[rule.preset] &&
+    rule.condition
+  );
+}
+
+/**
+ * Generate network condition rules for Chrome DevTools Protocol
+ * Returns the payload for Network.emulateNetworkConditionsByRule
+ */
+export function generateNetworkConditionRules(data: DataType): NetworkConditionsOutput | null {
+  if (!data?.active) {
+    return null;
+  }
+
+  if (!Array.isArray(data.folders)) {
+    return null;
+  }
+
+  const matchedNetworkConditions: NetworkConditionRuleOutput[] = [];
+  let hasOfflineRule = false;
+
+  for (const folder of data.folders) {
+    if (!folder?.active || !Array.isArray(folder.tabs)) continue;
+
+    for (const tab of folder.tabs) {
+      if (!tab?.active) continue;
+
+      if (Array.isArray(tab.networkConditions)) {
+        for (const rule of tab.networkConditions) {
+          if (!isValidNetworkConditionRule(rule)) continue;
+
+          const preset = NETWORK_PRESETS[rule.preset];
+          
+          // Track if any rule is offline (affects global offline state)
+          if (preset.offline) {
+            hasOfflineRule = true;
+          }
+
+          console.log({
+            ruleCondition: rule.condition, 
+            ruleDomain: tab.requestDomains,
+            latency: preset.latency,
+            downloadThroughput: preset.downloadThroughput,
+            uploadThroughput: preset.uploadThroughput,
+          });
+
+          matchedNetworkConditions.push({
+            urlPattern: buildUrlPattern(rule.condition, tab.requestDomains),
+            latency: preset.latency,
+            downloadThroughput: preset.downloadThroughput,
+            uploadThroughput: preset.uploadThroughput,
+          });
+        }
+      }
+    }
+  }
+
+  if (matchedNetworkConditions.length === 0) {
+    return null;
+  }
+
+  return {
+    offline: hasOfflineRule,
+    matchedNetworkConditions,
+  };
 }

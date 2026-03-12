@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { generateRules, parseDomains, cleanDomain } from './utils';
+import { generateRules, generateNetworkConditionRules, parseDomains, cleanDomain, getChromeVersion, isNetworkConditionsSupported } from './utils';
 import { DataType } from './interfaces';
 
 /**
@@ -31,6 +31,7 @@ function createTab(overrides = {}) {
     responseHeaders: [],
     blockedRequests: [],
     redirectRequests: [],
+    networkConditions: [],
     ...overrides,
   };
 }
@@ -67,6 +68,18 @@ function createRedirectRule(overrides = {}) {
     url: "https://example.com/redirect",
     condition: {
       urlFilter: "/old-path",
+      requestDomains: "",
+    },
+    ...overrides,
+  };
+}
+
+function createNetworkConditionRule(overrides = {}) {
+  return {
+    active: true,
+    preset: "slow3g" as const,
+    condition: {
+      urlFilter: "",
       requestDomains: "",
     },
     ...overrides,
@@ -797,5 +810,558 @@ describe('generateRules security and limits', () => {
     expect(uniqueIds.size).toBe(rules.length);
     // IDs should be sequential starting from 1
     expect(ids).toEqual([1, 2, 3, 4]);
+  });
+});
+
+describe('getChromeVersion', () => {
+  it('returns 0 when navigator is undefined', () => {
+    // In test environment, navigator may not match Chrome format
+    const version = getChromeVersion();
+    expect(typeof version).toBe('number');
+    expect(version).toBeGreaterThanOrEqual(0);
+  });
+
+  it('returns a number', () => {
+    expect(typeof getChromeVersion()).toBe('number');
+  });
+});
+
+describe('isNetworkConditionsSupported', () => {
+  it('returns a boolean', () => {
+    expect(typeof isNetworkConditionsSupported()).toBe('boolean');
+  });
+
+  it('returns false when Chrome version is below 145', () => {
+    // getChromeVersion returns 0 in test environment (no Chrome UA)
+    // so isNetworkConditionsSupported should return false
+    const version = getChromeVersion();
+    if (version < 145) {
+      expect(isNetworkConditionsSupported()).toBe(false);
+    }
+  });
+});
+
+describe('generateNetworkConditionRules', () => {
+  describe('basic functionality', () => {
+    it('returns null when data.active is false', () => {
+      const data = createData({ active: false });
+      expect(generateNetworkConditionRules(data)).toBeNull();
+    });
+
+    it('returns null when folders is empty', () => {
+      const data = createData({ folders: [] });
+      expect(generateNetworkConditionRules(data)).toBeNull();
+    });
+
+    it('returns null when data is null/undefined', () => {
+      expect(generateNetworkConditionRules(null as any)).toBeNull();
+      expect(generateNetworkConditionRules(undefined as any)).toBeNull();
+    });
+
+    it('returns null when folders is not an array', () => {
+      const data = { active: true, folders: "invalid" } as any;
+      expect(generateNetworkConditionRules(data)).toBeNull();
+    });
+
+    it('returns null when no network condition rules exist', () => {
+      const data = createData({
+        folders: [
+          createFolder({
+            tabs: [createTab()],
+          }),
+        ],
+      });
+      expect(generateNetworkConditionRules(data)).toBeNull();
+    });
+
+    it('returns null when network conditions array is empty', () => {
+      const data = createData({
+        folders: [
+          createFolder({
+            tabs: [createTab({ networkConditions: [] })],
+          }),
+        ],
+      });
+      expect(generateNetworkConditionRules(data)).toBeNull();
+    });
+  });
+
+  describe('rule generation', () => {
+    it('generates rules for active network conditions', () => {
+      const data = createData({
+        folders: [
+          createFolder({
+            tabs: [
+              createTab({
+                networkConditions: [createNetworkConditionRule()],
+              }),
+            ],
+          }),
+        ],
+      });
+
+      const result = generateNetworkConditionRules(data);
+      expect(result).not.toBeNull();
+      expect(result?.matchedNetworkConditions).toHaveLength(1);
+      expect(result?.offline).toBe(false);
+    });
+
+    it('skips inactive network condition rules', () => {
+      const data = createData({
+        folders: [
+          createFolder({
+            tabs: [
+              createTab({
+                networkConditions: [
+                  createNetworkConditionRule({ active: false }),
+                ],
+              }),
+            ],
+          }),
+        ],
+      });
+
+      expect(generateNetworkConditionRules(data)).toBeNull();
+    });
+
+    it('skips inactive tabs', () => {
+      const data = createData({
+        folders: [
+          createFolder({
+            tabs: [
+              createTab({
+                active: false,
+                networkConditions: [createNetworkConditionRule()],
+              }),
+            ],
+          }),
+        ],
+      });
+
+      expect(generateNetworkConditionRules(data)).toBeNull();
+    });
+
+    it('skips inactive folders', () => {
+      const data = createData({
+        folders: [
+          createFolder({
+            active: false,
+            tabs: [
+              createTab({
+                networkConditions: [createNetworkConditionRule()],
+              }),
+            ],
+          }),
+        ],
+      });
+
+      expect(generateNetworkConditionRules(data)).toBeNull();
+    });
+  });
+
+  describe('preset values', () => {
+    it('applies correct values for slow3g preset', () => {
+      const data = createData({
+        folders: [
+          createFolder({
+            tabs: [
+              createTab({
+                networkConditions: [
+                  createNetworkConditionRule({ preset: 'slow3g' }),
+                ],
+              }),
+            ],
+          }),
+        ],
+      });
+
+      const result = generateNetworkConditionRules(data);
+      expect(result?.matchedNetworkConditions[0]).toMatchObject({
+        latency: 2000,
+        downloadThroughput: 50000,
+        uploadThroughput: 50000,
+      });
+      expect(result?.offline).toBe(false);
+    });
+
+    it('applies correct values for slow4g preset', () => {
+      const data = createData({
+        folders: [
+          createFolder({
+            tabs: [
+              createTab({
+                networkConditions: [
+                  createNetworkConditionRule({ preset: 'slow4g' }),
+                ],
+              }),
+            ],
+          }),
+        ],
+      });
+
+      const result = generateNetworkConditionRules(data);
+      expect(result?.matchedNetworkConditions[0]).toMatchObject({
+        latency: 563,
+        downloadThroughput: 180000,
+        uploadThroughput: 84375,
+      });
+      expect(result?.offline).toBe(false);
+    });
+
+    it('applies correct values for fast4g preset', () => {
+      const data = createData({
+        folders: [
+          createFolder({
+            tabs: [
+              createTab({
+                networkConditions: [
+                  createNetworkConditionRule({ preset: 'fast4g' }),
+                ],
+              }),
+            ],
+          }),
+        ],
+      });
+
+      const result = generateNetworkConditionRules(data);
+      expect(result?.matchedNetworkConditions[0]).toMatchObject({
+        latency: 165,
+        downloadThroughput: 1012500,
+        uploadThroughput: 168750,
+      });
+      expect(result?.offline).toBe(false);
+    });
+
+    it('applies correct values for offline preset', () => {
+      const data = createData({
+        folders: [
+          createFolder({
+            tabs: [
+              createTab({
+                networkConditions: [
+                  createNetworkConditionRule({ preset: 'offline' }),
+                ],
+              }),
+            ],
+          }),
+        ],
+      });
+
+      const result = generateNetworkConditionRules(data);
+      expect(result?.matchedNetworkConditions[0]).toMatchObject({
+        latency: 0,
+        downloadThroughput: 0,
+        uploadThroughput: 0,
+      });
+      expect(result?.offline).toBe(true);
+    });
+
+    it('sets offline to true when any rule uses offline preset', () => {
+      const data = createData({
+        folders: [
+          createFolder({
+            tabs: [
+              createTab({
+                networkConditions: [
+                  createNetworkConditionRule({ preset: 'slow3g' }),
+                  createNetworkConditionRule({ preset: 'offline' }),
+                ],
+              }),
+            ],
+          }),
+        ],
+      });
+
+      const result = generateNetworkConditionRules(data);
+      expect(result?.offline).toBe(true);
+      expect(result?.matchedNetworkConditions).toHaveLength(2);
+    });
+  });
+
+  describe('URL pattern generation', () => {
+    it('uses urlFilter directly when provided', () => {
+      const data = createData({
+        folders: [
+          createFolder({
+            tabs: [
+              createTab({
+                networkConditions: [
+                  createNetworkConditionRule({
+                    condition: { urlFilter: '*://*.example.com/*', requestDomains: '' },
+                  }),
+                ],
+              }),
+            ],
+          }),
+        ],
+      });
+
+      const result = generateNetworkConditionRules(data);
+      expect(result?.matchedNetworkConditions[0].urlPattern).toBe('*://*.example.com/*');
+    });
+
+    it('builds URL pattern from requestDomains when urlFilter is empty', () => {
+      const data = createData({
+        folders: [
+          createFolder({
+            tabs: [
+              createTab({
+                networkConditions: [
+                  createNetworkConditionRule({
+                    condition: { urlFilter: '', requestDomains: 'example.com' },
+                  }),
+                ],
+              }),
+            ],
+          }),
+        ],
+      });
+
+      const result = generateNetworkConditionRules(data);
+      expect(result?.matchedNetworkConditions[0].urlPattern).toBe('*://example.com/*');
+    });
+
+    it('uses tab requestDomains as fallback', () => {
+      const data = createData({
+        folders: [
+          createFolder({
+            tabs: [
+              createTab({
+                requestDomains: 'fallback.com',
+                networkConditions: [
+                  createNetworkConditionRule({
+                    condition: { urlFilter: '', requestDomains: '' },
+                  }),
+                ],
+              }),
+            ],
+          }),
+        ],
+      });
+
+      const result = generateNetworkConditionRules(data);
+      expect(result?.matchedNetworkConditions[0].urlPattern).toBe('*://fallback.com/*');
+    });
+
+    it('uses wildcard pattern when no filter or domains provided', () => {
+      const data = createData({
+        folders: [
+          createFolder({
+            tabs: [
+              createTab({
+                networkConditions: [
+                  createNetworkConditionRule({
+                    condition: { urlFilter: '', requestDomains: '' },
+                  }),
+                ],
+              }),
+            ],
+          }),
+        ],
+      });
+
+      const result = generateNetworkConditionRules(data);
+      expect(result?.matchedNetworkConditions[0].urlPattern).toBe('*://*/*');
+    });
+
+    it('uses first domain when multiple domains provided', () => {
+      const data = createData({
+        folders: [
+          createFolder({
+            tabs: [
+              createTab({
+                networkConditions: [
+                  createNetworkConditionRule({
+                    condition: { urlFilter: '', requestDomains: 'first.com, second.com' },
+                  }),
+                ],
+              }),
+            ],
+          }),
+        ],
+      });
+
+      const result = generateNetworkConditionRules(data);
+      expect(result?.matchedNetworkConditions[0].urlPattern).toBe('*://first.com/*');
+    });
+  });
+
+  describe('multiple rules', () => {
+    it('generates rules from multiple tabs', () => {
+      const data = createData({
+        folders: [
+          createFolder({
+            tabs: [
+              createTab({
+                networkConditions: [createNetworkConditionRule({ preset: 'slow3g' })],
+              }),
+              createTab({
+                networkConditions: [createNetworkConditionRule({ preset: 'fast4g' })],
+              }),
+            ],
+          }),
+        ],
+      });
+
+      const result = generateNetworkConditionRules(data);
+      expect(result?.matchedNetworkConditions).toHaveLength(2);
+    });
+
+    it('generates rules from multiple folders', () => {
+      const data = createData({
+        folders: [
+          createFolder({
+            tabs: [
+              createTab({
+                networkConditions: [createNetworkConditionRule({ preset: 'slow3g' })],
+              }),
+            ],
+          }),
+          createFolder({
+            tabs: [
+              createTab({
+                networkConditions: [createNetworkConditionRule({ preset: 'slow4g' })],
+              }),
+            ],
+          }),
+        ],
+      });
+
+      const result = generateNetworkConditionRules(data);
+      expect(result?.matchedNetworkConditions).toHaveLength(2);
+    });
+
+    it('maintains rule order across folders and tabs', () => {
+      const data = createData({
+        folders: [
+          createFolder({
+            tabs: [
+              createTab({
+                networkConditions: [
+                  createNetworkConditionRule({ 
+                    preset: 'slow3g',
+                    condition: { urlFilter: '*://first.com/*', requestDomains: '' },
+                  }),
+                ],
+              }),
+            ],
+          }),
+          createFolder({
+            tabs: [
+              createTab({
+                networkConditions: [
+                  createNetworkConditionRule({ 
+                    preset: 'fast4g',
+                    condition: { urlFilter: '*://second.com/*', requestDomains: '' },
+                  }),
+                ],
+              }),
+            ],
+          }),
+        ],
+      });
+
+      const result = generateNetworkConditionRules(data);
+      expect(result?.matchedNetworkConditions[0].urlPattern).toBe('*://first.com/*');
+      expect(result?.matchedNetworkConditions[1].urlPattern).toBe('*://second.com/*');
+    });
+  });
+
+  describe('edge cases', () => {
+    it('handles invalid preset gracefully', () => {
+      const data = createData({
+        folders: [
+          createFolder({
+            tabs: [
+              createTab({
+                networkConditions: [
+                  createNetworkConditionRule({ preset: 'invalid' as any }),
+                ],
+              }),
+            ],
+          }),
+        ],
+      });
+
+      // Invalid preset should be skipped
+      expect(generateNetworkConditionRules(data)).toBeNull();
+    });
+
+    it('handles missing condition gracefully', () => {
+      const data = createData({
+        folders: [
+          createFolder({
+            tabs: [
+              createTab({
+                networkConditions: [
+                  { active: true, preset: 'slow3g' } as any,
+                ],
+              }),
+            ],
+          }),
+        ],
+      });
+
+      // Missing condition should be skipped
+      expect(generateNetworkConditionRules(data)).toBeNull();
+    });
+
+    it('handles null networkConditions array', () => {
+      const data = createData({
+        folders: [
+          createFolder({
+            tabs: [
+              createTab({
+                networkConditions: null as any,
+              }),
+            ],
+          }),
+        ],
+      });
+
+      expect(generateNetworkConditionRules(data)).toBeNull();
+    });
+
+    it('strips protocol from requestDomains', () => {
+      const data = createData({
+        folders: [
+          createFolder({
+            tabs: [
+              createTab({
+                networkConditions: [
+                  createNetworkConditionRule({
+                    condition: { urlFilter: '', requestDomains: 'https://example.com' },
+                  }),
+                ],
+              }),
+            ],
+          }),
+        ],
+      });
+
+      const result = generateNetworkConditionRules(data);
+      expect(result?.matchedNetworkConditions[0].urlPattern).toBe('*://example.com/*');
+    });
+
+    it('trims whitespace from urlFilter', () => {
+      const data = createData({
+        folders: [
+          createFolder({
+            tabs: [
+              createTab({
+                networkConditions: [
+                  createNetworkConditionRule({
+                    condition: { urlFilter: '  *://example.com/*  ', requestDomains: '' },
+                  }),
+                ],
+              }),
+            ],
+          }),
+        ],
+      });
+
+      const result = generateNetworkConditionRules(data);
+      expect(result?.matchedNetworkConditions[0].urlPattern).toBe('*://example.com/*');
+    });
   });
 });

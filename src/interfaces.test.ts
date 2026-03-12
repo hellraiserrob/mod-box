@@ -4,6 +4,7 @@ import {
   isValidHeaderRule,
   isValidBlockedRequest,
   isValidRedirectRequest,
+  isValidNetworkConditionRule,
   isValidTab,
   isValidFolder,
   isValidExportPayload,
@@ -146,6 +147,96 @@ describe('Type Guards', () => {
     });
   });
 
+  describe('isValidNetworkConditionRule', () => {
+    const validNetworkCondition = {
+      active: true,
+      preset: 'slow3g',
+      condition: { urlFilter: '', requestDomains: '' },
+    };
+
+    it('returns true for valid network condition rule', () => {
+      expect(isValidNetworkConditionRule(validNetworkCondition)).toBe(true);
+    });
+
+    it('returns true for all valid presets', () => {
+      expect(isValidNetworkConditionRule({ ...validNetworkCondition, preset: 'offline' })).toBe(true);
+      expect(isValidNetworkConditionRule({ ...validNetworkCondition, preset: 'slow3g' })).toBe(true);
+      expect(isValidNetworkConditionRule({ ...validNetworkCondition, preset: 'slow4g' })).toBe(true);
+      expect(isValidNetworkConditionRule({ ...validNetworkCondition, preset: 'fast4g' })).toBe(true);
+    });
+
+    it('returns false for invalid preset', () => {
+      expect(isValidNetworkConditionRule({ ...validNetworkCondition, preset: 'invalid' })).toBe(false);
+      expect(isValidNetworkConditionRule({ ...validNetworkCondition, preset: '3g' })).toBe(false);
+      expect(isValidNetworkConditionRule({ ...validNetworkCondition, preset: '' })).toBe(false);
+    });
+
+    it('returns false for null', () => {
+      expect(isValidNetworkConditionRule(null)).toBe(false);
+    });
+
+    it('returns false for undefined', () => {
+      expect(isValidNetworkConditionRule(undefined)).toBe(false);
+    });
+
+    it('returns false for non-boolean active', () => {
+      expect(isValidNetworkConditionRule({ ...validNetworkCondition, active: 'true' })).toBe(false);
+      expect(isValidNetworkConditionRule({ ...validNetworkCondition, active: 1 })).toBe(false);
+    });
+
+    it('returns false for non-string preset', () => {
+      expect(isValidNetworkConditionRule({ ...validNetworkCondition, preset: 123 })).toBe(false);
+      expect(isValidNetworkConditionRule({ ...validNetworkCondition, preset: null })).toBe(false);
+    });
+
+    it('returns false for missing preset', () => {
+      const { preset, ...noPreset } = validNetworkCondition;
+      expect(isValidNetworkConditionRule(noPreset)).toBe(false);
+    });
+
+    it('returns false for missing condition', () => {
+      const { condition, ...noCondition } = validNetworkCondition;
+      expect(isValidNetworkConditionRule(noCondition)).toBe(false);
+    });
+
+    it('returns false for null condition', () => {
+      expect(isValidNetworkConditionRule({ ...validNetworkCondition, condition: null })).toBe(false);
+    });
+
+    it('returns false for invalid condition', () => {
+      expect(isValidNetworkConditionRule({ 
+        ...validNetworkCondition, 
+        condition: { urlFilter: 123, requestDomains: '' } 
+      })).toBe(false);
+      expect(isValidNetworkConditionRule({ 
+        ...validNetworkCondition, 
+        condition: { urlFilter: '', requestDomains: 123 } 
+      })).toBe(false);
+    });
+
+    it('returns false for condition missing urlFilter', () => {
+      expect(isValidNetworkConditionRule({ 
+        ...validNetworkCondition, 
+        condition: { requestDomains: '' } 
+      })).toBe(false);
+    });
+
+    it('returns false for condition missing requestDomains', () => {
+      expect(isValidNetworkConditionRule({ 
+        ...validNetworkCondition, 
+        condition: { urlFilter: '' } 
+      })).toBe(false);
+    });
+
+    it('returns true with urlFilter and requestDomains populated', () => {
+      expect(isValidNetworkConditionRule({
+        active: true,
+        preset: 'offline',
+        condition: { urlFilter: '*.js', requestDomains: 'example.com' },
+      })).toBe(true);
+    });
+  });
+
   describe('isValidTab', () => {
     const validTab = {
       name: 'Test Tab',
@@ -190,6 +281,31 @@ describe('Type Guards', () => {
         }],
       };
       expect(isValidTab(tabWithRules)).toBe(true);
+    });
+
+    it('returns true without networkConditions (optional)', () => {
+      expect(isValidTab(validTab)).toBe(true);
+    });
+
+    it('returns true with empty networkConditions array', () => {
+      expect(isValidTab({ ...validTab, networkConditions: [] })).toBe(true);
+    });
+
+    it('returns true with populated networkConditions array', () => {
+      const tabWithNetworkConditions = {
+        ...validTab,
+        networkConditions: [{
+          active: true,
+          preset: 'slow3g',
+          condition: { urlFilter: '', requestDomains: '' },
+        }],
+      };
+      expect(isValidTab(tabWithNetworkConditions)).toBe(true);
+    });
+
+    it('returns false for non-array networkConditions', () => {
+      expect(isValidTab({ ...validTab, networkConditions: 'invalid' })).toBe(false);
+      expect(isValidTab({ ...validTab, networkConditions: {} })).toBe(false);
     });
   });
 

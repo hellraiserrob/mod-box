@@ -1,6 +1,6 @@
 <template>
-  <div ref="root" class="dropdown dropdown--select" :class="{ 'dropdown--open': isOpen }">
-    <button @click="toggle" class="dropdown__trigger">
+  <div ref="root" class="dropdown dropdown--select" :class="{ 'dropdown--open': isOpen, 'dropdown--up': openUpward }">
+    <button @click="handleToggle" class="dropdown__trigger">
       {{ defaultOption?.label }}
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-down-fill" viewBox="0 0 16 16">
         <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
@@ -21,6 +21,7 @@ import { useOutsideClick } from "../composables";
 
 const model = defineModel();
 const root: Ref<HTMLElement | null> = ref(null);
+const openUpward = ref(false);
 const { isOpen, toggle, close } = useOutsideClick(root);
 
 interface Option {
@@ -50,6 +51,17 @@ const defaultOption = computed(() => {
 /**
  * functions
  */
+
+function handleToggle() {
+  // Check if dropdown should open upward before toggling
+  if (!isOpen.value && root.value) {
+    const rect = root.value.getBoundingClientRect();
+    const menuHeight = options.value.length * 30 + 16; // Approximate menu height
+    const spaceBelow = window.innerHeight - rect.bottom;
+    openUpward.value = spaceBelow < menuHeight && rect.top > menuHeight;
+  }
+  toggle();
+}
 
 function set(val: string | boolean) {
   model.value = val;
