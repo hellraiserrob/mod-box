@@ -68,7 +68,7 @@ function toggleGlobalActive() {
 }
 
 function reset() {
-  data.value = { ...fallbackData };
+  data.value = structuredClone(fallbackData);
 }
 
 function importFolders(folders: FolderType[]) {

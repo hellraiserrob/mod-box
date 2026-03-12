@@ -58,6 +58,10 @@
         </label>
       </div>
 
+      <div v-if="exportError.length > 0" class="error mb20">
+        {{ exportError }}
+      </div>
+
       <div class="panel__actions">
         <button
           class="btn"
@@ -222,39 +226,94 @@ const fileupload: Ref<HTMLFormElement | null> = ref(null);
 const selectedExport: Ref<number[]> = ref([]);
 const selectedImport: Ref<number[]> = ref([]);
 const importData: Ref<FolderType[]> = ref([]);
+const exportError = ref("");
 const importError = ref("");
 const showDeleteConfirmation = ref(false);
 
 /**
  * Export functionality
+ *
+ * Uses a DOM anchor-click approach to trigger a file download.
+ * Hardened with:
+ * - try/catch for error resilience
+ * - URL.revokeObjectURL cleanup to prevent memory leaks
+ * - Data size guard to avoid allocating excessive Blobs
+ * - Deferred click via setTimeout for popup-lifecycle stability on Linux
  */
+const MAX_EXPORT_SIZE = 50_000_000; // 50 MB safety threshold
+
 function download() {
-  const exportData: FolderType[] = [];
+  if (!selectedExport.value.length) return;
 
-  props.folders.forEach((folder: FolderType, index: number) => {
-    if (selectedExport.value.includes(index)) {
-      exportData.push(folder);
+  exportError.value = "";
+  let url: string | null = null;
+  let anchor: HTMLAnchorElement | null = null;
+
+  try {
+    const exportData: FolderType[] = [];
+
+    props.folders.forEach((folder: FolderType, index: number) => {
+      if (selectedExport.value.includes(index)) {
+        exportData.push(folder);
+      }
+    });
+
+    const payload = {
+      name: "modbox",
+      version: 1,
+      folders: exportData,
+    };
+
+    const json = JSON.stringify(payload);
+
+    if (json.length > MAX_EXPORT_SIZE) {
+      exportError.value = "Export data is too large. Try selecting fewer folders.";
+      return;
     }
-  });
 
-  const payload = {
-    name: "modbox",
-    version: 1,
-    folders: exportData,
-  };
+    const blob = new Blob([json], { type: "application/json" });
+    url = URL.createObjectURL(blob);
+    anchor = document.createElement("a");
 
-  const json = JSON.stringify(payload);
-  const blob = new Blob([json], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `modbox-export-${Math.floor(Date.now() / 1000)}.json`;
+    document.body.appendChild(anchor);
 
-  anchor.href = url;
-  anchor.download = `modbox-export-${Math.floor(Date.now() / 1000)}.json`;
-  document.body.appendChild(anchor);
-  anchor.click();
-  document.body.removeChild(anchor);
+    // Defer the click to the next frame so the browser has time to fully
+    // attach the anchor. This improves reliability in Chrome extension
+    // popups, especially on Linux where popup teardown can be aggressive.
+    const currentUrl = url;
+    const currentAnchor = anchor;
 
-  selectedExport.value = [];
+    setTimeout(() => {
+      try {
+        currentAnchor.click();
+      } catch {
+        // Click may fail if popup is closing — non-fatal
+      } finally {
+        if (currentAnchor.parentNode) {
+          document.body.removeChild(currentAnchor);
+        }
+      }
+
+      // Give the browser time to initiate the download before revoking
+      setTimeout(() => {
+        URL.revokeObjectURL(currentUrl);
+      }, 3000);
+    }, 0);
+
+    selectedExport.value = [];
+  } catch (e) {
+    exportError.value = "Failed to export rules. Please try again.";
+
+    // Cleanup on error
+    if (anchor?.parentNode) {
+      document.body.removeChild(anchor);
+    }
+    if (url) {
+      URL.revokeObjectURL(url);
+    }
+  }
 }
 
 /**
