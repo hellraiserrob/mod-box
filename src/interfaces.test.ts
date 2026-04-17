@@ -104,6 +104,18 @@ describe('Type Guards', () => {
     it('returns false for invalid condition', () => {
       expect(isValidHeaderRule({ ...validRule, condition: 'invalid' })).toBe(false);
     });
+
+    it('returns true with a string note', () => {
+      expect(isValidHeaderRule({ ...validRule, note: 'some note' })).toBe(true);
+    });
+
+    it('returns true without note (undefined)', () => {
+      expect(isValidHeaderRule(validRule)).toBe(true);
+    });
+
+    it('returns false for non-string note', () => {
+      expect(isValidHeaderRule({ ...validRule, note: 123 })).toBe(false);
+    });
   });
 
   describe('isValidBlockedRequest', () => {
@@ -122,6 +134,18 @@ describe('Type Guards', () => {
 
     it('returns false for missing condition', () => {
       expect(isValidBlockedRequest({ active: true })).toBe(false);
+    });
+
+    it('returns true with a string note', () => {
+      expect(isValidBlockedRequest({ ...validBlock, note: 'block note' })).toBe(true);
+    });
+
+    it('returns true without note (undefined)', () => {
+      expect(isValidBlockedRequest(validBlock)).toBe(true);
+    });
+
+    it('returns false for non-string note', () => {
+      expect(isValidBlockedRequest({ ...validBlock, note: true })).toBe(false);
     });
   });
 
@@ -143,6 +167,18 @@ describe('Type Guards', () => {
 
     it('returns false for non-string url', () => {
       expect(isValidRedirectRequest({ ...validRedirect, url: 123 })).toBe(false);
+    });
+
+    it('returns true with a string note', () => {
+      expect(isValidRedirectRequest({ ...validRedirect, note: 'redirect note' })).toBe(true);
+    });
+
+    it('returns true without note (undefined)', () => {
+      expect(isValidRedirectRequest(validRedirect)).toBe(true);
+    });
+
+    it('returns false for non-string note', () => {
+      expect(isValidRedirectRequest({ ...validRedirect, note: 42 })).toBe(false);
     });
   });
 

@@ -3,8 +3,6 @@
 # ModBox
 A compact and easy to use extension for modifying HTTP request & response headers and blocking HTTP requests.
 
-
-
 ## Features
 - Create rules to modify HTTP request and response headers
 - Create rules to block HTTP request & even block entire sites
