@@ -1060,14 +1060,20 @@ hr {
     }
 
     svg {
-      width: 10px;
+      width: 12px;
       vertical-align: middle;
       display: inline-block;
       opacity: 0;
     }
+
+    &--icon svg {
+      opacity: 1;
+      // width: 16px;
+    }
     
     &:hover svg {
       opacity: 1;
+      fill: #000;
     }
   }
 

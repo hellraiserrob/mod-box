@@ -133,6 +133,7 @@
 
             <!-- <Tooltip> Single or comma separated domains </Tooltip> -->
           </th>
+          <th>Note</th>
           <th></th>
         </tr>
 
@@ -181,6 +182,15 @@
               :domains="true"
             />
           </td>
+          <td class="table__short">
+            <Editor
+              v-model="header.note"
+              placeholder="Note"
+              :icon="true"
+              :aligned="'right'"
+              label="Note"
+            />
+          </td>
           <td class="table__short text-right">
             <DropdownMenu :options="requestActions" :rule="header" />
           </td>
@@ -217,6 +227,7 @@
             Domains
             <!-- <Tooltip>Single or comma separated domains</Tooltip> -->
           </th>
+          <th>Note</th>
           <th></th>
         </tr>
         <RuleDragger
@@ -264,6 +275,15 @@
               :aligned="'right'"
             />
           </td>
+          <td class="table__short">
+            <Editor
+              v-model="header.note"
+              placeholder="Note"
+              :icon="true"
+              :aligned="'right'"
+              label="Note"
+            />
+          </td>
           <td class="table__short text-right">
             <DropdownMenu :options="responseActions" :rule="header" />
           </td>
@@ -298,6 +318,7 @@
             Domains
             <!-- <Tooltip> Single or comma separated domains</Tooltip> -->
           </th>
+          <th>Note</th>
           <th class="table__short"></th>
         </tr>
         <RuleDragger
@@ -344,6 +365,15 @@
               :aligned="'right'"
             />
           </td>
+          <td class="table__short">
+            <Editor
+              v-model="request.note"
+              placeholder="Note"
+              :icon="true"
+              :aligned="'right'"
+              label="Note"
+            />
+          </td>
           <td class="table__short text-right">
             <DropdownMenu :options="blockActions" :rule="request" />
           </td>
@@ -381,6 +411,7 @@
             Domains
             <!-- <Tooltip> Single or comma separated domains</Tooltip> -->
           </th>
+          <th>Note</th>
           <th class="table__short"></th>
         </tr>
         <!-- <tr v-for="request in tab.redirectRequests"> -->
@@ -421,6 +452,15 @@
               :fallback="tab.requestDomains"
               :domains="true"
               :aligned="'right'"
+            />
+          </td>
+          <td class="table__short">
+            <Editor
+              v-model="request.note"
+              placeholder="Note"
+              :icon="true"
+              :aligned="'right'"
+              label="Note"
             />
           </td>
           <td class="table__short text-right">
@@ -686,6 +726,7 @@ function addRequestHeader() {
     active: true,
     name: "",
     value: "",
+    note: "",
     condition: {
       urlFilter: "",
       requestDomains: "",
@@ -698,6 +739,7 @@ function addResponseHeader() {
     active: true,
     name: "",
     value: "",
+    note: "",
     condition: {
       urlFilter: "",
       requestDomains: "",
@@ -708,6 +750,7 @@ function addResponseHeader() {
 function addBlockedRequest() {
   tab.value.blockedRequests.push({
     active: true,
+    note: "",
     condition: {
       urlFilter: "",
       requestDomains: "",
@@ -724,6 +767,7 @@ function addRedirectRequest() {
   tab.value.redirectRequests.push({
     active: true,
     url: "",
+    note: "",
     condition: {
       urlFilter: "",
       requestDomains: "",

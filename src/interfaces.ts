@@ -9,17 +9,20 @@ export interface HeaderRule {
   name: string;
   value: string;
   operation?: 'set' | 'remove';
+  note?: string;
   condition: RuleCondition;
 }
 
 export interface BlockedRequest {
   active: boolean;
+  note?: string;
   condition: RuleCondition;
 }
 
 export interface RedirectRequest {
   active: boolean;
   url: string;
+  note?: string;
   condition: Omit<RuleCondition, 'document'>;
 }
 
@@ -70,6 +73,7 @@ export function isValidHeaderRule(obj: unknown): obj is HeaderRule {
     typeof rule.name === 'string' &&
     typeof rule.value === 'string' &&
     (rule.operation === undefined || rule.operation === 'set' || rule.operation === 'remove') &&
+    (rule.note === undefined || typeof rule.note === 'string') &&
     isValidRuleCondition(rule.condition)
   );
 }
@@ -79,6 +83,7 @@ export function isValidBlockedRequest(obj: unknown): obj is BlockedRequest {
   const rule = obj as Record<string, unknown>;
   return (
     typeof rule.active === 'boolean' &&
+    (rule.note === undefined || typeof rule.note === 'string') &&
     isValidRuleCondition(rule.condition)
   );
 }
@@ -89,6 +94,7 @@ export function isValidRedirectRequest(obj: unknown): obj is RedirectRequest {
   return (
     typeof rule.active === 'boolean' &&
     typeof rule.url === 'string' &&
+    (rule.note === undefined || typeof rule.note === 'string') &&
     rule.condition !== null &&
     typeof rule.condition === 'object' &&
     typeof (rule.condition as Record<string, unknown>).urlFilter === 'string' &&
