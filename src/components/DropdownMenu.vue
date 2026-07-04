@@ -12,8 +12,8 @@
         </button>
         <div v-if="option.confirm" :class="{'dropdown__menu__item__confirm--active': confirmationOpen === index}" class="dropdown__menu__item__confirm">
           <div class="btn-group">
-            <button class="btn btn--danger" @click="handleClick(option, index, true)">Yes</button>
-            <button class="btn" @click="confirmationOpen = -1">No</button>
+            <button class="btn btn--danger" @click="handleClick(option, index, true)">{{ t("dropdownMenu.yes") }}</button>
+            <button class="btn" @click="confirmationOpen = -1">{{ t("dropdownMenu.no") }}</button>
           </div>
         </div>
       </div>
@@ -24,7 +24,9 @@
 <script setup lang="ts">
 import { ref, toRefs, watch } from "vue";
 import type { Ref, PropType } from "vue";
-import { useOutsideClick } from "../composables";
+import { useOutsideClick, useI18n } from "../composables";
+
+const { t } = useI18n();
 
 const root: Ref<HTMLElement | null> = ref(null);
 const { isOpen, toggle, close } = useOutsideClick(root);

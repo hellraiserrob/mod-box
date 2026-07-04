@@ -1,6 +1,6 @@
 <template>
   <div v-for="(folder, index) in folders" :key="`folder-drag-${index}`" class="folders__list__item"
-    :class="{ 
+    :class="{
       'folders__list__item--active': index === activeFolder && !showSettings,
       'folders__list__item--bottom': index === target && target > tmp && target !== tmp,
       'folders__list__item--top': index === target && target < tmp,
@@ -15,10 +15,10 @@
     @dragend="dragging = false; tmp = -1; target = -1"
     @dragenter="target = index"
   >
-    <button :title="'select ' + folder.name" @click="setFolder(index)" class="folders__list__item__label">{{
+    <button :title="t('folderDragger.selectFolder', { name: folder.name })" @click="setFolder(index)" class="folders__list__item__label">{{
       name(folder) }}</button>
 
-    <div v-if="folders.length > 1 && !compact" class="folders__list__item__handle" @mousedown="tmp = index" @mouseup="tmp = -1" title="drag to move">
+    <div v-if="folders.length > 1 && !compact" class="folders__list__item__handle" @mousedown="tmp = index" @mouseup="tmp = -1" :title="t('folderDragger.dragToMove')">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-grip-vertical"
         viewBox="0 0 16 16">
         <path
@@ -27,9 +27,9 @@
     </div>
 
     <button v-if="!compact" class="toggle" @click="toggle(folder)" :class="{ 'toggle--active': folder.active }"
-      :title="folder.active ? 'Disable folder rules' : 'Enable folder rules'">
+      :title="folder.active ? t('folderDragger.disableRules') : t('folderDragger.enableRules')">
       <div class="toggle__text">
-        {{ folder.active ? "On" : "Off" }}
+        {{ folder.active ? t("folderPanel.on") : t("folderPanel.off") }}
       </div>
     </button>
   </div>
@@ -38,6 +38,9 @@
 <script setup lang="ts">
 import { ref, toRefs, type PropType } from "vue";
 import { FolderType } from "../interfaces";
+import { useI18n } from "../composables";
+
+const { t } = useI18n();
 
 const props = defineProps({
   folders: {
@@ -95,7 +98,7 @@ function name(folder:FolderType) {
   if(compact.value) {
     const words = folder.name.split(" ");
     let letters = "";
-    
+
     words.forEach(word => {
       letters += word.substring(0,1)
     })

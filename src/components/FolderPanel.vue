@@ -10,8 +10,8 @@
           <img src="/images/48_48.png" alt="Modbox" />
           <span v-if="!compact">ModBox</span>
         </h1>
-        <h3 v-if="!compact" class="mb10">Folders</h3>
-        <div v-if="!data.folders.length">No folders</div>
+        <h3 v-if="!compact" class="mb10">{{ t("folderPanel.folders") }}</h3>
+        <div v-if="!data.folders.length">{{ t("folderPanel.noFolders") }}</div>
 
         <FolderDragger
           :folders="data.folders"
@@ -26,7 +26,7 @@
         <button
           class="mt10 mb20"
           @click="addFolder"
-          title="Add folder"
+          :title="compact ? t('folderPanel.addFolder') : undefined"
           :class="{
             btn: !compact,
             'btn-icon btn-icon--with--border': compact,
@@ -46,28 +46,30 @@
               />
             </svg>
           </template>
-          <template v-else>Add</template>
+          <template v-else>{{ t("folderPanel.add") }}</template>
         </button>
 
         <hr />
 
         <div class="folders__list__settings">
-          <h3 v-if="!compact" class="mb10">Global</h3>
+          <h3 v-if="!compact" class="mb10">{{ t("folderPanel.global") }}</h3>
           <div v-if="!compact" class="folders__list__item">
             <button
               class="folders__list__item__label"
               @click="$emit('toggleGlobalActive')"
+              :title="t('folderPanel.rulesEnabledTooltip')"
             >
-              Rules enabled
+              {{ t("folderPanel.rulesEnabled") }}
               <div class="badge">{{ totalActiveRules }}</div>
             </button>
             <div
               class="toggle toggle--warning"
               @click="$emit('toggleGlobalActive')"
               :class="{ 'toggle--active': data.active }"
+              :title="t('folderPanel.rulesEnabledTooltip')"
             >
               <div class="toggle__text">
-                {{ data.active ? "On" : "Off" }}
+                {{ data.active ? t("folderPanel.on") : t("folderPanel.off") }}
               </div>
             </div>
           </div>
@@ -82,9 +84,9 @@
             <button
               class="folders__list__item__label"
               @click="showSettings = true"
-              title="Global settings"
+              :title="t('folderPanel.settings')"
             >
-              <template v-if="!compact">Settings</template>
+              <template v-if="!compact">{{ t("folderPanel.settings") }}</template>
               <template v-else>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -136,10 +138,13 @@ import * as _ from "lodash";
 
 import { DataType, FolderType } from "../interfaces";
 import { isChrome } from "../utils";
+import { useI18n } from "../composables";
 
 import Folder from "./Folder.vue";
 import FolderDragger from "./FolderDragger.vue";
 import Settings from "./Settings.vue";
+
+const { t } = useI18n();
 
 const props = defineProps({
   data: {

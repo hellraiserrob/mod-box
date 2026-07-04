@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-if="error" class="error error--top">
-      There was an error setting the rules, did you use an invalid header name
+      {{ t("app.error") }}
     </div>
     <FolderPanel
       v-if="data.folders"
@@ -17,11 +17,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from "vue";
+import { ref, provide, onMounted, watch } from "vue";
 import type { Ref } from "vue";
 
 import { DataType, FolderType } from "./interfaces";
 import { generateRules, isChrome } from "./utils";
+import { detectLocale, SUPPORTED_LOCALES } from "./locales";
+import type { Locale } from "./locales";
+import { LOCALE_KEY } from "./composables";
+import { getMessage } from "./locales";
 
 import FolderPanel from "./components/FolderPanel.vue";
 
@@ -59,6 +63,56 @@ const data: Ref<DataType> = ref({
 
 const totalActiveRules = ref(0);
 const error = ref(false);
+
+/**
+ * i18n 初始化
+ * 优先级：chrome.storage > localStorage > 浏览器语言自动检测
+ */
+const locale: Ref<Locale> = ref(detectLocale());
+provide(LOCALE_KEY, locale);
+
+// 在 provide 之后创建 i18n 实例供本组件使用
+const { t } = {
+  t(path: string, params?: Record<string, string | number>) {
+    return getMessage(locale.value, path, params);
+  },
+};
+
+/**
+ * 将当前语言偏好持久化到 chrome.storage 或 localStorage
+ * chrome 环境下失败静默处理，不影响用户体验
+ *
+ * @param newLocale - 当前 locale 值
+ */
+function saveLocale(newLocale: Locale) {
+  if (isChrome) {
+    chrome.storage.local.set({ locale: newLocale }).then(() => {
+      console.log("Chrome storage locale set");
+    });
+  } else {
+    window.localStorage.setItem("locale", newLocale);
+  }
+}
+
+/**
+ * 从 storage 恢复已保存的语言偏好
+ * 如果用户之前手动切换过则覆盖浏览器的自动检测结果
+ * 提升：chrome.storage.local 需要异步读取，非 chrome 环境从 localStorage 读取
+ */
+async function loadLocale() {
+  let storedLocale: string | null | undefined;
+
+  if (isChrome) {
+    const chromeData = await chrome.storage.local.get(["locale"]);
+    storedLocale = chromeData.locale;
+  } else {
+    storedLocale = window.localStorage.getItem("locale");
+  }
+
+  if (storedLocale && SUPPORTED_LOCALES.includes(storedLocale as Locale)) {
+    locale.value = storedLocale as Locale;
+  }
+}
 
 /**
  * Event handlers from FolderPanel
@@ -165,10 +219,14 @@ watch(
   { deep: true }
 );
 
+// 监听 locale 变更并持久化
+watch(locale, (newLocale) => saveLocale(newLocale));
+
 /**
  * Lifecycle
  */
-onMounted(() => {
+onMounted(async () => {
+  await loadLocale();
   loadData();
 });
 </script>

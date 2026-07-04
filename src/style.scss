@@ -507,6 +507,15 @@ hr {
   margin-top: 20px;
 }
 
+.help-content {
+  max-height: 70vh;
+  overflow-y: auto;
+  padding-right: 4px;
+  h3 { font-size: 18px; font-weight: 600; }
+  h4 { font-size: 16px; font-weight: 600; color: #333; }
+  p { font-size: 14px; line-height: 1.6; }
+}
+
 // .row {
 //   display: flex;
 //   gap: 20px;

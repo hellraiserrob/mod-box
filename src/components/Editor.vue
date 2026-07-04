@@ -11,7 +11,7 @@
       :title="model || fallback || ''"
     >
       {{ model || fallback || "-" }}
-    
+
     </button>
 
     <button
@@ -41,7 +41,7 @@
       <Tooltip v-if="splitDomains.length > 1" :trigger="splitDomains.length - 1">
         <div v-for="(domain, idx) in splitDomains" :key="idx">{{ cleanDomain(domain) }}</div>
       </Tooltip>
-      
+
       <button v-if="!splitDomains.length" @click="edit" class="editor__trigger">
         -
         <svg
@@ -75,8 +75,8 @@
         ></textarea>
       </div>
       <div style="margin-top: 10px; display: flex; gap: 2px;">
-        <button class="btn button--primary" @click="save">Save</button>
-        <button class="btn button--secondary" @click="cancel" style="border-color: transparent; box-shadow: none">Cancel</button>
+        <button class="btn button--primary" @click="save">{{ t("editor.save") }}</button>
+        <button class="btn button--secondary" @click="cancel" style="border-color: transparent; box-shadow: none">{{ t("editor.cancel") }}</button>
       </div>
     </div>
   </div>
@@ -86,8 +86,11 @@
 import { ref, nextTick, toRefs, computed } from "vue";
 import type { Ref } from "vue";
 import { cleanDomain } from "../utils";
+import { useI18n } from "../composables";
 
 import Tooltip from "./Tooltip.vue";
+
+const { t } = useI18n();
 
 const model = defineModel<string>();
 const props = defineProps(["placeholder", "locked", "fallback", "domains", "label", "aligned", "icon"]);
@@ -123,8 +126,6 @@ const splitDomains = computed(() => {
   if (!props.domains || typeof model.value !== "string" || (model.value === "" && typeof fallback === undefined)) {
     return [];
   }
-
-  // 
 
   if(model.value === "" && typeof fallback?.value === "string") {
     if(fallback?.value === "") {

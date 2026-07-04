@@ -1,15 +1,15 @@
 <template>
-  <div 
+  <div
     v-for="(tab, index) in tabs"
     :key="`tab-drag-${index}`"
     class="tabs__tab"
-    :class="{ 
+    :class="{
       'tabs__tab--active': index === activeTab,
       'tabs__tab--right': index === target && target > tmp && target !== tmp,
       'tabs__tab--left': index === target && target < tmp,
       'tabs__tab--disabled': !tab.active
     }"
-    @click="active = index" :draggable="tmp >= 0" 
+    @click="active = index" :draggable="tmp >= 0"
     @dragover.prevent="target = index"
     @drop="onDragDrop(index)"
     @dragstart="onDragStart(index)"
@@ -17,7 +17,7 @@
     @dragenter="target = index"
     >
 
-    <div v-if="tabs.length > 1" class="tabs__tab__handle" @mousedown="tmp = index" @mouseup="tmp = -1" title="drag to move">
+    <div v-if="tabs.length > 1" class="tabs__tab__handle" @mousedown="tmp = index" @mouseup="tmp = -1" :title="t('tabDragger.dragToMove')">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-grip-horizontal"
         viewBox="0 0 16 16">
         <path
@@ -25,14 +25,14 @@
       </svg>
     </div>
 
-    <button :title="'select ' + tab.name" @click="setTab(index)" class="tabs__tab__label">{{
+    <button :title="t('tabDragger.selectTab', { name: tab.name })" @click="setTab(index)" class="tabs__tab__label">{{
       tab.name }}
     </button>
 
     <button class="toggle" @click="toggle(tab)" :class="{ 'toggle--active': tab.active }"
-      :title="tab.active ? 'Disable folder rules' : 'Enable folder rules'">
+      :title="tab.active ? t('tabDragger.disableRules') : t('tabDragger.enableRules')">
       <div class="toggle__text">
-        {{ tab.active ? "On" : "Off" }}
+        {{ tab.active ? t("folderPanel.on") : t("folderPanel.off") }}
       </div>
     </button>
   </div>
@@ -42,6 +42,9 @@
 <script setup lang="ts">
 import { ref, toRefs, type PropType } from "vue";
 import { TabType } from "../interfaces";
+import { useI18n } from "../composables";
+
+const { t } = useI18n();
 
 const props = defineProps({
   tabs: {

@@ -3,7 +3,7 @@
     <div class="toast__text">
       {{ toast.message }}
     </div>
-    
+
     <button class="btn-icon" @click="toast.active = false">
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -21,11 +21,12 @@
   </div>
   <div class="tab" :class="{ 'tab--active': tab.active }">
     <div class="folder__header mb10">
-      <h3>Tab ({{ tab.name }})</h3>
+      <h3>{{ t("tab.title", { name: tab.name }) }}</h3>
       <button
         @click="showSettings = !showSettings"
         class="btn-icon"
         :class="{ 'btn-icon--active': showSettings }"
+        :title="t('tab.settings')"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -61,31 +62,31 @@
       </div>
 
       <div v-if="showDeleteConfirmation" class="panel__modal">
-        <h3 class="mb10">Confirm tab deletion</h3>
+        <h3 class="mb10">{{ t("tab.confirmDeletion") }}</h3>
         <div class="panel__modal__actions">
-          <button class="btn btn--danger" @click="deleteTab">Delete</button>
+          <button class="btn btn--danger" @click="deleteTab">{{ t("folder.delete") }}</button>
           <button class="btn" @click="showDeleteConfirmation = false">
-            Cancel
+            {{ t("folder.cancel") }}
           </button>
         </div>
       </div>
-      <h3 class="mb20">Tab settings</h3>
+      <h3 class="mb20">{{ t("tab.settings") }}</h3>
 
       <div class="field mb20">
-        <label class="field__label">Tab name</label>
+        <label class="field__label">{{ t("tab.name") }}</label>
         <input
           class="field__input"
           type="text"
           v-model="tab.name"
-          placeholder="Tab name"
+          :placeholder="t('tab.name')"
           ref="tabName"
         />
       </div>
 
       <div class="field mb20">
         <label class="field__label">
-          Tab request domains
-          <Tooltip> Single or comma separated domains </Tooltip>
+          {{ t("tab.requestDomains") }}
+          <Tooltip>{{ t("tab.requestDomainsHint") }}</Tooltip>
         </label>
         <input
           class="field__input"
@@ -93,26 +94,24 @@
           v-model="tab.requestDomains"
           placeholder="Domains"
         />
-        <label class="field__hint"
-          >- Applies to all tab rules unless overridden</label
-        >
+        <label class="field__hint">{{ t("tab.domainsFallbackHint") }}</label>
       </div>
 
       <div class="panel__actions btn-group">
         <button @click="showDeleteConfirmation = true" class="btn">
-          Delete tab
+          {{ t("tab.deleteTab") }}
         </button>
-        <button @click="cloneTab" class="btn">Clone tab</button>
+        <button @click="cloneTab" class="btn">{{ t("tab.cloneTab") }}</button>
       </div>
     </div>
 
     <div class="panel">
-      <h3 class="mb10">
-        Request headers
+      <h3 class="mb10" :title="t('tab.requestHeadersTooltip')">
+        {{ t("tab.requestHeaders") }}
          - {{ requestHeaderTotal }}
       </h3>
       <div class="empty" v-if="!tab.requestHeaders?.length">
-        Zero request headers
+        {{ t("tab.zeroRequestHeaders") }}
       </div>
 
       <table class="table" v-if="tab.requestHeaders?.length">
@@ -120,20 +119,15 @@
           <th></th>
           <th></th>
           <th></th>
-          <th>Name</th>
-          <th>Value</th>
+          <th>{{ t("tab.table.name") }}</th>
+          <th>{{ t("tab.table.value") }}</th>
           <th>
-            Url Filter
-            <!-- <Tooltip>
-              The pattern which is matched against the network request url
-            </Tooltip> -->
+            {{ t("tab.table.urlFilter") }}
           </th>
           <th>
-            Domains
-
-            <!-- <Tooltip> Single or comma separated domains </Tooltip> -->
+            {{ t("tab.table.domains") }}
           </th>
-          <th>Note</th>
+          <th>{{ t("tab.table.note") }}</th>
           <th></th>
         </tr>
 
@@ -154,7 +148,7 @@
               :class="{ 'toggle--active': header.active }"
             >
               <div class="toggle__text">
-                {{ header.active ? "On" : "Off" }}
+                {{ header.active ? t("folderPanel.on") : t("folderPanel.off") }}
               </div>
             </button>
           </td>
@@ -162,21 +156,21 @@
             <Dropdown v-model="header.operation" :options="operationOptions" />
           </td>
           <td :colspan="header.operation !== 'remove' ? 1 : 2">
-            <Editor v-model="header.name" placeholder="Header name" label="Header name" />
+            <Editor v-model="header.name" :placeholder="t('tab.placeholder.headerName')" :label="t('tab.table.name')" />
           </td>
           <td v-if="header.operation !== 'remove'">
-            <Editor v-model="header.value" placeholder="Header value" />
+            <Editor v-model="header.value" :placeholder="t('tab.placeholder.headerValue')" />
           </td>
           <td>
             <Editor
               v-model="header.condition.urlFilter"
-              placeholder="urlFilter"
+              :placeholder="t('tab.placeholder.urlFilter')"
             />
           </td>
           <td>
             <Editor
               v-model="header.condition.requestDomains"
-              placeholder="Request domains"
+              :placeholder="t('tab.placeholder.domains')"
               :aligned="'right'"
               :fallback="tab.requestDomains"
               :domains="true"
@@ -185,10 +179,10 @@
           <td class="table__short">
             <Editor
               v-model="header.note"
-              placeholder="Note"
+              :placeholder="t('tab.placeholder.note')"
               :icon="true"
               :aligned="'right'"
-              label="Note"
+              :label="t('tab.table.note')"
             />
           </td>
           <td class="table__short text-right">
@@ -198,16 +192,16 @@
       </table>
 
       <button class="btn mt10" @click="addRequestHeader()">
-        Add
+        {{ t("folderPanel.add") }}
       </button>
     </div>
 
     <div class="panel">
-      <h3 class="mb10">
-        Response headers - {{ responseHeaderTotal }}
+      <h3 class="mb10" :title="t('tab.responseHeadersTooltip')">
+        {{ t("tab.responseHeaders") }} - {{ responseHeaderTotal }}
       </h3>
       <div class="empty" v-if="!tab.responseHeaders?.length">
-        Zero response headers
+        {{ t("tab.zeroResponseHeaders") }}
       </div>
 
       <table class="table" v-if="tab.responseHeaders?.length">
@@ -215,19 +209,15 @@
           <th></th>
           <th></th>
           <th></th>
-          <th>Name</th>
-          <th>Value</th>
+          <th>{{ t("tab.table.name") }}</th>
+          <th>{{ t("tab.table.value") }}</th>
           <th>
-            Url Filter
-            <!-- <Tooltip>
-              The pattern which is matched against the network request url
-            </Tooltip> -->
+            {{ t("tab.table.urlFilter") }}
           </th>
           <th>
-            Domains
-            <!-- <Tooltip>Single or comma separated domains</Tooltip> -->
+            {{ t("tab.table.domains") }}
           </th>
-          <th>Note</th>
+          <th>{{ t("tab.table.note") }}</th>
           <th></th>
         </tr>
         <RuleDragger
@@ -247,7 +237,7 @@
               :class="{ 'toggle--active': header.active }"
             >
               <div class="toggle__text">
-                {{ header.active ? "On" : "Off" }}
+                {{ header.active ? t("folderPanel.on") : t("folderPanel.off") }}
               </div>
             </button>
           </td>
@@ -255,21 +245,21 @@
             <Dropdown v-model="header.operation" :options="operationOptions" />
           </td>
           <td :colspan="header.operation !== 'remove' ? 1 : 2">
-            <Editor v-model="header.name" placeholder="Header name" />
+            <Editor v-model="header.name" :placeholder="t('tab.placeholder.headerName')" />
           </td>
           <td v-if="header.operation !== 'remove'">
-            <Editor v-model="header.value" placeholder="Header value" />
+            <Editor v-model="header.value" :placeholder="t('tab.placeholder.headerValue')" />
           </td>
           <td>
             <Editor
               v-model="header.condition.urlFilter"
-              placeholder="urlFilter"
+              :placeholder="t('tab.placeholder.urlFilter')"
             />
           </td>
           <td>
             <Editor
               v-model="header.condition.requestDomains"
-              placeholder="Request domains"
+              :placeholder="t('tab.placeholder.domains')"
               :fallback="tab.requestDomains"
               :domains="true"
               :aligned="'right'"
@@ -278,10 +268,10 @@
           <td class="table__short">
             <Editor
               v-model="header.note"
-              placeholder="Note"
+              :placeholder="t('tab.placeholder.note')"
               :icon="true"
               :aligned="'right'"
-              label="Note"
+              :label="t('tab.table.note')"
             />
           </td>
           <td class="table__short text-right">
@@ -291,34 +281,30 @@
       </table>
 
       <button class="btn mt10" @click="addResponseHeader()">
-        Add
+        {{ t("folderPanel.add") }}
       </button>
     </div>
 
     <div class="panel">
-      <h3 class="mb10">
-        Block requests - {{ blockedTotal }}
+      <h3 class="mb10" :title="t('tab.blockRequestsTooltip')">
+        {{ t("tab.blockRequests") }} - {{ blockedTotal }}
       </h3>
       <div class="empty" v-if="!tab.blockedRequests?.length">
-        Zero blocked requests
+        {{ t("tab.zeroBlockedRequests") }}
       </div>
 
       <table v-if="tab.blockedRequests?.length" class="table">
         <tr>
           <th></th>
           <th class="table__short"></th>
-          <th>Type</th>
+          <th>{{ t("tab.table.type") }}</th>
           <th>
-            Url Filter
-            <!-- <Tooltip>
-              The pattern which is matched against the network request url
-            </Tooltip> -->
+            {{ t("tab.table.urlFilter") }}
           </th>
           <th>
-            Domains
-            <!-- <Tooltip> Single or comma separated domains</Tooltip> -->
+            {{ t("tab.table.domains") }}
           </th>
-          <th>Note</th>
+          <th>{{ t("tab.table.note") }}</th>
           <th class="table__short"></th>
         </tr>
         <RuleDragger
@@ -338,7 +324,7 @@
               :class="{ 'toggle--active': request.active }"
             >
               <div class="toggle__text">
-                {{ request.active ? "On" : "Off" }}
+                {{ request.active ? t("folderPanel.on") : t("folderPanel.off") }}
               </div>
             </button>
           </td>
@@ -352,14 +338,14 @@
             <Editor
               v-if="!request.condition.document"
               v-model="request.condition.urlFilter"
-              placeholder="urlFilter"
+              :placeholder="t('tab.placeholder.urlFilter')"
               :locked="request.condition.document"
             />
           </td>
           <td>
             <Editor
               v-model="request.condition.requestDomains"
-              placeholder="Request domains"
+              :placeholder="t('tab.placeholder.domains')"
               :fallback="tab.requestDomains"
               :domains="true"
               :aligned="'right'"
@@ -368,10 +354,10 @@
           <td class="table__short">
             <Editor
               v-model="request.note"
-              placeholder="Note"
+              :placeholder="t('tab.placeholder.note')"
               :icon="true"
               :aligned="'right'"
-              label="Note"
+              :label="t('tab.table.note')"
             />
           </td>
           <td class="table__short text-right">
@@ -381,16 +367,16 @@
       </table>
 
       <button class="mt10 btn" @click="addBlockedRequest()">
-        Add
+        {{ t("folderPanel.add") }}
       </button>
     </div>
 
     <div class="panel">
-      <h3 class="mb10">
-        Redirect requests - {{ redirectedTotal }}
+      <h3 class="mb10" :title="t('tab.redirectRequestsTooltip')">
+        {{ t("tab.redirectRequests") }} - {{ redirectedTotal }}
       </h3>
       <div class="empty" v-if="!tab.redirectRequests?.length">
-        Zero redirect requests
+        {{ t("tab.zeroRedirectRequests") }}
       </div>
 
       <table v-if="tab.redirectRequests?.length" class="table">
@@ -398,23 +384,17 @@
           <th></th>
           <th class="table__short"></th>
           <th>
-            Url Filter
-            <!-- <Tooltip>
-              The pattern which is matched against the network request url
-            </Tooltip> -->
+            {{ t("tab.table.urlFilter") }}
           </th>
           <th>
-            Destination
-            <!-- <Tooltip> An absolute destination Url </Tooltip> -->
+            {{ t("tab.table.destination") }}
           </th>
           <th>
-            Domains
-            <!-- <Tooltip> Single or comma separated domains</Tooltip> -->
+            {{ t("tab.table.domains") }}
           </th>
-          <th>Note</th>
+          <th>{{ t("tab.table.note") }}</th>
           <th class="table__short"></th>
         </tr>
-        <!-- <tr v-for="request in tab.redirectRequests"> -->
         <RuleDragger
           v-for="(request, index) in tab.redirectRequests"
           :index="Number(index)"
@@ -432,23 +412,23 @@
               :class="{ 'toggle--active': request.active }"
             >
               <div class="toggle__text">
-                {{ request.active ? "On" : "Off" }}
+                {{ request.active ? t("folderPanel.on") : t("folderPanel.off") }}
               </div>
             </button>
           </td>
           <td>
             <Editor
               v-model="request.condition.urlFilter"
-              placeholder="urlFilter"
+              :placeholder="t('tab.placeholder.urlFilter')"
             />
           </td>
           <td>
-            <Editor v-model="request.url" placeholder="Url" />
+            <Editor v-model="request.url" :placeholder="t('tab.placeholder.url')" />
           </td>
           <td>
             <Editor
               v-model="request.condition.requestDomains"
-              placeholder="Request domains"
+              :placeholder="t('tab.placeholder.domains')"
               :fallback="tab.requestDomains"
               :domains="true"
               :aligned="'right'"
@@ -457,10 +437,10 @@
           <td class="table__short">
             <Editor
               v-model="request.note"
-              placeholder="Note"
+              :placeholder="t('tab.placeholder.note')"
               :icon="true"
               :aligned="'right'"
-              label="Note"
+              :label="t('tab.table.note')"
             />
           </td>
           <td class="table__short text-right">
@@ -470,7 +450,7 @@
       </table>
 
       <button class="mt10 btn" @click="addRedirectRequest()">
-        Add
+        {{ t("folderPanel.add") }}
       </button>
     </div>
   </div>
@@ -485,6 +465,9 @@ import Dropdown from "./Dropdown.vue";
 import DropdownMenu from "./DropdownMenu.vue";
 import Tooltip from "./Tooltip.vue";
 import RuleDragger from "./RuleDragger.vue";
+import { useI18n } from "../composables";
+
+const { t } = useI18n();
 
 const props = defineProps({
   tab: {
@@ -499,14 +482,14 @@ const tabName: Ref<HTMLInputElement | null> = ref(null);
 
 const requestActions = [
   {
-    label: "Delete",
+    label: t("tab.action.delete"),
     confirm: true,
     action: (rule:any) => {
       deleteRequestHeader(rule)
     },
   },
   {
-    label: "Copy to clipboard",
+    label: t("tab.action.copyToClipboard"),
     action: (rule: any) => {
       showToast(`${rule.name}${rule.value ? ':' + rule.value : ''}`);
     },
@@ -515,14 +498,14 @@ const requestActions = [
 
 const responseActions = [
   {
-    label: "Delete",
+    label: t("tab.action.delete"),
     confirm: true,
     action: (rule:any) => {
       deleteResponseHeader(rule)
     },
   },
   {
-    label: "Copy to clipboard",
+    label: t("tab.action.copyToClipboard"),
     action: (rule: any) => {
       showToast(`${rule.name}${rule.value ? ':' + rule.value : ''}`);
     },
@@ -531,7 +514,7 @@ const responseActions = [
 
 const blockActions = [
   {
-    label: "Delete",
+    label: t("tab.action.delete"),
     confirm: true,
     action: (rule:any) => {
       deleteBlockRequest(rule)
@@ -541,7 +524,7 @@ const blockActions = [
 
 const redirectActions = [
   {
-    label: "Delete",
+    label: t("tab.action.delete"),
     confirm: true,
     action: (rule:any) => {
       deleteRedirectRequest(rule)
@@ -549,27 +532,34 @@ const redirectActions = [
   }
 ];
 
-const operationOptions = [
+/**
+ * 操作选项（Set / Remove）使用计算属性以支持 i18n 动态更新
+ */
+const operationOptions = computed(() => [
   {
-    label: "Set",
+    label: t("tab.dropdown.set"),
     value: "set",
+    tooltip: t("operation.setTooltip"),
   },
   {
-    label: "Remove",
+    label: t("tab.dropdown.remove"),
     value: "remove",
+    tooltip: t("operation.removeTooltip"),
   },
-];
+]);
 
-const blockOptions = [
+const blockOptions = computed(() => [
   {
-    label: "Assets",
+    label: t("tab.dropdown.assets"),
     value: false,
+    tooltip: t("blockType.assetsTooltip"),
   },
   {
-    label: "Domain",
+    label: t("tab.dropdown.domain"),
     value: true,
+    tooltip: t("blockType.domainTooltip"),
   },
-];
+]);
 
 /**
  * reactive
@@ -631,12 +621,12 @@ const responseHeaderTotal = computed(() => {
 async function showToast(text: string) {
   try {
     await navigator.clipboard.writeText(text).then(() => {
-      toast.value.message = "Copied to clipboard...";
+      toast.value.message = t("tab.toast.copied");
       toast.value.active = true;
       hideToast();
     });
   } catch (error) {
-    toast.value.message = "Couldn't copy to clipboard...";
+    toast.value.message = t("tab.toast.failed");
     toast.value.active = true;
     hideToast();
   }

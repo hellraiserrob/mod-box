@@ -7,7 +7,9 @@
       </svg>
     </button>
     <div v-show="isOpen" class="dropdown__menu">
-      <button v-for="(option, index) in options" :key="index" @click="option.action ? option.action() : set(option.value)" class="dropdown__menu__item" :class="{'dropdown__menu__item--active' : model === option.value}">
+      <button v-for="(option, index) in options" :key="index" @click="option.action ? option.action() : set(option.value)"
+        class="dropdown__menu__item" :class="{'dropdown__menu__item--active' : model === option.value}"
+        :title="option.tooltip || ''">
         {{ option.label }}
       </button>
     </div>
@@ -26,7 +28,8 @@ const { isOpen, toggle, close } = useOutsideClick(root);
 interface Option {
   label: string,
   value: string | boolean,
-  action?: Function
+  action?: Function,
+  tooltip?: string,
 }
 
 const props = defineProps({
@@ -43,7 +46,7 @@ const defaultOption = computed(() => {
   if(typeof model.value !== "undefined" && model.value !== "") {
     return options.value.find(option => option.value === model.value)
   }
-  
+
   return options.value[0]
 })
 

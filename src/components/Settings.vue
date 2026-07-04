@@ -1,19 +1,39 @@
 <template>
   <div>
     <div class="folder__header mb10">
-      <h3>Settings</h3>
+      <h3>{{ t("settings.title") }}</h3>
     </div>
 
     <!-- Compact Mode -->
     <div class="panel panel--large mb20">
-      <h3 class="mb10">Compact mode <div class="tag">New</div></h3>
+      <h3 class="mb10" :title="t('settings.compactModeTooltip')">
+        {{ t("settings.compactMode") }} <div class="tag">{{ t("settings.new") }}</div>
+      </h3>
       <p class="mb20">
-        If you need a bit more space to work with your rules, compact mode reduces the left hand column width.
+        {{ t("settings.compactDesc") }}
       </p>
 
       <div class="panel__actions">
         <button @click="$emit('toggleCompact')" class="btn">
-          {{ compact ? "Disable compact mode" : "Enable compact mode" }}
+          {{ compact ? t("settings.disableCompact") : t("settings.enableCompact") }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Language -->
+    <div class="panel panel--large mb20">
+      <h3 class="mb10">{{ t("settings.language") }} <div class="tag">{{ t("settings.new") }}</div></h3>
+      <p class="mb20">{{ t("settings.languageDesc") }}</p>
+
+      <div class="panel__actions btn-group">
+        <button
+          v-for="loc in availableLocales"
+          :key="loc.code"
+          class="btn"
+          :class="{ 'btn--primary': locale === loc.code }"
+          @click="changeLocale(loc.code)"
+        >
+          {{ loc.label }}
         </button>
       </div>
     </div>
@@ -21,13 +41,11 @@
     <!-- Export -->
     <div class="panel panel--large mb20">
       <h3 class="mb10">
-        Export
-        <div class="tag">New</div>
+        {{ t("settings.export") }}
+        <div class="tag">{{ t("settings.new") }}</div>
       </h3>
       <p class="mb20">
-        You can export your rules into .json packages to backup, or send
-        to friends/colleagues. Check the folders you want and click
-        export.
+        {{ t("settings.exportDesc") }}
       </p>
 
       <div class="mb20">
@@ -68,7 +86,7 @@
           @click="download"
           :disabled="!selectedExport.length"
         >
-          Export
+          {{ t("settings.exportBtn") }}
         </button>
       </div>
     </div>
@@ -76,12 +94,11 @@
     <!-- Import -->
     <div class="panel panel--large mb20">
       <h3 class="mb10">
-        Import
-        <div class="tag">New</div>
+        {{ t("settings.import") }}
+        <div class="tag">{{ t("settings.new") }}</div>
       </h3>
       <p class="mb20">
-        You can select and import modbox backup files and append them to
-        your current set of folders, tabs and rules.
+        {{ t("settings.importDesc") }}
       </p>
 
       <div class="mb20">
@@ -132,49 +149,92 @@
           @click="clearImported"
           :disabled="!importData.length"
         >
-          Clear
+          {{ t("settings.clear") }}
         </button>
         <button
           class="btn"
           @click="appendImported"
           :disabled="!selectedImport.length"
         >
-          Append
+          {{ t("settings.append") }}
         </button>
+      </div>
+    </div>
+
+    <!-- Help -->
+    <div class="panel panel--large mb20">
+      <h3 class="mb10">{{ t("settings.help") }} <div class="tag">{{ t("settings.new") }}</div></h3>
+      <p class="mb20">{{ t("settings.helpDesc") }}</p>
+
+      <div class="panel__actions">
+        <button @click="showHelp = true" class="btn">
+          {{ t("settings.openHelp") }}
+        </button>
+      </div>
+
+      <!-- Help Modal -->
+      <div v-if="showHelp" class="panel__modal">
+        <div class="help-content">
+          <h3 class="mb15">{{ t("settings.helpContent.title") }}</h3>
+
+          <p class="mb15">{{ t("settings.helpContent.overview") }}</p>
+
+          <h4 class="mb10">{{ t("settings.helpContent.folders.title") }}</h4>
+          <p class="mb15">{{ t("settings.helpContent.folders.body") }}</p>
+
+          <h4 class="mb10">{{ t("settings.helpContent.rules.title") }}</h4>
+          <p class="mb15">{{ t("settings.helpContent.rules.body") }}</p>
+
+          <h4 class="mb10">{{ t("settings.helpContent.condition.title") }}</h4>
+          <p class="mb15">{{ t("settings.helpContent.condition.body") }}</p>
+
+          <h4 class="mb10">{{ t("settings.helpContent.toggle.title") }}</h4>
+          <p class="mb15">{{ t("settings.helpContent.toggle.body") }}</p>
+
+          <h4 class="mb10">{{ t("settings.helpContent.compact.title") }}</h4>
+          <p class="mb15">{{ t("settings.helpContent.compact.body") }}</p>
+
+          <h4 class="mb10">{{ t("settings.helpContent.exportImport.title") }}</h4>
+          <p class="mb15">{{ t("settings.helpContent.exportImport.body") }}</p>
+
+          <div class="panel__modal__actions">
+            <button class="btn" @click="showHelp = false">
+              {{ t("folder.cancel") }}
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
     <!-- Delete All -->
     <div class="panel panel--large mb20">
       <div v-if="showDeleteConfirmation" class="panel__modal">
-        <h3 class="mb10">Confirm rules deletion</h3>
+        <h3 class="mb10">{{ t("settings.confirmDeletion") }}</h3>
         <div class="panel__modal__actions">
-          <button class="btn btn--danger" @click="confirmReset">Delete</button>
+          <button class="btn btn--danger" @click="confirmReset">{{ t("folder.delete") }}</button>
           <button class="btn" @click="showDeleteConfirmation = false">
-            Cancel
+            {{ t("folder.cancel") }}
           </button>
         </div>
       </div>
 
-      <h3 class="mb10">Delete all rules</h3>
+      <h3 class="mb10">{{ t("settings.deleteAll") }}</h3>
       <p class="mb20">
-        If you want to totally reset all of your rules. This cannot be
-        undone so please use carefully.
+        {{ t("settings.deleteAllDesc") }}
       </p>
 
       <div class="panel__actions">
         <button @click="showDeleteConfirmation = true" class="btn">
-          Delete all
+          {{ t("settings.deleteAllBtn") }}
         </button>
       </div>
     </div>
 
     <!-- About -->
     <div class="panel panel--large">
-      <h3 class="mb10">About</h3>
+      <h3 class="mb10">{{ t("settings.about") }}</h3>
       <p class="mb20">
-        ModBox is a hobby project with the aim of providing developers and
-        hackers a tool for testing and debugging.
+        {{ t("settings.aboutDesc") }}
       </p>
 
       <div class="panel__actions">
@@ -183,14 +243,14 @@
           class="btn"
           target="_blank"
         >
-          My LinkedIn
+          {{ t("settings.linkedIn") }}
         </a>
         <a
           href="https://www.buymeacoffee.com/robphillips"
           class="btn"
           target="_blank"
         >
-          Tip Jar
+          {{ t("settings.tipJar") }}
         </a>
       </div>
     </div>
@@ -198,9 +258,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref, type PropType } from "vue";
-import type { Ref } from "vue";
+import { ref, inject, computed, type PropType } from "vue";
 import { FolderType, isValidExportPayload } from "../interfaces";
+import { LOCALE_KEY, useI18n } from "../composables";
+import type { Locale } from "../locales";
+import { SUPPORTED_LOCALES, LOCALE_LABELS } from "../locales";
+import type { Ref } from "vue";
+
+const { t } = useI18n();
+
+const locale = inject<Ref<Locale>>(LOCALE_KEY);
+
+/** 可选的语言列表 */
+const availableLocales = computed(() =>
+  SUPPORTED_LOCALES.map((code) => ({
+    code,
+    label: LOCALE_LABELS[code],
+  }))
+);
 
 const props = defineProps({
   folders: {
@@ -229,6 +304,26 @@ const importData: Ref<FolderType[]> = ref([]);
 const exportError = ref("");
 const importError = ref("");
 const showDeleteConfirmation = ref(false);
+const showHelp = ref(false);
+
+/**
+ * 切换界面语言并持久化到 storage
+ * 因为 locale 是一个 provide 进来的 Ref，修改它在 App.vue 会被 watch 到并自动保存
+ * 此处额外保存一次以确保 chrome.storage 同步（跨 popup 实例可见）
+ *
+ * @param newLocale - 目标语言代码
+ */
+function changeLocale(newLocale: Locale) {
+  if (!locale) return;
+  locale.value = newLocale;
+
+  // 持久化到 storage
+  if (typeof chrome !== "undefined" && chrome?.storage) {
+    chrome.storage.local.set({ locale: newLocale });
+  } else {
+    window.localStorage.setItem("locale", newLocale);
+  }
+}
 
 /**
  * Export functionality
@@ -267,7 +362,7 @@ function download() {
     const json = JSON.stringify(payload);
 
     if (json.length > MAX_EXPORT_SIZE) {
-      exportError.value = "Export data is too large. Try selecting fewer folders.";
+      exportError.value = t("settings.exportTooLarge");
       return;
     }
 
@@ -304,7 +399,7 @@ function download() {
 
     selectedExport.value = [];
   } catch (e) {
-    exportError.value = "Failed to export rules. Please try again.";
+    exportError.value = t("settings.exportFailed");
 
     // Cleanup on error
     if (anchor?.parentNode) {
@@ -322,7 +417,7 @@ function download() {
 function onFileChange(e: Event) {
   const target = e.target as HTMLInputElement;
   const file = target.files?.[0];
-  
+
   if (!file) return;
 
   const fr = new FileReader();
@@ -331,18 +426,18 @@ function onFileChange(e: Event) {
     try {
       const result = event.target?.result;
       if (typeof result !== 'string') return;
-      
+
       const payload = JSON.parse(result);
 
       if (!isValidExportPayload(payload)) {
-        importError.value = "Invalid file format. Please select a valid ModBox backup file.";
+        importError.value = t("settings.invalidFile");
         return;
       }
 
       importData.value = payload.folders;
       importError.value = "";
     } catch {
-      importError.value = "Failed to parse file. Please ensure it's a valid JSON file.";
+      importError.value = t("settings.parseFailed");
     }
   };
   fr.readAsText(file);

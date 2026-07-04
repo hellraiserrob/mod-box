@@ -1,9 +1,13 @@
 <template>
   <div class="folder" :class="{ 'folder--active': folder.active }">
     <div class="folder__header mb10">
-      <h3>Folder ({{ folder.name }})</h3>
-      <button @click="showSettings = !showSettings" class="btn-icon" :class="{ 'btn-icon--active': showSettings }">
-        
+      <h3>{{ t("folder.title", { name: folder.name }) }}</h3>
+      <button
+        @click="showSettings = !showSettings"
+        class="btn-icon"
+        :class="{ 'btn-icon--active': showSettings }"
+        :title="t('folder.settings')"
+      >
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
           class="bi bi-gear-wide-connected" viewBox="0 0 16 16">
           <path
@@ -24,29 +28,29 @@
       </div>
 
       <div v-if="showDeleteConfirmation" class="panel__modal">
-        <h3 class="mb10">Confirm folder deletion</h3>
+        <h3 class="mb10">{{ t("folder.confirmDeletion") }}</h3>
         <div class="panel__modal__actions">
-          <button class="btn btn--danger" @click="deleteFolder">Delete</button>
-          <button class="btn" @click="showDeleteConfirmation = false">Cancel</button>
+          <button class="btn btn--danger" @click="deleteFolder">{{ t("folder.delete") }}</button>
+          <button class="btn" @click="showDeleteConfirmation = false">{{ t("folder.cancel") }}</button>
         </div>
       </div>
 
-      <h3 class="mb10">Folder settings</h3>
+      <h3 class="mb10">{{ t("folder.settings") }}</h3>
       <div class="mb10">
         <div class="field">
-          <label class="field__label" for="">Folder name</label>
-          <input class="field__input" type="text" v-model="folder.name" placeholder="Folder name" ref="folderName" />
+          <label class="field__label" for="">{{ t("folder.name") }}</label>
+          <input class="field__input" type="text" v-model="folder.name" :placeholder="t('folder.name')" ref="folderName" />
         </div>
       </div>
       <div class="panel__actions btn-group">
         <button @click="showDeleteConfirmation = true" class="btn">
-          Delete folder
+          {{ t("folder.deleteFolder") }}
         </button>
         <button @click="cloneFolder" class="btn">
-          Clone folder
+          {{ t("folder.cloneFolder") }}
         </button>
         <button @click="toggleActive" class="btn">
-          {{ folder.active ? "Disable folder" : "Enable folder"}}
+          {{ folder.active ? t("folder.disableFolder") : t("folder.enableFolder") }}
         </button>
       </div>
     </div>
@@ -55,17 +59,6 @@
     <div class="tabs mb15">
       <TabDragger :tabs="folder.tabs" :active-tab="activeTab" @moveTab="moveTab" @toggleTab="toggleTab"
         @setTab="setTab" />
-      <!-- <div class="tabs__tab" v-for="(tab, index) in folder.tabs" :class="{ 'tabs__tab--active': index === activeTab }">
-        <button class="tabs__tab__label" @click="activeTab = index">
-          {{ tab.name }}
-        </button>
-
-        <div class="toggle" @click="tab.active = !tab.active" :class="{ 'toggle--active': tab.active }">
-          <div class="toggle__text">
-            {{ tab.active ? "On" : "Off" }}
-          </div>
-        </div>
-      </div> -->
       <div class="tabs__tab">
         <button class="btn-icon" @click="addTab">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg"
@@ -92,6 +85,9 @@ import { isChrome } from "../utils"
 import Tab from "./Tab.vue";
 import TabDragger from "./TabDragger.vue";
 import { TabType } from "../interfaces";
+import { useI18n } from "../composables";
+
+const { t } = useI18n();
 
 const props = defineProps({
   folder: {
@@ -187,7 +183,7 @@ async function restoreTab() {
  */
 
 onMounted(() => {
-  // opens the folder settings automaticallly
+  // opens the folder settings automatically
   if (folder.value.name === "New folder" || folder.value.name === "Cloned folder") {
     showSettings.value = true;
 
