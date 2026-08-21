@@ -167,16 +167,22 @@ hr {
 
 .folders {
   display: flex;
+  // 固定高度布局：整体锁定视口高度，详情区内部滚动，侧边栏常驻不随内容滚动
+  height: calc(100vh - 20px);
+  min-height: 500px;
 
   &__list {
     flex-basis: 175px;
     margin-right: 12px;
     position: relative;
+    flex-shrink: 0;
     // transition: all ease 0.3s;
     // overflow: hidden;
-    
+
     &__wrapper {
       width: 175px;
+      max-height: 100%;
+      overflow-y: auto;
     }
 
     &__settings {
@@ -331,6 +337,9 @@ hr {
   }
   &__detail {
     flex: 1;
+    min-width: 0;
+    max-height: 100%;
+    overflow-y: auto;
   }
 
   &--compact &__list {
@@ -341,6 +350,8 @@ hr {
   }
   &--compact &__list__wrapper {
     width: auto;
+    max-height: 100%;
+    overflow-y: auto;
   }
 }
 
@@ -508,12 +519,19 @@ hr {
 }
 
 .help-content {
-  max-height: 70vh;
+  // 自适应内容高度，仅受弹窗遮罩（含 20px padding）约束；超出部分内部滚动
+  max-height: 100%;
   overflow-y: auto;
   padding-right: 4px;
   h3 { font-size: 18px; font-weight: 600; }
   h4 { font-size: 16px; font-weight: 600; color: #333; }
   p { font-size: 14px; line-height: 1.6; }
+
+  &--panel {
+    background: #efefef;
+    border-radius: 6px;
+    padding: 15px;
+  }
 }
 
 // .row {
