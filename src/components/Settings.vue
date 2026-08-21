@@ -174,7 +174,7 @@
 
       <!-- Help Modal -->
       <div v-if="showHelp" class="panel__modal">
-        <div class="help-content">
+        <div class="help-content help-content--panel">
           <h3 class="mb15">{{ t("settings.helpContent.title") }}</h3>
 
           <p class="mb15">{{ t("settings.helpContent.overview") }}</p>
