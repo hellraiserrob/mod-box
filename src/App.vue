@@ -181,12 +181,6 @@ async function save() {
 
     chrome.storage.local.set({ rules: JSON.stringify(data.value) });
     chrome.storage.local.set({ totalActiveRules: `${activeRules.length}` });
-
-    // Update badge
-    chrome.action.setBadgeBackgroundColor({ color: "blue" });
-    chrome.action.setBadgeText({
-      text: totalActiveRules.value > 0 ? `${totalActiveRules.value}` : "",
-    });
   } else {
     window.localStorage.setItem("rules", JSON.stringify(data.value));
   }
