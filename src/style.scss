@@ -518,6 +518,13 @@ hr {
   margin-top: 20px;
 }
 
+// 帮助弹窗专用：absolute 版 modal 只能盖住所在的小卡片，
+// 改为 fixed 铺满整个 popup 视口，内部 help-content 的 max-height:100% 才有意义。
+// 注意需放在 .panel 之后以覆盖其 position；其余确认弹窗不受影响仍为 absolute。
+.panel__modal--fullscreen {
+  position: fixed;
+}
+
 .help-content {
   // 自适应内容高度，仅受弹窗遮罩（含 20px padding）约束；超出部分内部滚动
   max-height: 100%;

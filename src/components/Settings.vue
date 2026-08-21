@@ -173,7 +173,7 @@
       </div>
 
       <!-- Help Modal -->
-      <div v-if="showHelp" class="panel__modal">
+      <div v-if="showHelp" class="panel__modal panel__modal--fullscreen">
         <div class="help-content help-content--panel">
           <h3 class="mb15">{{ t("settings.helpContent.title") }}</h3>
 
