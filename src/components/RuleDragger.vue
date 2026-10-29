@@ -68,6 +68,11 @@ function onDragStart(newTmp: number) {
 }
 
 function onDragDrop(index: number) {
+  // ignore drops that did not start from a rule handle of this table, e.g. dragged text (#6)
+  if (tmp.value < 0) {
+    setTarget(-1);
+    return;
+  }
   moveRule(tmp.value, index);
 }
 

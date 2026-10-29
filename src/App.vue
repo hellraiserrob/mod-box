@@ -21,7 +21,7 @@ import { ref, onMounted, watch } from "vue";
 import type { Ref } from "vue";
 
 import { DataType, FolderType } from "./interfaces";
-import { generateRules, isChrome } from "./utils";
+import { generateRules, isChrome, removeEmptyEntries } from "./utils";
 
 import FolderPanel from "./components/FolderPanel.vue";
 
@@ -142,14 +142,14 @@ async function loadData() {
   if (isChrome) {
     const chromeData = await chrome.storage.local.get(["rules"]);
     if (chromeData.rules) {
-      data.value = JSON.parse(chromeData.rules);
+      data.value = removeEmptyEntries(JSON.parse(chromeData.rules));
     } else {
       data.value = fallbackData;
     }
   } else {
     const rules = window.localStorage.getItem("rules");
     if (rules) {
-      data.value = JSON.parse(rules);
+      data.value = removeEmptyEntries(JSON.parse(rules));
     } else {
       data.value = fallbackData;
     }

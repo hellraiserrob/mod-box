@@ -480,6 +480,7 @@
 import { ref, toRefs, computed, onMounted, onUnmounted, nextTick } from "vue";
 import type { Ref } from "vue";
 
+import { moveItem } from "../utils";
 import Editor from "./Editor.vue";
 import Dropdown from "./Dropdown.vue";
 import DropdownMenu from "./DropdownMenu.vue";
@@ -661,10 +662,7 @@ function onSetRequestHeaderTarget(tmp: number) {
 }
 
 function moveRequestHeaderRule(from: number, to: number) {
-  const rule = tab.value.requestHeaders[from];
-
-  tab.value.requestHeaders.splice(from, 1);
-  tab.value.requestHeaders.splice(to, 0, rule);
+  moveItem(tab.value.requestHeaders, from, to);
 }
 
 // response headers specifics
@@ -677,10 +675,7 @@ function onSetResponseHeaderTarget(tmp: number) {
 
 
 function moveResponseHeaderRule(from: number, to: number) {
-  const rule = tab.value.responseHeaders[from];
-
-  tab.value.responseHeaders.splice(from, 1);
-  tab.value.responseHeaders.splice(to, 0, rule);
+  moveItem(tab.value.responseHeaders, from, to);
 }
 
 // blocked request specifics
@@ -692,10 +687,7 @@ function onSetBlockedTarget(tmp: number) {
 }
 
 function moveBlockedRule(from: number, to: number) {
-  const rule = tab.value.blockedRequests[from];
-
-  tab.value.blockedRequests.splice(from, 1);
-  tab.value.blockedRequests.splice(to, 0, rule);
+  moveItem(tab.value.blockedRequests, from, to);
 }
 
 // redirect requests specifics
@@ -707,10 +699,7 @@ function onSetRedirectTarget(tmp: number) {
 }
 
 function moveRedirectRule(from: number, to: number) {
-  const rule = tab.value.redirectRequests[from];
-
-  tab.value.redirectRequests.splice(from, 1);
-  tab.value.redirectRequests.splice(to, 0, rule);
+  moveItem(tab.value.redirectRequests, from, to);
 }
 
 function deleteTab() {

@@ -135,7 +135,7 @@ import { ref, onMounted, type PropType } from "vue";
 import * as _ from "lodash";
 
 import { DataType, FolderType } from "../interfaces";
-import { isChrome } from "../utils";
+import { isChrome, moveItem } from "../utils";
 
 import Folder from "./Folder.vue";
 import FolderDragger from "./FolderDragger.vue";
@@ -212,10 +212,9 @@ function cloneFolder(folder: FolderType) {
 }
 
 function moveFolder(from: number, to: number) {
-  const folder = props.data.folders[from];
-  props.data.folders.splice(from, 1);
-  props.data.folders.splice(to, 0, folder);
-  setFolder(to, false);
+  if (moveItem(props.data.folders, from, to)) {
+    setFolder(to, false);
+  }
 }
 
 function toggleActive(folder: FolderType) {
