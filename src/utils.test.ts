@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { generateRules, parseDomains, cleanDomain } from './utils';
+import { generateRules, parseDomains, cleanDomain, moveItem, removeEmptyEntries } from './utils';
 import { DataType } from './interfaces';
 
 /**
@@ -797,5 +797,103 @@ describe('generateRules security and limits', () => {
     expect(uniqueIds.size).toBe(rules.length);
     // IDs should be sequential starting from 1
     expect(ids).toEqual([1, 2, 3, 4]);
+  });
+});
+
+describe('moveItem', () => {
+  it('moves an item forward', () => {
+    const items = ['a', 'b', 'c'];
+    expect(moveItem(items, 0, 2)).toBe(true);
+    expect(items).toEqual(['b', 'c', 'a']);
+  });
+
+  it('moves an item backward', () => {
+    const items = ['a', 'b', 'c'];
+    expect(moveItem(items, 2, 0)).toBe(true);
+    expect(items).toEqual(['c', 'a', 'b']);
+  });
+
+  it('keeps the array unchanged when from equals to', () => {
+    const items = ['a', 'b', 'c'];
+    expect(moveItem(items, 1, 1)).toBe(true);
+    expect(items).toEqual(['a', 'b', 'c']);
+  });
+
+  it('ignores a drop without dragstart (from = -1) instead of removing the last item (#6)', () => {
+    const items = ['a', 'b'];
+    expect(moveItem(items, -1, 1)).toBe(false);
+    expect(items).toEqual(['a', 'b']);
+  });
+
+  it('ignores out of range indexes', () => {
+    const items = ['a', 'b'];
+    expect(moveItem(items, 2, 0)).toBe(false);
+    expect(moveItem(items, 0, 2)).toBe(false);
+    expect(moveItem(items, 0, -1)).toBe(false);
+    expect(moveItem(items, 0.5, 1)).toBe(false);
+    expect(items).toEqual(['a', 'b']);
+  });
+
+  it('ignores moves in an empty array', () => {
+    const items: string[] = [];
+    expect(moveItem(items, 0, 0)).toBe(false);
+    expect(items).toEqual([]);
+  });
+});
+
+describe('removeEmptyEntries', () => {
+  it('removes null folders persisted by #6', () => {
+    const folder = createFolder({ tabs: [createTab()] });
+    const data = createData({ folders: [null, folder] as any });
+
+    expect(removeEmptyEntries(data).folders).toEqual([folder]);
+  });
+
+  it('removes null tabs and null rules', () => {
+    const header = createHeaderRule();
+    const data = createData({
+      folders: [
+        createFolder({
+          tabs: [
+            null,
+            createTab({
+              requestHeaders: [null, header],
+              responseHeaders: [null],
+              blockedRequests: [null, createBlockRule()],
+              redirectRequests: [createRedirectRule(), null],
+            }),
+          ],
+        }),
+      ] as any,
+    });
+
+    const tab = removeEmptyEntries(data).folders[0].tabs[0];
+    expect(data.folders[0].tabs).toHaveLength(1);
+    expect(tab.requestHeaders).toEqual([header]);
+    expect(tab.responseHeaders).toEqual([]);
+    expect(tab.blockedRequests).toHaveLength(1);
+    expect(tab.redirectRequests).toHaveLength(1);
+  });
+
+  it('keeps valid data unchanged', () => {
+    const data = createData({
+      folders: [createFolder({ tabs: [createTab({ requestHeaders: [createHeaderRule()] })] })],
+    });
+    const expected = structuredClone(data);
+
+    expect(removeEmptyEntries(data)).toEqual(expected);
+  });
+
+  it('tolerates missing folders or tabs', () => {
+    expect(removeEmptyEntries({ active: true } as any)).toEqual({ active: true });
+    expect(removeEmptyEntries(createData({ folders: [{ name: 'x', active: true } as any] })).folders).toHaveLength(1);
+  });
+
+  it('keeps generated rules of the remaining folders', () => {
+    const data = createData({
+      folders: [null, createFolder({ tabs: [createTab({ requestHeaders: [createHeaderRule()] })] })] as any,
+    });
+
+    expect(generateRules(removeEmptyEntries(data))).toHaveLength(1);
   });
 });

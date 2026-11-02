@@ -243,3 +243,47 @@ export function cleanDomain(domain: string): string {
   }
   return domain.trim().replace(/^https?:\/\//i, "");
 }
+
+/**
+ * Move an array item from one index to another, in place.
+ * Out of range indexes are ignored, e.g. a drop without a matching dragstart
+ * (from = -1) would otherwise remove the last item and insert undefined (#6)
+ */
+export function moveItem<T>(items: T[], from: number, to: number): boolean {
+  const inRange = (index: number) =>
+    Number.isInteger(index) && index >= 0 && index < items.length;
+
+  if (!inRange(from) || !inRange(to)) {
+    return false;
+  }
+
+  const [item] = items.splice(from, 1);
+  items.splice(to, 0, item);
+  return true;
+}
+
+/**
+ * Remove null entries from folders, tabs and rule lists.
+ * Repairs data that was persisted while affected by #6
+ */
+export function removeEmptyEntries(data: DataType): DataType {
+  if (!Array.isArray(data?.folders)) {
+    return data;
+  }
+
+  data.folders = data.folders.filter(Boolean);
+
+  for (const folder of data.folders) {
+    if (!Array.isArray(folder.tabs)) continue;
+    folder.tabs = folder.tabs.filter(Boolean);
+
+    for (const tab of folder.tabs) {
+      if (Array.isArray(tab.requestHeaders)) tab.requestHeaders = tab.requestHeaders.filter(Boolean);
+      if (Array.isArray(tab.responseHeaders)) tab.responseHeaders = tab.responseHeaders.filter(Boolean);
+      if (Array.isArray(tab.blockedRequests)) tab.blockedRequests = tab.blockedRequests.filter(Boolean);
+      if (Array.isArray(tab.redirectRequests)) tab.redirectRequests = tab.redirectRequests.filter(Boolean);
+    }
+  }
+
+  return data;
+}

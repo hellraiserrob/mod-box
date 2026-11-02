@@ -75,6 +75,11 @@ function onDragStart(index: number) {
 }
 
 function onDragDrop(index: number) {
+  // ignore drops that did not start from a folder handle, e.g. dragged text (#6)
+  if (tmp.value < 0) {
+    target.value = -1;
+    return;
+  }
   switcher(tmp.value, index);
 }
 

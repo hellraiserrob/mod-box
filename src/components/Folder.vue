@@ -88,7 +88,7 @@ import { ref, toRefs, onMounted, nextTick } from "vue";
 import type { Ref } from "vue";
 import * as _ from "lodash";
 
-import { isChrome } from "../utils"
+import { isChrome, moveItem } from "../utils"
 import Tab from "./Tab.vue";
 import TabDragger from "./TabDragger.vue";
 import { TabType } from "../interfaces";
@@ -128,12 +128,9 @@ function toggleTab(tab: TabType) {
 }
 
 function moveTab(from: number, to: number) {
-  const tab = folder.value.tabs[from];
-
-  folder.value.tabs.splice(from, 1);
-  folder.value.tabs.splice(to, 0, tab);
-
-  setTab(to);
+  if (moveItem(folder.value.tabs, from, to)) {
+    setTab(to);
+  }
 }
 
 function deleteTab(targetTab: any) {
