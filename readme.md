@@ -10,6 +10,7 @@ A compact and easy to use extension for modifying HTTP request & response header
 - Scope your tabs and rules to specific domains and url criteria
 - Organise your rules by a folder and tab structure, with drag'n'drop and clone
 - Quickly toggle individual rules, tabs, folders and globally
+- Use the Auto, Light, or Dark buttons under Settings > Theme. Your selection is saved when you reopen the popup. Auto is the default and follows your operating system's appearance.
 - No tracking, no commercial version, no funny business
 
 ## Links

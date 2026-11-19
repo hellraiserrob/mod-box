@@ -47,6 +47,8 @@ export interface DataType {
   folders: FolderType[];
 }
 
+export type ThemePreference = 'auto' | 'light' | 'dark';
+
 export interface ExportPayload {
   name: 'modbox';
   version: number;
@@ -56,6 +58,10 @@ export interface ExportPayload {
 /**
  * Type guards for runtime validation
  */
+export function isValidThemePreference(value: unknown): value is ThemePreference {
+  return value === 'auto' || value === 'light' || value === 'dark';
+}
+
 export function isValidRuleCondition(obj: unknown): obj is RuleCondition {
   if (!obj || typeof obj !== 'object') return false;
   const cond = obj as Record<string, unknown>;

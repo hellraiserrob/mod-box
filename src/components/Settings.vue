@@ -4,9 +4,34 @@
       <h3>Settings</h3>
     </div>
 
+    <div class="panel panel--large mb20">
+      <h3 class="mb10">
+        <span id="theme-heading">Theme</span>
+        <span class="tag">New</span>
+      </h3>
+      <p class="mb20" id="theme-description">Auto follows your operating system's appearance.</p>
+      <div
+        class="panel__actions btn-group theme-options"
+        role="group"
+        aria-labelledby="theme-heading"
+        aria-describedby="theme-description"
+      >
+        <button
+          v-for="option in themeOptions"
+          :key="option.value"
+          type="button"
+          class="btn"
+          :aria-pressed="theme === option.value"
+          @click="emit('themeChanged', option.value)"
+        >
+          {{ option.label }}
+        </button>
+      </div>
+    </div>
+
     <!-- Compact Mode -->
     <div class="panel panel--large mb20">
-      <h3 class="mb10">Compact mode <div class="tag">New</div></h3>
+      <h3 class="mb10">Compact mode</h3>
       <p class="mb20">
         If you need a bit more space to work with your rules, compact mode reduces the left hand column width.
       </p>
@@ -20,10 +45,7 @@
 
     <!-- Export -->
     <div class="panel panel--large mb20">
-      <h3 class="mb10">
-        Export
-        <div class="tag">New</div>
-      </h3>
+      <h3 class="mb10">Export</h3>
       <p class="mb20">
         You can export your rules into .json packages to backup, or send
         to friends/colleagues. Check the folders you want and click
@@ -75,10 +97,7 @@
 
     <!-- Import -->
     <div class="panel panel--large mb20">
-      <h3 class="mb10">
-        Import
-        <div class="tag">New</div>
-      </h3>
+      <h3 class="mb10">Import</h3>
       <p class="mb20">
         You can select and import modbox backup files and append them to
         your current set of folders, tabs and rules.
@@ -200,7 +219,7 @@
 <script setup lang="ts">
 import { ref, type PropType } from "vue";
 import type { Ref } from "vue";
-import { FolderType, isValidExportPayload } from "../interfaces";
+import { FolderType, isValidExportPayload, type ThemePreference } from "../interfaces";
 
 const props = defineProps({
   folders: {
@@ -211,13 +230,24 @@ const props = defineProps({
     type: Boolean,
     required: true,
   },
+  theme: {
+    type: String as PropType<ThemePreference>,
+    required: true,
+  },
 });
 
 const emit = defineEmits<{
   toggleCompact: [];
+  themeChanged: [theme: ThemePreference];
   reset: [];
   importFolders: [folders: FolderType[]];
 }>();
+
+const themeOptions: { value: ThemePreference; label: string }[] = [
+  { value: "auto", label: "Auto" },
+  { value: "light", label: "Light" },
+  { value: "dark", label: "Dark" },
+];
 
 /**
  * Reactive state

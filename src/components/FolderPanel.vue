@@ -122,7 +122,9 @@
         v-else
         :folders="data.folders"
         :compact="compact"
+        :theme="theme"
         @toggleCompact="toggleCompact"
+        @themeChanged="$emit('themeChanged', $event)"
         @reset="$emit('reset')"
         @importFolders="importFolders"
       />
@@ -134,7 +136,7 @@
 import { ref, onMounted, type PropType } from "vue";
 import * as _ from "lodash";
 
-import { DataType, FolderType } from "../interfaces";
+import { DataType, FolderType, type ThemePreference } from "../interfaces";
 import { isChrome, moveItem } from "../utils";
 
 import Folder from "./Folder.vue";
@@ -148,6 +150,10 @@ const props = defineProps({
   },
   totalActiveRules: {
     type: Number,
+    required: true,
+  },
+  theme: {
+    type: String as PropType<ThemePreference>,
     required: true,
   },
   initialActiveFolder: {
@@ -165,6 +171,7 @@ const emit = defineEmits<{
   reset: [];
   importFolders: [folders: FolderType[]];
   compactChanged: [compact: boolean];
+  themeChanged: [theme: ThemePreference];
   activeFolderChanged: [index: number, saveTab: boolean];
 }>();
 
@@ -240,7 +247,7 @@ function importFolders(folders: FolderType[]) {
 }
 
 /**
- * Restore active folder from storage
+ * Restore popup preferences from storage
  */
 onMounted(async () => {
   if (isChrome) {

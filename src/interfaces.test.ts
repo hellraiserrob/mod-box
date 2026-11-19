@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
+  isValidThemePreference,
   isValidRuleCondition,
   isValidHeaderRule,
   isValidBlockedRequest,
@@ -11,6 +12,16 @@ import {
 } from './interfaces';
 
 describe('Type Guards', () => {
+  describe('isValidThemePreference', () => {
+    it.each(['auto', 'light', 'dark'])('accepts %s', (value) => {
+      expect(isValidThemePreference(value)).toBe(true);
+    });
+
+    it.each([undefined, null, '', 'sepia', 1])('rejects %s', (value) => {
+      expect(isValidThemePreference(value)).toBe(false);
+    });
+  });
+
   describe('isValidRuleCondition', () => {
     it('returns true for valid condition', () => {
       expect(isValidRuleCondition({

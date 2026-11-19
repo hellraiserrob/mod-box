@@ -7,6 +7,8 @@
       v-if="data.folders"
       :data="data"
       :totalActiveRules="totalActiveRules"
+      :theme="theme"
+      @themeChanged="saveTheme"
       @toggleGlobalActive="toggleGlobalActive"
       @reset="reset"
       @importFolders="importFolders"
@@ -20,10 +22,17 @@
 import { ref, onMounted, watch } from "vue";
 import type { Ref } from "vue";
 
-import { DataType, FolderType } from "./interfaces";
+import { DataType, FolderType, type ThemePreference } from "./interfaces";
 import { generateRules, isChrome, removeEmptyEntries } from "./utils";
 
 import FolderPanel from "./components/FolderPanel.vue";
+
+const props = defineProps<{ initialTheme: ThemePreference }>();
+const theme = ref(props.initialTheme);
+
+watch(theme, (value) => {
+  document.documentElement.dataset.theme = value;
+}, { immediate: true });
 
 /**
  * Default data structure
@@ -73,6 +82,19 @@ function reset() {
 
 function importFolders(folders: FolderType[]) {
   data.value.folders.push(...folders);
+}
+
+async function saveTheme(value: ThemePreference) {
+  theme.value = value;
+  try {
+    if (isChrome) {
+      await chrome.storage.local.set({ theme: value });
+    } else {
+      window.localStorage.setItem("theme", value);
+    }
+  } catch (error) {
+    console.error("Could not save theme preference", error);
+  }
 }
 
 function saveCompact(compact: boolean) {
